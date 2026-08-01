@@ -1,0 +1,163 @@
+[
+  {
+    "id": 101,
+    "name": "Zinedine Zidane",
+    "position": "MID",
+    "rating": 99,
+    "image": "/players/zinedine-zidane.png"
+  },
+  {
+    "id": 102,
+    "name": "Luka Modric",
+    "position": "MID",
+    "rating": 97,
+    "image": "/players/luka-modric.png"
+  },
+  {
+    "id": 103,
+    "name": "Andres Iniesta",
+    "position": "MID",
+    "rating": 98,
+    "image": "/players/andres-iniesta.png"
+  },
+  {
+    "id": 104,
+    "name": "Xavi",
+    "position": "MID",
+    "rating": 98,
+    "image": "/players/xavi.png"
+  },
+  {
+    "id": 105,
+    "name": "Kevin De Bruyne",
+    "position": "MID",
+    "rating": 97,
+    "image": "/players/kevin-de-bruyne.png"
+  },
+  {
+    "id": 106,
+    "name": "Toni Kroos",
+    "position": "MID",
+    "rating": 96,
+    "image": "/players/toni-kroos.png"
+  },
+  {
+    "id": 107,
+    "name": "Andrea Pirlo",
+    "position": "MID",
+    "rating": 96,
+    "image": "/players/andrea-pirlo.png"
+  },
+  {
+    "id": 108,
+    "name": "Steven Gerrard",
+    "position": "MID",
+    "rating": 96,
+    "image": "/players/steven-gerrard.png"
+  },
+  {
+    "id": 109,
+    "name": "Frank Lampard",
+    "position": "MID",
+    "rating": 95,
+    "image": "/players/frank-lampard.png"
+  },
+  {
+    "id": 110,
+    "name": "Paul Scholes",
+    "position": "MID",
+    "rating": 95,
+    "image": "/players/paul-scholes.png"
+  },
+  {
+    "id": 111,
+    "name": "Patrick Vieira",
+    "position": "MID",
+    "rating": 96,
+    "image": "/players/patrick-vieira.png"
+  },
+  {
+    "id": 112,
+    "name": "Claude Makelele",
+    "position": "MID",
+    "rating": 95,
+    "image": "/players/claude-makelele.png"
+  },
+  {
+    "id": 113,
+    "name": "Rodri",
+    "position": "MID",
+    "rating": 96,
+    "image": "/players/rodri.png"
+  },
+  {
+    "id": 114,
+    "name": "Jude Bellingham",
+    "position": "MID",
+    "rating": 95,
+    "image": "/players/jude-bellingham.png"
+  },
+  {
+    "id": 115,
+    "name": "Pedri",
+    "position": "MID",
+    "rating": 94,
+    "image": "/players/pedri.png"
+  },
+  {
+    "id": 116,
+    "name": "Bruno Fernandes",
+    "position": "MID",
+    "rating": 94,
+    "image": "/players/bruno-fernandes.png"
+  },
+  {
+    "id": 117,
+    "name": "Kaka",
+    "position": "MID",
+    "rating": 97,
+    "image": "/players/kaka.png"
+  },
+  {
+    "id": 118,
+    "name": "Michael Ballack",
+    "position": "MID",
+    "rating": 95,
+    "image": "/players/michael-ballack.png"
+  },
+  {
+    "id": 119,
+    "name": "Mesut Ozil",
+    "position": "MID",
+    "rating": 94,
+    "image": "/players/mesut-ozil.png"
+  },
+  {
+    "id": 120,
+    "name": "Yaya Toure",
+    "position": "MID",
+    "rating": 96,
+    "image": "/players/yaya-toure.png"
+  },
+  {
+    "id": 121,
+    "name": "Cesc Fabregas",
+    "position": "MID",
+    "rating": 94,
+    "image": "/players/cesc-fabregas.png"
+  },
+  {
+    "id": 122,
+    "name": "David Silva",
+    "position": "MID",
+    "rating": 96,
+    "image": "/players/david-silva.png"
+  },
+  {
+    "id": 123,
+    "name": "Kevin De Bruyne",
+    "position": "MID",
+    "rating": 97,
+    "image": "/players/kevin-de-bruyne.png"
+  }
+]

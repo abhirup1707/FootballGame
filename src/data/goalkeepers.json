@@ -1,0 +1,107 @@
+[
+  {
+    "id": 301,
+    "name": "Gianluigi Buffon",
+    "position": "GK",
+    "rating": 98,
+    "image": "/players/gianluigi-buffon.png"
+  },
+  {
+    "id": 302,
+    "name": "Manuel Neuer",
+    "position": "GK",
+    "rating": 98,
+    "image": "/players/manuel-neuer.png"
+  },
+  {
+    "id": 303,
+    "name": "Iker Casillas",
+    "position": "GK",
+    "rating": 97,
+    "image": "/players/iker-casillas.png"
+  },
+  {
+    "id": 304,
+    "name": "Lev Yashin",
+    "position": "GK",
+    "rating": 99,
+    "image": "/players/lev-yashin.png"
+  },
+  {
+    "id": 305,
+    "name": "Petr Cech",
+    "position": "GK",
+    "rating": 96,
+    "image": "/players/petr-cech.png"
+  },
+  {
+    "id": 306,
+    "name": "Oliver Kahn",
+    "position": "GK",
+    "rating": 97,
+    "image": "/players/oliver-kahn.png"
+  },
+  {
+    "id": 307,
+    "name": "Edwin van der Sar",
+    "position": "GK",
+    "rating": 96,
+    "image": "/players/edwin-van-der-sar.png"
+  },
+  {
+    "id": 308,
+    "name": "Alisson",
+    "position": "GK",
+    "rating": 95,
+    "image": "/players/alisson.png"
+  },
+  {
+    "id": 309,
+    "name": "Thibaut Courtois",
+    "position": "GK",
+    "rating": 96,
+    "image": "/players/thibaut-courtois.png"
+  },
+  {
+    "id": 310,
+    "name": "Jan Oblak",
+    "position": "GK",
+    "rating": 95,
+    "image": "/players/jan-oblak.png"
+  },
+  {
+    "id": 311,
+    "name": "Dino Zoff",
+    "position": "GK",
+    "rating": 96,
+    "image": "/players/dino-zoff.png"
+  },
+  {
+    "id": 312,
+    "name": "Peter Schmeichel",
+    "position": "GK",
+    "rating": 98,
+    "image": "/players/peter-schmeichel.png"
+  },
+  {
+    "id": 313,
+    "name": "David Seaman",
+    "position": "GK",
+    "rating": 93,
+    "image": "/players/david-seaman.png"
+  },
+  {
+    "id": 314,
+    "name": "Victor Valdes",
+    "position": "GK",
+    "rating": 93,
+    "image": "/players/victor-valdes.png"
+  },
+  {
+    "id": 315,
+    "name": "Emiliano Martinez",
+    "position": "GK",
+    "rating": 94,
+    "image": "/players/emiliano-martinez.png"
+  }
+]

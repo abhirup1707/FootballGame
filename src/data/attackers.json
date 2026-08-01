@@ -1,0 +1,177 @@
+[
+  {
+    "id": 1,
+    "name": "Lionel Messi",
+    "position": "ATT",
+    "rating": 99,
+    "image": "/players/lionel-messi.png"
+  },
+  {
+    "id": 2,
+    "name": "Cristiano Ronaldo",
+    "position": "ATT",
+    "rating": 98,
+    "image": "/players/cristiano-ronaldo.png"
+  },
+  {
+    "id": 3,
+    "name": "Neymar",
+    "position": "ATT",
+    "rating": 96,
+    "image": "/players/neymar.png"
+  },
+  {
+    "id": 4,
+    "name": "Kylian Mbappe",
+    "position": "ATT",
+    "rating": 97,
+    "image": "/players/kylian-mbappe.png"
+  },
+  {
+    "id": 5,
+    "name": "Thierry Henry",
+    "position": "ATT",
+    "rating": 98,
+    "image": "/players/thierry-henry.png"
+  },
+  {
+    "id": 6,
+    "name": "Luis Suarez",
+    "position": "ATT",
+    "rating": 96,
+    "image": "/players/luis-suarez.png"
+  },
+  {
+    "id": 7,
+    "name": "Mohamed Salah",
+    "position": "ATT",
+    "rating": 96,
+    "image": "/players/mohamed-salah.png"
+  },
+  {
+    "id": 8,
+    "name": "Robert Lewandowski",
+    "position": "ATT",
+    "rating": 96,
+    "image": "/players/robert-lewandowski.png"
+  },
+  {
+    "id": 9,
+    "name": "Karim Benzema",
+    "position": "ATT",
+    "rating": 95,
+    "image": "/players/karim-benzema.png"
+  },
+  {
+    "id": 10,
+    "name": "Ronaldinho",
+    "position": "ATT",
+    "rating": 98,
+    "image": "/players/ronaldinho.png"
+  },
+  {
+    "id": 11,
+    "name": "Ronaldo Nazario",
+    "position": "ATT",
+    "rating": 99,
+    "image": "/players/ronaldo-nazario.png"
+  },
+  {
+    "id": 12,
+    "name": "Gareth Bale",
+    "position": "ATT",
+    "rating": 93,
+    "image": "/players/gareth-bale.png"
+  },
+  {
+    "id": 13,
+    "name": "Harry Kane",
+    "position": "ATT",
+    "rating": 95,
+    "image": "/players/harry-kane.png"
+  },
+  {
+    "id": 14,
+    "name": "Erling Haaland",
+    "position": "ATT",
+    "rating": 96,
+    "image": "/players/erling-haaland.png"
+  },
+  {
+    "id": 15,
+    "name": "Sadio Mane",
+    "position": "ATT",
+    "rating": 93,
+    "image": "/players/sadio-mane.png"
+  },
+  {
+    "id": 16,
+    "name": "Didier Drogba",
+    "position": "ATT",
+    "rating": 94,
+    "image": "/players/didier-drogba.png"
+  },
+  {
+    "id": 17,
+    "name": "Samuel Eto'o",
+    "position": "ATT",
+    "rating": 95,
+    "image": "/players/samuel-eto-o.png"
+  },
+  {
+    "id": 18,
+    "name": "Wayne Rooney",
+    "position": "ATT",
+    "rating": 95,
+    "image": "/players/wayne-rooney.png"
+  },
+  {
+    "id": 19,
+    "name": "David Villa",
+    "position": "ATT",
+    "rating": 94,
+    "image": "/players/david-villa.png"
+  },
+  {
+    "id": 20,
+    "name": "Vinicius Jr",
+    "position": "ATT",
+    "rating": 94,
+    "image": "/players/vinicius-jr.png"
+  },
+  {
+    "id": 21,
+    "name": "George Best",
+    "position": "ATT",
+    "rating": 96,
+    "image": "/players/george-best.png"
+  },
+  {
+    "id": 22,
+    "name": "Marco van Basten",
+    "position": "ATT",
+    "rating": 97,
+    "image": "/players/marco-van-basten.png"
+  },
+  {
+    "id": 23,
+    "name": "Ruud van Nistelrooy",
+    "position": "ATT",
+    "rating": 94,
+    "image": "/players/ruud-van-nistelrooy.png"
+  },
+  {
+    "id": 24,
+    "name": "Antoine Griezmann",
+    "position": "ATT",
+    "rating": 94,
+    "image": "/players/antoine-griezmann.png"
+  },
+  {
+    "id": 25,
+    "name": "Son Heung-min",
+    "position": "ATT",
+    "rating": 94,
+    "image": "/players/son-heung-min.png"
+  }
+]

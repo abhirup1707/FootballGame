@@ -1,0 +1,170 @@
+[
+  {
+    "id": 201,
+    "name": "Paolo Maldini",
+    "position": "DEF",
+    "rating": 99,
+    "image": "/players/paolo-maldini.png"
+  },
+  {
+    "id": 202,
+    "name": "Sergio Ramos",
+    "position": "DEF",
+    "rating": 97,
+    "image": "/players/sergio-ramos.png"
+  },
+  {
+    "id": 203,
+    "name": "Carles Puyol",
+    "position": "DEF",
+    "rating": 96,
+    "image": "/players/carles-puyol.png"
+  },
+  {
+    "id": 204,
+    "name": "Franz Beckenbauer",
+    "position": "DEF",
+    "rating": 99,
+    "image": "/players/franz-beckenbauer.png"
+  },
+  {
+    "id": 205,
+    "name": "Fabio Cannavaro",
+    "position": "DEF",
+    "rating": 96,
+    "image": "/players/fabio-cannavaro.png"
+  },
+  {
+    "id": 206,
+    "name": "Alessandro Nesta",
+    "position": "DEF",
+    "rating": 96,
+    "image": "/players/alessandro-nesta.png"
+  },
+  {
+    "id": 207,
+    "name": "Virgil van Dijk",
+    "position": "DEF",
+    "rating": 96,
+    "image": "/players/virgil-van-dijk.png"
+  },
+  {
+    "id": 208,
+    "name": "Rio Ferdinand",
+    "position": "DEF",
+    "rating": 95,
+    "image": "/players/rio-ferdinand.png"
+  },
+  {
+    "id": 209,
+    "name": "Nemanja Vidic",
+    "position": "DEF",
+    "rating": 95,
+    "image": "/players/nemanja-vidic.png"
+  },
+  {
+    "id": 210,
+    "name": "John Terry",
+    "position": "DEF",
+    "rating": 95,
+    "image": "/players/john-terry.png"
+  },
+  {
+    "id": 211,
+    "name": "Ashley Cole",
+    "position": "DEF",
+    "rating": 94,
+    "image": "/players/ashley-cole.png"
+  },
+  {
+    "id": 212,
+    "name": "Philipp Lahm",
+    "position": "DEF",
+    "rating": 97,
+    "image": "/players/philipp-lahm.png"
+  },
+  {
+    "id": 213,
+    "name": "Cafu",
+    "position": "DEF",
+    "rating": 96,
+    "image": "/players/cafu.png"
+  },
+  {
+    "id": 214,
+    "name": "Roberto Carlos",
+    "position": "DEF",
+    "rating": 96,
+    "image": "/players/roberto-carlos.png"
+  },
+  {
+    "id": 215,
+    "name": "Javier Zanetti",
+    "position": "DEF",
+    "rating": 96,
+    "image": "/players/javier-zanetti.png"
+  },
+  {
+    "id": 216,
+    "name": "Ruben Dias",
+    "position": "DEF",
+    "rating": 94,
+    "image": "/players/ruben-dias.png"
+  },
+  {
+    "id": 217,
+    "name": "Thiago Silva",
+    "position": "DEF",
+    "rating": 95,
+    "image": "/players/thiago-silva.png"
+  },
+  {
+    "id": 218,
+    "name": "Marquinhos",
+    "position": "DEF",
+    "rating": 94,
+    "image": "/players/marquinhos.png"
+  },
+  {
+    "id": 219,
+    "name": "Gerard Pique",
+    "position": "DEF",
+    "rating": 95,
+    "image": "/players/gerard-pique.png"
+  },
+  {
+    "id": 220,
+    "name": "Jaap Stam",
+    "position": "DEF",
+    "rating": 95,
+    "image": "/players/jaap-stam.png"
+  },
+  {
+    "id": 221,
+    "name": "Bobby Moore",
+    "position": "DEF",
+    "rating": 97,
+    "image": "/players/bobby-moore.png"
+  },
+  {
+    "id": 222,
+    "name": "Alessandro Nesta",
+    "position": "DEF",
+    "rating": 96,
+    "image": "/players/alessandro-nesta.png"
+  },
+  {
+    "id": 223,
+    "name": "Philipp Lahm",
+    "position": "DEF",
+    "rating": 97,
+    "image": "/players/philipp-lahm.png"
+  },
+  {
+    "id": 224,
+    "name": "Marcelo",
+    "position": "DEF",
+    "rating": 94,
+    "image": "/players/marcelo.png"
+  }
+]

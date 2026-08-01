@@ -1,0 +1,4 @@
+Player portraits downloaded from Wikimedia/Wikipedia thumbnails on 2026-08-01T19:32:12.074Z.
+
+Failures:
+None

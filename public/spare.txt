@@ -1,0 +1,166 @@
+socket.on(
+  "submitChoice",
+  ({ roomCode, number }) => {
+
+    const room =
+      rooms[roomCode];
+
+    if (!room) return;
+
+    room.choices[
+      socket.id
+    ] = number;
+
+    if (
+      Object.keys(
+        room.choices
+      ).length < 2
+    ) {
+      return;
+    }
+
+    const p1 =
+      room.players[0].id;
+
+    const p2 =
+      room.players[1].id;
+
+    const c1 =
+      room.choices[p1];
+
+    const c2 =
+      room.choices[p2];
+
+    room.choices = {};
+
+    
+
+    if (!room.goalMode) {
+
+      if (c1 === c2) {
+
+        if (
+          room.possession ===
+            room.higherRatedPlayer &&
+          !room.shieldUsed
+        ) {
+
+          room.shieldUsed =
+            true;
+
+          room.commentary =
+            "🛡 Shield Activated!";
+
+        } else {
+
+          room.passes = 0;
+
+          room.possession =
+            room.possession === p1
+              ? p2
+              : p1;
+
+          room.commentary =
+            "Interception!";
+        }
+
+      } else {
+
+        room.passes++;
+
+        room.commentary =
+          `Pass Completed (${room.passes}/6)`;
+
+        if (
+          room.passes >= 6
+        ) {
+
+          room.goalMode =
+            true;
+
+          room.commentary =
+            "⚽ SHOOTING CHANCE!";
+        }
+      }
+
+    } else {
+
+      if (c1 !== c2) {
+
+        if (
+          room.possession === p1
+        ) {
+          room.scoreA++;
+        } else {
+          room.scoreB++;
+        }
+
+        room.commentary =
+          "GOAL ⚽";
+
+      } else {
+
+        room.commentary =
+          "Great Save 🧤";
+      }
+
+      room.goalMode =
+        false;
+
+      room.passes = 0;
+
+      room.possession =
+        room.possession === p1
+          ? p2
+          : p1;
+    }
+
+    if (
+      room.scoreA >= 3 ||
+      room.scoreB >= 3 
+      
+    ) {
+
+      io.to(roomCode).emit(
+        "matchFinished",
+        {
+          scoreA:
+            room.scoreA,
+
+          scoreB:
+            room.scoreB,
+        }
+      );
+
+      return;
+    }
+
+    io.to(roomCode).emit(
+      "matchUpdate",
+      {
+        scoreA:
+          room.scoreA,
+
+        scoreB:
+          room.scoreB,
+
+        passes:
+          room.passes,
+
+        goalMode:
+          room.goalMode,
+
+        possession:
+          room.possession,
+
+        shieldUsed:
+          room.shieldUsed,
+
+        commentary:
+          room.commentary,
+
+        
+      }
+    );
+  }
+);

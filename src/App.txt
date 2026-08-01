@@ -1,0 +1,196 @@
+import { useEffect, useState } from "react";
+import Header from "./components/Header";
+import FormationSelector from "./components/FormationSelector";
+import PlayerList from "./components/PlayerList";
+import SquadBoard from "./components/SquadBoard";
+import playersData from "./data/playerSeasons.json";
+import "./App.css";
+
+export default function App() {
+  const [formation, setFormation] = useState("4-3-3");
+
+  const [draftedPlayers, setDraftedPlayers] = useState([]);
+
+  const [currentPack, setCurrentPack] = useState([]);
+
+  const [positions, setPositions] = useState({
+    GK: null,
+
+    LB: null,
+    CB1: null,
+    CB2: null,
+    RB: null,
+
+    CM1: null,
+    CM2: null,
+    CAM: null,
+
+    LW: null,
+    ST: null,
+    RW: null,
+  });
+
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
+
+  useEffect(() => {
+    generatePack([]);
+  }, []);
+
+  function generatePack(existingDraft) {
+    const draftedNames = existingDraft.map(
+      (player) => player.name
+    );
+
+    const remaining = playersData.filter(
+      (player) =>
+        !draftedNames.includes(player.name)
+    );
+
+    const goalkeepers = remaining.filter(
+      (p) => p.position === "GK"
+    );
+
+    const outfieldPlayers = remaining.filter(
+      (p) => p.position !== "GK"
+    );
+
+    const randomGK =
+      goalkeepers.length > 0
+        ? goalkeepers[
+            Math.floor(
+              Math.random() * goalkeepers.length
+            )
+          ]
+        : null;
+
+    const shuffledOutfield = [...outfieldPlayers]
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 9);
+
+    const pack = [randomGK, ...shuffledOutfield]
+      .filter(Boolean)
+      .sort(() => Math.random() - 0.5);
+
+    setCurrentPack(pack);
+  }
+
+  function draftPlayer(player) {
+    if (draftedPlayers.length >= 14) {
+      alert("Draft complete.");
+      return;
+    }
+
+    const duplicatePlayer =
+      draftedPlayers.some(
+        (p) => p.name === player.name
+      );
+
+    if (duplicatePlayer) {
+      alert(
+        `${player.name} has already been drafted.`
+      );
+      return;
+    }
+
+    const updatedDraft = [
+      ...draftedPlayers,
+      player,
+    ];
+
+    setDraftedPlayers(updatedDraft);
+
+    localStorage.setItem(
+      "footballDraftSquad",
+      JSON.stringify(updatedDraft)
+    );
+
+    generatePack(updatedDraft);
+  }
+
+  function assignPlayer(positionKey) {
+    if (!selectedPlayer) return;
+
+    if (
+      positionKey === "GK" &&
+      selectedPlayer.position !== "GK"
+    ) {
+      alert(
+        "Only goalkeepers can be placed in the GK position."
+      );
+      return;
+    }
+
+    if (
+      positionKey !== "GK" &&
+      selectedPlayer.position === "GK"
+    ) {
+      alert(
+        "Goalkeepers can only be placed in the GK position."
+      );
+      return;
+    }
+
+    const alreadyUsed = Object.values(
+      positions
+    ).some(
+      (player) =>
+        player?.id === selectedPlayer.id
+    );
+
+    if (alreadyUsed) {
+      alert("Player already assigned.");
+      return;
+    }
+
+    setPositions((prev) => ({
+      ...prev,
+      [positionKey]: selectedPlayer,
+    }));
+
+    setSelectedPlayer(null);
+  }
+
+  const assignedPlayers = Object.values(
+    positions
+  ).filter(Boolean).length;
+
+  const overall =
+    assignedPlayers === 0
+      ? 0
+      : (
+          Object.values(positions)
+            .filter(Boolean)
+            .reduce(
+              (sum, player) =>
+                sum + player.rating,
+              0
+            ) / assignedPlayers
+        ).toFixed(1);
+
+  return (
+    <div className="app">
+      <Header />
+
+      <FormationSelector
+        formation={formation}
+        setFormation={setFormation}
+      />
+
+      <div className="main-layout">
+        <PlayerList
+          players={currentPack}
+          pickPlayer={draftPlayer}
+        />
+
+        <SquadBoard
+          positions={positions}
+          draftedPlayers={draftedPlayers}
+          selectedPlayer={selectedPlayer}
+          setSelectedPlayer={setSelectedPlayer}
+          assignPlayer={assignPlayer}
+          overall={overall}
+        />
+      </div>
+    </div>
+  );
+}
