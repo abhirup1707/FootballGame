@@ -7,6 +7,7 @@
     "client": "vite",
     "server": "cd server && nodemon server.js",
     "dev": "concurrently \"npm run client\" \"npm run server\"",
+    "start": "node server/server.js",
     "build": "vite build",
     "preview": "vite preview"
   },

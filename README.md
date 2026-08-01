@@ -1,16 +1,30 @@
-# React + Vite
+# Football Draft
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This app has two deployable parts:
 
-Currently, two official plugins are available:
+- **Frontend:** React/Vite, hosted on Vercel.
+- **Realtime backend:** Express and Socket.IO, which must be hosted on a persistent Node service. Vercel's serverless functions are not suitable for this app's long-lived Socket.IO rooms.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Run locally
 
-## React Compiler
+```bash
+npm install
+npm run dev
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+The frontend runs on Vite and connects to `http://localhost:5000` by default.
 
-## Expanding the ESLint configuration
+## Deploy the backend on Render
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. Push these changes to GitHub.
+2. In Render, choose **New > Blueprint** and select this repository. It will read `render.yaml`.
+3. Set `CLIENT_ORIGIN` to your Vercel URL, for example `https://football-draft.vercel.app`. Add any custom domain as a comma-separated value too.
+4. Deploy and open `https://<your-render-service>.onrender.com/health`; it should return `{"status":"ok"}`.
+
+## Connect Vercel to the backend
+
+1. In Vercel, open **Project Settings > Environment Variables**.
+2. Add `VITE_SOCKET_URL` with the Render service URL, for example `https://football-draft-server.onrender.com` (no trailing slash).
+3. Apply it to Production (and Preview too if you use preview deployments), then redeploy.
+
+`VITE_SOCKET_URL` is embedded while Vite builds the frontend, so setting it without redeploying will not change the deployed site.

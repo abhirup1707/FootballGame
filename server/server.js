@@ -4,9 +4,15 @@ const cors = require("cors");
 const { Server } = require("socket.io");
 
 const app = express();
-app.use(cors());
+const allowedOrigins = process.env.CLIENT_ORIGIN
+  ? process.env.CLIENT_ORIGIN.split(",").map((origin) => origin.trim()).filter(Boolean)
+  : "*";
+const corsOptions = { origin: allowedOrigins };
+
+app.use(cors(corsOptions));
+app.get("/health", (_req, res) => res.status(200).json({ status: "ok" }));
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "*" } });
+const io = new Server(server, { cors: corsOptions });
 const rooms = {};
 const DRAFT_ROUNDS = [...Array(6).fill("ATT"), ...Array(6).fill("MID"), ...Array(8).fill("DEF"), ...Array(2).fill("GK")];
 const PASS_TARGETS = {
@@ -255,4 +261,5 @@ io.on("connection", (socket) => {
   });
   socket.on("disconnect", () => { Object.keys(rooms).forEach((code) => { const room = rooms[code]; room.players = room.players.filter((player) => player.id !== socket.id); if (!room.players.length) { if (room.timer) clearInterval(room.timer); delete rooms[code]; } }); });
 });
-server.listen(5000, () => console.log("Server running on 5000"));
+const port = Number(process.env.PORT) || 5000;
+server.listen(port, () => console.log(`Server running on ${port}`));
