@@ -147,20 +147,6 @@
     "image": "/players/bobby-moore.png"
   },
   {
-    "id": 222,
-    "name": "Alessandro Nesta",
-    "position": "DEF",
-    "rating": 96,
-    "image": "/players/alessandro-nesta.png"
-  },
-  {
-    "id": 223,
-    "name": "Philipp Lahm",
-    "position": "DEF",
-    "rating": 97,
-    "image": "/players/philipp-lahm.png"
-  },
-  {
     "id": 224,
     "name": "Marcelo",
     "position": "DEF",

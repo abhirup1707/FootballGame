@@ -152,12 +152,5 @@
     "position": "MID",
     "rating": 96,
     "image": "/players/david-silva.png"
-  },
-  {
-    "id": 123,
-    "name": "Kevin De Bruyne",
-    "position": "MID",
-    "rating": 97,
-    "image": "/players/kevin-de-bruyne.png"
   }
 ]

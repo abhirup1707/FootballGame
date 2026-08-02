@@ -15,10 +15,6 @@ const server = http.createServer(app);
 const io = new Server(server, { cors: corsOptions });
 const rooms = {};
 const DRAFT_ROUNDS = [...Array(6).fill("ATT"), ...Array(6).fill("MID"), ...Array(8).fill("DEF"), ...Array(2).fill("GK")];
-const PASS_TARGETS = {
-  GK:["LB","CB1","CB2","RB"], LB:["GK","CB1","CM1","LW"], CB1:["GK","LB","CB2","CM1","CAM"], CB2:["GK","CB1","RB","CM2","CAM"], RB:["GK","CB2","CM2","RW"],
-  CM1:["LB","CB1","CM2","CAM","LW","ST"], CM2:["CB2","RB","CM1","CAM","ST","RW"], CAM:["CM1","CM2","LW","ST","RW"], LW:["LB","CM1","CAM","ST"], ST:["LW","CAM","RW"], RW:["RB","CM2","CAM","ST"],
-};
 const PITCH_COORDINATES = { GK:[50,88], LB:[17,70], CB1:[38,74], CB2:[62,74], RB:[83,70], CM1:[32,53], CM2:[68,53], CAM:[50,43], LW:[19,25], ST:[50,18], RW:[81,25] };
 const randomItem = (items) => items[Math.floor(Math.random() * items.length)];
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
@@ -30,13 +26,26 @@ function passOptions(room) {
   if (room.match.phase !== "PASS") return [];
   const team = room.teams[room.possession];
   const carrierPosition = playerPosition(team, room.match.carrier.id);
-  return (PASS_TARGETS[carrierPosition] || []).map((key) => team.positions[key]).filter(Boolean);
+  const [carrierX, carrierY] = PITCH_COORDINATES[carrierPosition] || [50, 50];
+  // Every pass presents exactly the three closest teammates. This keeps the
+  // choice competitive and adapts naturally to whichever player has the ball.
+  return Object.entries(team.positions)
+    .filter(([position, player]) => player && position !== carrierPosition)
+    .map(([position, player]) => {
+      const [x, y] = PITCH_COORDINATES[position] || [50, 50];
+      return { player, distance:(x - carrierX) ** 2 + (y - carrierY) ** 2 };
+    })
+    .sort((a, b) => a.distance - b.distance)
+    .slice(0, 3)
+    .map(({ player }) => player);
 }
 function matchPayload(room) {
   const options = passOptions(room);
+  // Keep penalty directions secret until both players have made their choice.
+  const shootout = room.shootout ? { ...room.shootout, choices:{} } : null;
   return { teams:room.teams, scoreA:room.scoreA, scoreB:room.scoreB, possession:room.possession, commentary:room.commentary, stats:room.stats,
     config:{ mode:room.matchMode, goalLimit:room.goalLimit, timeLimit:room.timeLimit }, elapsedMs:Math.max(0, Date.now() - (room.matchStartedAt || Date.now())),
-    shootout:room.shootout || null,
+    shootout,
     match: { phase:room.match.phase, passCount:room.match.passCount, carrier:room.match.carrier, options, choicesLocked:Object.keys(room.match.choices).length } };
 }
 function sendMatch(room, event = "matchUpdate") { io.to(room.roomCode).emit(event, matchPayload(room)); }
