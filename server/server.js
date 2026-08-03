@@ -159,6 +159,7 @@ function resolvePass(room) {
     room.match.interception = { receiver, interceptor };
     addStory(room, `INTERCEPTED! ${interceptor.name} steps in ahead of ${receiver.name} and wins the ball.`);
     sendMatch(room);
+    io.to(room.roomCode).emit("interceptionMade", { interceptor:interceptor.name, receiver:receiver.name });
     setTimeout(() => {
       if (room.match?.phase !== "INTERCEPTION") return;
       startPossession(room, defendId, `${room.players.find((p) => p.id === defendId).name} begin a new five-pass move with ${interceptor.name}.`, interceptor);
