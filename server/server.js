@@ -16,8 +16,21 @@ const io = new Server(server, { cors: corsOptions });
 const rooms = {};
 const DRAFT_ROUNDS = [...Array(6).fill("ATT"), ...Array(6).fill("MID"), ...Array(8).fill("DEF"), ...Array(2).fill("GK")];
 const PITCH_COORDINATES = { GK:[50,88], LB:[17,70], CB1:[38,74], CB2:[62,74], RB:[83,70], CM1:[32,53], CM2:[68,53], CAM:[50,43], LW:[19,25], ST:[50,18], RW:[81,25] };
+const FORMATION_CATEGORY = { GK:"GK", LB:"DEF", CB1:"DEF", CB2:"DEF", RB:"DEF", CM1:"MID", CM2:"MID", CAM:"MID", LW:"ATT", ST:"ATT", RW:"ATT" };
 const randomItem = (items) => items[Math.floor(Math.random() * items.length)];
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+function validLineup(room, playerId, positions) {
+  const drafted = room.draft.picks[playerId] || [];
+  if (!positions || drafted.length !== Object.keys(FORMATION_CATEGORY).length) return false;
+  const draftedById = new Map(drafted.map((player) => [player.id, player]));
+  const usedIds = new Set();
+  return Object.entries(FORMATION_CATEGORY).every(([slot, category]) => {
+    const player = positions[slot], draftedPlayer = player && draftedById.get(player.id);
+    if (!draftedPlayer || draftedPlayer.position !== category || usedIds.has(player.id)) return false;
+    usedIds.add(player.id);
+    return true;
+  }) && usedIds.size === drafted.length;
+}
 function movePlayerState(room, previousId, nextId) {
   if (previousId === nextId) return;
   const moveKey = (object) => { if (object && Object.prototype.hasOwnProperty.call(object, previousId)) { object[nextId] = object[previousId]; delete object[previousId]; } };
@@ -252,7 +265,9 @@ io.on("connection", (socket) => {
   });
   socket.on("playerReady", ({ roomCode, positions, overall }) => {
     const room = rooms[roomCode]; if (!room || room.teams[socket.id]) return;
-    room.teams[socket.id] = { positions, overall }; room.readyPlayers += 1; io.to(roomCode).emit("readyCount", room.readyPlayers);
+    if (!validLineup(room, socket.id, positions)) return socket.emit("errorMessage", "Your lineup must keep each player in their own category.");
+    const verifiedOverall = Number((Object.keys(FORMATION_CATEGORY).reduce((sum, slot) => sum + positions[slot].rating, 0) / Object.keys(FORMATION_CATEGORY).length).toFixed(1));
+    room.teams[socket.id] = { positions, overall:verifiedOverall }; room.readyPlayers += 1; io.to(roomCode).emit("readyCount", room.readyPlayers);
     if (room.readyPlayers === 2) {
       const [first, second] = room.players.map((player) => player.id);
       room.stats = { [first]:{ passes:0, interceptions:0, goals:[] }, [second]:{ passes:0, interceptions:0, goals:[] } };

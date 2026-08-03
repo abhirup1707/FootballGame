@@ -11,12 +11,33 @@ import goalkeepers from "../data/goalkeepers.json";
 
 const allPlayers = [...attackers, ...midfielders, ...defenders, ...goalkeepers];
 const emptyPositions = () => ({ GK:null, LB:null, CB1:null, CB2:null, RB:null, CM1:null, CM2:null, CAM:null, LW:null, ST:null, RW:null });
+const EMPTY_PLAYERS = [];
+const slotCategory = { GK:"GK", LB:"DEF", CB1:"DEF", CB2:"DEF", RB:"DEF", CM1:"MID", CM2:"MID", CAM:"MID", LW:"ATT", ST:"ATT", RW:"ATT" };
 const label = { ATT:"Attackers", MID:"Midfielders", DEF:"Defenders", GK:"Goalkeeper" };
 
 function buildXI(players) {
   const by = (position) => players.filter((player) => player.position === position);
   const att = by("ATT"), mid = by("MID"), def = by("DEF"), gk = by("GK");
   return { GK:gk[0], LB:def[0], CB1:def[1], CB2:def[2], RB:def[3], CM1:mid[0], CAM:mid[1], CM2:mid[2], LW:att[0], ST:att[1], RW:att[2] };
+}
+
+function syncLineup(current, players) {
+  const next = emptyPositions();
+  const draftedById = new Map(players.map((player) => [player.id, player]));
+  const assignedIds = new Set();
+  Object.entries(current).forEach(([slot, player]) => {
+    const draftedPlayer = player && draftedById.get(player.id);
+    if (draftedPlayer && slotCategory[slot] === draftedPlayer.position) {
+      next[slot] = draftedPlayer;
+      assignedIds.add(draftedPlayer.id);
+    }
+  });
+  players.forEach((player) => {
+    if (assignedIds.has(player.id)) return;
+    const openSlot = Object.keys(next).find((slot) => !next[slot] && slotCategory[slot] === player.position);
+    if (openSlot) next[openSlot] = player;
+  });
+  return next;
 }
 
 function Rulebook({ onConfirm }) {
@@ -33,12 +54,13 @@ export default function Draft({ room }) {
   const [finished, setFinished] = useState(null);
   const [celebration, setCelebration] = useState(null);
   const [rulesAccepted, setRulesAccepted] = useState(false);
+  const [myPositions, setMyPositions] = useState(emptyPositions);
   const me = room.players.find((player) => player.id === socket.id);
   const turnPlayer = room.players.find((player) => player.id === draft.turnId);
-  const myPicks = draft.picks[socket.id] || [];
+  const myPicks = draft.picks[socket.id] || EMPTY_PLAYERS;
   const opponent = room.players.find((player) => player.id !== socket.id);
   const opponentPicks = draft.picks[opponent?.id] || [];
-  const positions = useMemo(() => buildXI(myPicks), [myPicks]);
+  const positions = myPositions;
   const overall = useMemo(() => myPicks.length ? Number((myPicks.reduce((sum, player) => sum + player.rating, 0) / myPicks.length).toFixed(1)) : 0, [myPicks]);
   const opponentPositions = useMemo(() => buildXI(opponentPicks), [opponentPicks]);
   const opponentOverall = useMemo(() => opponentPicks.length ? Number((opponentPicks.reduce((sum, player) => sum + player.rating, 0) / opponentPicks.length).toFixed(1)) : 0, [opponentPicks]);
@@ -60,6 +82,8 @@ export default function Draft({ room }) {
     if (rulesAccepted && draft.turnId === socket.id && !draft.complete) socket.emit("requestDraftPack", { roomCode:room.roomCode, players:allPlayers });
   }, [draft.turnId, draft.round, draft.complete, room.roomCode, rulesAccepted]);
 
+  useEffect(() => { setMyPositions((current) => syncLineup(current, myPicks)); }, [myPicks]);
+
   if (celebration && !finished) {
     const shootout = celebration.shootout;
     const score = (id) => shootout?.kicks?.[id]?.filter(Boolean).length || 0;
@@ -78,6 +102,14 @@ export default function Draft({ room }) {
   if (matchData) return <Match room={{ ...room, teams:matchData.teams }} initialData={matchData} />;
   if (!rulesAccepted) return <Rulebook onConfirm={() => setRulesAccepted(true)} />;
 
+  const repositionPlayer = (fromSlot, toSlot) => {
+    setMyPositions((current) => {
+      const player = current[fromSlot], target = current[toSlot];
+      if (!player || fromSlot === "GK" || toSlot === "GK" || slotCategory[toSlot] !== player.position) return current;
+      if (target && target.position !== player.position) return current;
+      return { ...current, [fromSlot]:target || null, [toSlot]:player };
+    });
+  };
   const ready = () => { setWaiting(true); socket.emit("playerReady", { roomCode:room.roomCode, positions, overall }); };
   return <main className="draft-page">
     <header className="draft-header"><div><span className="eyebrow">LIVE DRAFT</span><h1>{room.players[0]?.name} <b>vs</b> {room.players[1]?.name}</h1></div><div className="draft-progress"><strong>{Math.min(draft.round + 1, 22)} / 22</strong><span>picks completed</span></div></header>
@@ -90,7 +122,7 @@ export default function Draft({ room }) {
         {opening && !pack.length && <div className="pack-loading">Opening {label[draft.category]} pack…</div>}
         {pack.length > 0 && <AnimatedPack players={pack} onPick={(player) => socket.emit("draftPick", { roomCode:room.roomCode, player, allPlayers })} />}
         {draft.turnId !== socket.id && <div className="waiting-turn"><div className="spinner" /><h2>Watch the draft unfold</h2><p>{turnPlayer?.name} is selecting from {label[draft.category]?.toLowerCase()}.</p></div>}
-      </section><aside className="draft-team"><h2>Your XI</h2><SquadBoard positions={positions} draftedPlayers={myPicks} overall={overall} readOnly /></aside></div>
-    </> : <section className="team-ready"><div className="team-review-head"><span className="eyebrow">DRAFT COMPLETE</span><h2>Compare your starting XIs</h2><p>Both squads are revealed. Confirm when you are ready to start the match.</p></div><div className="team-review-squads"><div><h3>{me?.name}<small>Your team</small></h3><SquadBoard positions={positions} draftedPlayers={myPicks} overall={overall} readOnly /></div><div><h3>{opponent?.name}<small>Opponent team</small></h3><SquadBoard positions={opponentPositions} draftedPlayers={opponentPicks} overall={opponentOverall} readOnly /></div></div>{waiting ? <button className="primary-btn" disabled>Waiting for opponent · {readyCount}/2</button> : <button className="primary-btn" onClick={ready}>Ready for match</button>}</section>}
+      </section><aside className="draft-team"><h2>Your XI</h2><SquadBoard positions={positions} overall={overall} onReposition={repositionPlayer} /></aside></div>
+    </> : <section className="team-ready"><div className="team-review-head"><span className="eyebrow">DRAFT COMPLETE</span><h2>Set your starting XI</h2><p>Tap a player, then an empty spot or a teammate in the same category to move or swap. Goalkeepers stay fixed.</p></div><div className="team-review-squads"><div><h3>{me?.name}<small>Your team</small></h3><SquadBoard positions={positions} overall={overall} readOnly={waiting} onReposition={repositionPlayer} /></div><div><h3>{opponent?.name}<small>Opponent team</small></h3><SquadBoard positions={opponentPositions} overall={opponentOverall} readOnly /></div></div>{waiting ? <button className="primary-btn" disabled>Waiting for opponent · {readyCount}/2</button> : <button className="primary-btn" onClick={ready}>Ready for match</button>}</section>}
   </main>;
 }
