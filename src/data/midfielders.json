@@ -152,5 +152,13 @@
     "position": "MID",
     "rating": 96,
     "image": "/players/david-silva.png"
+  },
+
+  {
+    "id": 123,
+    "name": "Gullit",
+    "position": "MID",
+    "rating": 99,
+    "image": "/players/gullit.png"
   }
 ]
