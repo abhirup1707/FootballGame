@@ -31,7 +31,7 @@
     "id": 205,
     "name": "Fabio Cannavaro",
     "position": "DEF",
-    "rating": 96,
+    "rating": 97,
     "image": "/players/fabio-cannavaro.png"
   },
   {
@@ -45,7 +45,7 @@
     "id": 207,
     "name": "Virgil van Dijk",
     "position": "DEF",
-    "rating": 96,
+    "rating": 95,
     "image": "/players/virgil-van-dijk.png"
   },
   {
@@ -87,7 +87,7 @@
     "id": 213,
     "name": "Cafu",
     "position": "DEF",
-    "rating": 96,
+    "rating": 98,
     "image": "/players/cafu.png"
   },
   {
@@ -152,5 +152,13 @@
     "position": "DEF",
     "rating": 94,
     "image": "/players/marcelo.png"
+  },
+
+{
+    "id": 225,
+    "name": "Baresi",
+    "position": "DEF",
+    "rating": 96,
+    "image": "/players/baresi.png"
   }
 ]
