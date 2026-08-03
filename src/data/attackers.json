@@ -174,12 +174,39 @@
     "rating": 94,
     "image": "/players/son-heung-min.png"
   },
-
   {
     "id": 26,
-    "name": "Cruyff",
+    "name": "Pele",
+    "position": "ATT",
+    "rating": 99,
+    "image": "/players/pele.png"
+  },
+  {
+    "id": 27,
+    "name": "Johan Cruyff",
     "position": "ATT",
     "rating": 98,
-    "image": "/players/cruyff.png"
+    "image": "/players/johan-cruyff.png"
+  },
+  {
+    "id": 28,
+    "name": "Diego Maradona",
+    "position": "ATT",
+    "rating": 99,
+    "image": "/players/diego-maradona.png"
+  },
+  {
+    "id": 29,
+    "name": "Eusebio",
+    "position": "ATT",
+    "rating": 98,
+    "image": "/players/eusebio.png"
+  },
+  {
+    "id": 30,
+    "name": "Ferenc Puskas",
+    "position": "ATT",
+    "rating": 98,
+    "image": "/players/ferenc-puskas.png"
   }
 ]

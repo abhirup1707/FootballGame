@@ -153,20 +153,39 @@
     "rating": 94,
     "image": "/players/marcelo.png"
   },
-
-{
+  {
     "id": 225,
-    "name": "Baresi",
+    "name": "Laurent Blanc",
     "position": "DEF",
     "rating": 96,
-    "image": "/players/baresi.png"
- },
-
-{
+    "image": "/players/laurent-blanc.png"
+  },
+  {
     "id": 226,
-    "name": "Blanc",
+    "name": "Franco Baresi",
+    "position": "DEF",
+    "rating": 98,
+    "image": "/players/franco-baresi.png"
+  },
+  {
+    "id": 227,
+    "name": "Carlos Alberto",
+    "position": "DEF",
+    "rating": 96,
+    "image": "/players/carlos-alberto.png"
+  },
+  {
+    "id": 228,
+    "name": "Lilian Thuram",
     "position": "DEF",
     "rating": 95,
-    "image": "/players/blanc.png"
+    "image": "/players/lilian-thuram.png"
+  },
+  {
+    "id": 229,
+    "name": "Daniel Passarella",
+    "position": "DEF",
+    "rating": 96,
+    "image": "/players/daniel-passarella.png"
   }
 ]

@@ -18,9 +18,23 @@ const DRAFT_ROUNDS = [...Array(6).fill("ATT"), ...Array(6).fill("MID"), ...Array
 const PITCH_COORDINATES = { GK:[50,88], LB:[17,70], CB1:[38,74], CB2:[62,74], RB:[83,70], CM1:[32,53], CM2:[68,53], CAM:[50,43], LW:[19,25], ST:[50,18], RW:[81,25] };
 const randomItem = (items) => items[Math.floor(Math.random() * items.length)];
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+function movePlayerState(room, previousId, nextId) {
+  if (previousId === nextId) return;
+  const moveKey = (object) => { if (object && Object.prototype.hasOwnProperty.call(object, previousId)) { object[nextId] = object[previousId]; delete object[previousId]; } };
+  if (room.draft.turnId === previousId) room.draft.turnId = nextId;
+  moveKey(room.draft.picks); moveKey(room.teams); moveKey(room.stats);
+  if (room.possession === previousId) room.possession = nextId;
+  if (room.match?.choices) moveKey(room.match.choices);
+  if (room.shootout) {
+    if (room.shootout.currentTeam === previousId) room.shootout.currentTeam = nextId;
+    moveKey(room.shootout.kicks); moveKey(room.shootout.usedShooters); moveKey(room.shootout.choices);
+    room.shootout.order = room.shootout.order.map((id) => id === previousId ? nextId : id);
+  }
+}
 
 function draftPayload(room) { return { turnId:room.draft.turnId, round:room.draft.round, category:DRAFT_ROUNDS[room.draft.round] || null, picks:room.draft.picks, complete:room.draft.round >= DRAFT_ROUNDS.length }; }
 function sendDraftState(room) { io.to(room.roomCode).emit("draftState", draftPayload(room)); }
+function teamName(room, teamId) { return `${room.players.find((player) => player.id === teamId)?.name || "Unknown"}'s team`; }
 function playerPosition(team, playerId) { return Object.keys(team.positions).find((key) => team.positions[key]?.id === playerId); }
 function passOptions(room) {
   if (room.match.phase !== "PASS") return [];
@@ -46,7 +60,7 @@ function matchPayload(room) {
   return { teams:room.teams, scoreA:room.scoreA, scoreB:room.scoreB, possession:room.possession, commentary:room.commentary, stats:room.stats,
     config:{ mode:room.matchMode, goalLimit:room.goalLimit, timeLimit:room.timeLimit }, elapsedMs:Math.max(0, Date.now() - (room.matchStartedAt || Date.now())),
     shootout,
-    match: { phase:room.match.phase, passCount:room.match.passCount, carrier:room.match.carrier, options, choicesLocked:Object.keys(room.match.choices).length } };
+    match: { phase:room.match.phase, passCount:room.match.passCount, carrier:room.match.carrier, lastPass:room.match.lastPass || null, options, choicesLocked:Object.keys(room.match.choices).length } };
 }
 function sendMatch(room, event = "matchUpdate") { io.to(room.roomCode).emit(event, matchPayload(room)); }
 function finishMatch(room) {
@@ -160,7 +174,8 @@ function resolvePass(room) {
   room.match.passCount += 1;
   room.stats[attackId].passes += 1;
   const flair = markedCorrectly ? "beats the marker" : "finds space";
-  addStory(room, `✨ ${carrier.name} ${flair} — a clean pass reaches ${receiver.name}.`);
+  room.match.lastPass = { team:teamName(room, attackId), passer:carrier.name, receiver:receiver.name };
+  addStory(room, `⚽ ${teamName(room, attackId)}: ${carrier.name} passes to ${receiver.name} — ${flair}.`);
   if (room.match.passCount >= 5) {
     room.match.phase = "GOAL";
     addStory(room, `⚡ FIVE PASSES COMPLETE — ${receiver.name} has the final chance!`);
@@ -200,19 +215,26 @@ function resolveShot(room) {
 }
 
 io.on("connection", (socket) => {
-  socket.on("createRoom", ({ playerName, goalLimit, matchMode, timeLimit }) => {
+  socket.on("createRoom", ({ playerName, goalLimit, matchMode, timeLimit, resumeToken }) => {
     const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-    rooms[roomCode] = { roomCode, goalLimit:[1,3,5].includes(Number(goalLimit)) ? Number(goalLimit) : 3, matchMode:matchMode === "time" ? "time" : "goals", timeLimit:[90,120,150,180].includes(Number(timeLimit)) ? Number(timeLimit) : 90, players:[{ id:socket.id, name:playerName }], readyPlayers:0, teams:{}, scoreA:0, scoreB:0, possession:null, commentary:[], stats:{}, draft:{ round:0, turnId:socket.id, picks:{}, takenIds:[] }, match:null, timer:null, finished:false, shootout:null };
+    rooms[roomCode] = { roomCode, goalLimit:[1,3,5].includes(Number(goalLimit)) ? Number(goalLimit) : 3, matchMode:matchMode === "time" ? "time" : "goals", timeLimit:[90,120,150,180].includes(Number(timeLimit)) ? Number(timeLimit) : 90, players:[{ id:socket.id, name:playerName, resumeToken }], readyPlayers:0, teams:{}, scoreA:0, scoreB:0, possession:null, commentary:[], stats:{}, draft:{ round:0, turnId:socket.id, picks:{}, takenIds:[] }, match:null, timer:null, finished:false, shootout:null, reconnectTimers:{} };
     socket.join(roomCode); socket.emit("roomCreated", roomCode);
   });
-  socket.on("joinRoom", ({ roomCode, playerName }) => {
+  socket.on("joinRoom", ({ roomCode, playerName, resumeToken }) => {
     const room = rooms[roomCode];
     if (!room) return socket.emit("errorMessage", "Room not found");
+    const returningPlayer = resumeToken && room.players.find((player) => player.resumeToken === resumeToken);
+    if (returningPlayer) {
+      const previousId = returningPlayer.id;
+      if (room.reconnectTimers?.[previousId]) { clearTimeout(room.reconnectTimers[previousId]); delete room.reconnectTimers[previousId]; }
+      returningPlayer.id = socket.id; movePlayerState(room, previousId, socket.id); socket.join(roomCode);
+      socket.emit("roomReady", room); return;
+    }
     if (room.players.length >= 2) return socket.emit("errorMessage", "Room full");
-    room.players.push({ id:socket.id, name:playerName }); socket.join(roomCode);
+    room.players.push({ id:socket.id, name:playerName, resumeToken }); socket.join(roomCode);
     io.to(roomCode).emit("roomReady", room); sendDraftState(room);
   });
-  socket.on("getDraftState", ({ roomCode }) => { const room = rooms[roomCode]; if (room) socket.emit("draftState", draftPayload(room)); });
+  socket.on("getDraftState", ({ roomCode }) => { const room = rooms[roomCode]; if (!room) return; socket.emit("draftState", draftPayload(room)); if (room.match) socket.emit("enterMatch", matchPayload(room)); });
   socket.on("requestDraftPack", ({ roomCode, players }) => {
     const room = rooms[roomCode]; if (!room || room.draft.turnId !== socket.id) return;
     const category = DRAFT_ROUNDS[room.draft.round];
@@ -268,7 +290,7 @@ io.on("connection", (socket) => {
     shootout.choices[socket.id] = direction;
     if (Object.keys(shootout.choices).length === 2) resolvePenalty(room); else sendMatch(room);
   });
-  socket.on("disconnect", () => { Object.keys(rooms).forEach((code) => { const room = rooms[code]; room.players = room.players.filter((player) => player.id !== socket.id); if (!room.players.length) { if (room.timer) clearInterval(room.timer); delete rooms[code]; } }); });
+  socket.on("disconnect", () => { Object.keys(rooms).forEach((code) => { const room = rooms[code]; const player = room.players.find((participant) => participant.id === socket.id); if (!player) return; room.reconnectTimers ||= {}; room.reconnectTimers[socket.id] = setTimeout(() => { const currentRoom = rooms[code]; if (!currentRoom) return; currentRoom.players = currentRoom.players.filter((participant) => participant.id !== socket.id); delete currentRoom.reconnectTimers[socket.id]; if (!currentRoom.players.length) { if (currentRoom.timer) clearInterval(currentRoom.timer); delete rooms[code]; } }, 60000); }); });
 });
 const port = Number(process.env.PORT) || 5000;
 server.listen(port, () => console.log(`Server running on ${port}`));

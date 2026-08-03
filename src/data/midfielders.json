@@ -153,12 +153,39 @@
     "rating": 96,
     "image": "/players/david-silva.png"
   },
-
   {
     "id": 123,
-    "name": "Gullit",
+    "name": "Ruud Gullit",
     "position": "MID",
-    "rating": 99,
-    "image": "/players/gullit.png"
+    "rating": 97,
+    "image": "/players/ruud-gullit.png"
+  },
+  {
+    "id": 124,
+    "name": "Lothar Matthaus",
+    "position": "MID",
+    "rating": 97,
+    "image": "/players/lothar-matthaus.png"
+  },
+  {
+    "id": 125,
+    "name": "Clarence Seedorf",
+    "position": "MID",
+    "rating": 95,
+    "image": "/players/clarence-seedorf.png"
+  },
+  {
+    "id": 126,
+    "name": "Zico",
+    "position": "MID",
+    "rating": 97,
+    "image": "/players/zico.png"
+  },
+  {
+    "id": 127,
+    "name": "Xabi Alonso",
+    "position": "MID",
+    "rating": 95,
+    "image": "/players/xabi-alonso.png"
   }
 ]
