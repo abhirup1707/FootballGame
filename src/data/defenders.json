@@ -160,5 +160,13 @@
     "position": "DEF",
     "rating": 96,
     "image": "/players/baresi.png"
+ },
+
+{
+    "id": 226,
+    "name": "Blanc",
+    "position": "DEF",
+    "rating": 95,
+    "image": "/players/blanc.png"
   }
 ]
