@@ -173,5 +173,13 @@
     "position": "ATT",
     "rating": 94,
     "image": "/players/son-heung-min.png"
+  },
+
+  {
+    "id": 26,
+    "name": "Cruyff",
+    "position": "ATT",
+    "rating": 98,
+    "image": "/players/cruyff.png"
   }
 ]
