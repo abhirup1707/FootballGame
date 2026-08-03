@@ -80,21 +80,21 @@
     "id": 12,
     "name": "Gareth Bale",
     "position": "ATT",
-    "rating": 93,
+    "rating": 96,
     "image": "/players/gareth-bale.png"
   },
   {
     "id": 13,
     "name": "Harry Kane",
     "position": "ATT",
-    "rating": 95,
+    "rating": 97,
     "image": "/players/harry-kane.png"
   },
   {
     "id": 14,
     "name": "Erling Haaland",
     "position": "ATT",
-    "rating": 96,
+    "rating": 97,
     "image": "/players/erling-haaland.png"
   },
   {
@@ -108,14 +108,14 @@
     "id": 16,
     "name": "Didier Drogba",
     "position": "ATT",
-    "rating": 94,
+    "rating": 96,
     "image": "/players/didier-drogba.png"
   },
   {
     "id": 17,
     "name": "Samuel Eto'o",
     "position": "ATT",
-    "rating": 95,
+    "rating": 96,
     "image": "/players/samuel-eto-o.png"
   },
   {
