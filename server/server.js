@@ -203,9 +203,8 @@ function resolveShot(room) {
   const shooter = room.match.carrier;
   const keeper = room.teams[defendId].positions.GK;
   const matched = shot === save;
-  // A shot to the same side is not automatically saved: rating gives the scorer an edge.
-  const goalChance = clamp(60 + (shooter.rating - keeper.rating) * 3, 35, 82);
-  const goal = !matched || Math.random() * 100 < goalChance;
+  // If the keeper covers the selected side, the shot is saved.
+  const goal = !matched;
   room.match.choices = {};
   if (goal) {
     if (attackId === room.players[0].id) room.scoreA += 1; else room.scoreB += 1;
