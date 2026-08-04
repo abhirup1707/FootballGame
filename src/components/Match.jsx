@@ -11,15 +11,19 @@ const shortName = (name) => name?.length > 12 ? `${name.slice(0, 11)}…` : name
 function Player({ player, position, team, hasBall }) { const [x,y] = (team === "red" ? red : blue)[position]; return <div className={`match-player ${team} ${hasBall ? "has-ball" : ""}`} style={{ left:`${x}%`, top:`${y}%` }}><div className="shirt">{player.image ? <img src={player.image} alt="" /> : player.name.slice(0,2)}</div><em>{positions[position]}</em></div>; }
 
 export default function Match({ room, initialData }) {
-  const [data, setData] = useState(initialData), [locked, setLocked] = useState(false), [now, setNow] = useState(Date.now()), [flash, setFlash] = useState(null);
+  const [data, setData] = useState(initialData), [locked, setLocked] = useState(false), [now, setNow] = useState(Date.now()), [flash, setFlash] = useState(null), [deadlineKey, setDeadlineKey] = useState(null);
   useEffect(() => {
-    const update = (next) => { setData((old) => ({ ...old, ...next, receivedAt:Date.now() })); setLocked(false); };
+    const update = (next) => setData((old) => ({ ...old, ...next, receivedAt:Date.now() }));
     const goal = (next) => { setFlash({ type:"goal", ...next }); setTimeout(() => setFlash(null), 2200); };
     const save = (next) => { setFlash({ type:"save", ...next }); setTimeout(() => setFlash(null), 1600); };
     const interception = (next) => { setFlash({ type:"interception", ...next }); setTimeout(() => setFlash(null), 1800); };
     socket.on("matchUpdate", update); socket.on("goalScored", goal); socket.on("saveMade", save); socket.on("interceptionMade", interception); socket.on("penaltyStarted", update); socket.on("penaltyResult", update);
     return () => { socket.off("matchUpdate", update); socket.off("goalScored", goal); socket.off("saveMade", save); socket.off("interceptionMade", interception); socket.off("penaltyStarted", update); socket.off("penaltyResult", update); };
   }, []);
+  useEffect(() => {
+    const deadline = data?.match?.deadline || null;
+    if (deadline !== deadlineKey) { setDeadlineKey(deadline); setLocked(false); }
+  }, [data?.match?.deadline]);
   useEffect(() => { const id = setInterval(() => setNow(Date.now()), 40); return () => clearInterval(id); }, []);
   if (!data?.match) return null;
   if (data.shootout) return <PenaltyShootout room={room} data={data} />;
@@ -33,6 +37,8 @@ export default function Match({ room, initialData }) {
   const isAttacking = socket.id === attackerId;
   const options = goalTime ? ["LEFT","CENTER","RIGHT"] : data.match.options || [];
   const elapsed = (data.elapsedMs || 0) + (now - (data.receivedAt || now));
+  const deadline = data.match.deadline || 0;
+  const remaining = Math.max(0, (deadline - now) / 1000);
   const choose = (move) => { setLocked(true); socket.emit("submitMove", { roomCode:room.roomCode, move }); };
   const renderTeam = (id, side) => Object.entries(data.teams[id]?.positions || {}).map(([position, player]) => player && <Player key={`${id}-${position}`} player={player} position={position} team={side} hasBall={id === attackerId && player.id === carrier?.id} />);
 
@@ -44,7 +50,7 @@ export default function Match({ room, initialData }) {
     </header>
     <section className="match-layout">
       <div className="pitch-view"><div className="match-stage"><span>{goalTime ? "FINAL SHOT" : `PASS ${data.match.passCount + 1} / 5`}</span><h1>{carrier?.name} has the ball</h1><div className="pass-track">{[1,2,3,4,5].map((step) => <i key={step} className={step <= data.match.passCount ? "done" : ""}>{step}</i>)}</div></div><div className="single-pitch"><div className="centre-circle" /><div className="penalty top" /><div className="penalty bottom" />{renderTeam(aId,"red")}{renderTeam(bId,"blue")}<motion.div className="moving-ball" animate={{ left:`${ballX}%`, top:`${ballY}%` }} transition={{ type:"spring", stiffness:70, damping:10 }}>⚽</motion.div>{flash && <motion.div className={`${flash.type}-overlay`} initial={{ opacity:0,scale:.7 }} animate={{ opacity:1,scale:1 }}><span>{flash.type === "goal" ? "GOAL!" : flash.type === "save" ? "GREAT SAVE!" : "INTERCEPTED!"}</span><small>{flash.type === "goal" ? flash.scorer : flash.type === "save" ? `${flash.keeper} denies ${flash.shooter}` : `${flash.interceptor} steals it from ${flash.receiver}`}</small></motion.div>}</div></div>
-      <aside className="match-control"><div className="carrier-card"><small>{goalTime ? "FINAL SHOT" : "CURRENT BALL CARRIER"}</small><b>{carrier?.name}</b><span>{carrier?.rating} OVR</span>{data.match.lastPass && <div className="pass-announcement" aria-label={`Latest pass for ${data.match.lastPass.team}`}><small>{data.match.lastPass.team}</small><b>{data.match.lastPass.passer} <i>→</i> {data.match.lastPass.receiver}</b></div>}</div><p className="instruction">{isAttacking ? (goalTime ? "Pick the corner and take the shot." : "Choose the next pass.") : (goalTime ? "Read the shot and cover a side." : "Predict the next pass to intercept it.")}</p><div className={`move-options ${goalTime ? "direction-options" : "player-options"}`}>{options.map((option) => { const direction = typeof option === "string"; return <button key={direction ? option : option.id} disabled={locked} onClick={() => choose(direction ? option : option.id)}>{direction ? <><strong>{option === "LEFT" ? "←" : option === "RIGHT" ? "→" : "↑"}</strong><small>{option.toLowerCase()}</small></> : <><i>{option.rating}</i><span>{option.name}</span><small>{option.position}</small></>}</button>; })}</div>{locked && <p className="choice-wait">Locked in — waiting for the other player.</p>}<div className="match-feed"><strong>Match story</strong>{(data.commentary || []).map((line,index) => <p key={index}>{line}</p>)}</div></aside>
+      <aside className="match-control"><div className="carrier-card"><small>{goalTime ? "FINAL SHOT" : "CURRENT BALL CARRIER"}</small><b>{carrier?.name}</b><span>{carrier?.rating} OVR</span>{data.match.lastPass && <div className="pass-announcement" aria-label={`Latest pass for ${data.match.lastPass.team}`}><small>{data.match.lastPass.team}</small><b>{data.match.lastPass.passer} <i>→</i> {data.match.lastPass.receiver}</b></div>}</div><p className="instruction">{isAttacking ? (goalTime ? "Pick the corner and take the shot." : "Choose the next pass.") : (goalTime ? "Read the shot and cover a side." : "Predict the next pass to intercept it.")}</p>{!locked && <div className={`move-timer ${remaining < 1.5 ? "warning" : ""}`}><div className="move-timer-track"><div className="move-timer-bar" style={{ width:`${(remaining / 5) * 100}%` }} /></div><span>{remaining.toFixed(1)}s</span></div>}<div className={`move-options ${goalTime ? "direction-options" : "player-options"}`}>{options.map((option) => { const direction = typeof option === "string"; return <button key={direction ? option : option.id} disabled={locked} onClick={() => choose(direction ? option : option.id)}>{direction ? <><strong>{option === "LEFT" ? "←" : option === "RIGHT" ? "→" : "↑"}</strong><small>{option.toLowerCase()}</small></> : <><i>{option.rating}</i><span>{option.name}</span><small>{option.position}</small></>}</button>; })}</div>{locked && <p className="choice-wait">Locked in — waiting for the other player.</p>}<div className="match-feed"><strong>Match story</strong>{(data.commentary || []).map((line,index) => <p key={index}>{line}</p>)}</div></aside>
     </section>
   </main>;
 }

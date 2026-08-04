@@ -19,6 +19,7 @@ const PITCH_COORDINATES = { GK:[50,88], LB:[17,70], CB1:[38,74], CB2:[62,74], RB
 const FORMATION_CATEGORY = { GK:"GK", LB:"DEF", CB1:"DEF", CB2:"DEF", RB:"DEF", CM1:"MID", CM2:"MID", CAM:"MID", LW:"ATT", ST:"ATT", RW:"ATT" };
 const randomItem = (items) => items[Math.floor(Math.random() * items.length)];
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+const MOVE_TIMEOUT = 5000;
 function validLineup(room, playerId, positions) {
   const drafted = room.draft.picks[playerId] || [];
   if (!positions || drafted.length !== Object.keys(FORMATION_CATEGORY).length) return false;
@@ -73,7 +74,7 @@ function matchPayload(room) {
   return { teams:room.teams, scoreA:room.scoreA, scoreB:room.scoreB, possession:room.possession, commentary:room.commentary, stats:room.stats,
     config:{ mode:room.matchMode, goalLimit:room.goalLimit, timeLimit:room.timeLimit }, elapsedMs:Math.max(0, Date.now() - (room.matchStartedAt || Date.now())),
     shootout,
-    match: { phase:room.match.phase, passCount:room.match.passCount, carrier:room.match.carrier, lastPass:room.match.lastPass || null, options, choicesLocked:Object.keys(room.match.choices).length } };
+    match: { phase:room.match.phase, passCount:room.match.passCount, carrier:room.match.carrier, lastPass:room.match.lastPass || null, options, choicesLocked:Object.keys(room.match.choices).length, deadline:room.match.deadline || null } };
 }
 function sendMatch(room, event = "matchUpdate") { io.to(room.roomCode).emit(event, matchPayload(room)); }
 function finishMatch(room) {
@@ -120,7 +121,13 @@ function startMatchClock(room) {
     const elapsed = Date.now() - room.matchStartedAt;
     if (room.matchMode === "time" && elapsed >= room.timeLimit * 1000) {
       if (room.scoreA === room.scoreB) startShootout(room); else finishMatch(room);
-    } else sendMatch(room);
+    } else {
+      if ((room.match?.phase === "PASS" || room.match?.phase === "GOAL") && room.match.deadline && Date.now() >= room.match.deadline && Object.keys(room.match.choices).length < 2) {
+        autoPickMoves(room);
+        return;
+      }
+      sendMatch(room);
+    }
   }, 250);
 }
 function addStory(room, line) { room.commentary.unshift(line); room.commentary = room.commentary.slice(0, 5); }
@@ -129,7 +136,7 @@ function startPossession(room, teamId, story, carrier) {
   const team = room.teams[teamId];
   const openingCarrier = carrier || room.nextKickoffCarrier || randomItem([team.positions.CB1, team.positions.CB2].filter(Boolean));
   delete room.nextKickoffCarrier;
-  room.match = { phase:"PASS", passCount:0, carrier:openingCarrier, choices:{} };
+  room.match = { phase:"PASS", passCount:0, carrier:openingCarrier, choices:{}, deadline:Date.now() + MOVE_TIMEOUT };
   if (story) addStory(room, story);
 }
 function closestDefender(room, defendId, receiver) {
@@ -164,6 +171,7 @@ function resolvePass(room) {
   const interceptionChance = clamp(35 + (averageDefence(room.teams[defendId]) - receiver.rating) * 2.5, 18, 72);
   const intercepted = markedCorrectly;
   room.match.choices = {};
+  room.match.deadline = Date.now() + MOVE_TIMEOUT;
   if (intercepted) {
     const interceptor = closestDefender(room, defendId, receiver);
     if (!interceptor) return;
@@ -225,6 +233,19 @@ function resolveShot(room) {
   startPossession(room, defendId, `🔄 ${room.players.find((p) => p.id === defendId).name} build again from defence.`);
   io.to(room.roomCode).emit("saveMade", { keeper:keeper.name, shooter:shooter.name, shot });
   return false;
+}
+function autoPickMoves(room) {
+  const attackId = room.possession;
+  const defendId = room.players.find((player) => player.id !== attackId).id;
+  const isGoal = room.match.phase === "GOAL";
+  const firstPass = isGoal ? null : passOptions(room)[0]?.id;
+  if (!room.match.choices[attackId]) room.match.choices[attackId] = isGoal ? "LEFT" : firstPass;
+  if (!room.match.choices[defendId]) room.match.choices[defendId] = isGoal ? "LEFT" : firstPass;
+  addStory(room, "⏰ Time up — the move was chosen automatically.");
+  if (isGoal) { if (resolveShot(room)) return; }
+  else resolvePass(room);
+  if (room.match?.phase === "INTERCEPTION") return;
+  sendMatch(room);
 }
 
 io.on("connection", (socket) => {
