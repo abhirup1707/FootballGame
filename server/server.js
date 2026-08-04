@@ -19,7 +19,7 @@ const PITCH_COORDINATES = { GK:[50,88], LB:[17,70], CB1:[38,74], CB2:[62,74], RB
 const FORMATION_CATEGORY = { GK:"GK", LB:"DEF", CB1:"DEF", CB2:"DEF", RB:"DEF", CM1:"MID", CM2:"MID", CAM:"MID", LW:"ATT", ST:"ATT", RW:"ATT" };
 const randomItem = (items) => items[Math.floor(Math.random() * items.length)];
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
-const MOVE_TIMEOUT = 5000;
+const MOVE_TIMEOUT = 10000;
 function validLineup(room, playerId, positions) {
   const drafted = room.draft.picks[playerId] || [];
   if (!positions || drafted.length !== Object.keys(FORMATION_CATEGORY).length) return false;
