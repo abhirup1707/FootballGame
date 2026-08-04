@@ -26,7 +26,7 @@ export default function Lobby({ setRoom }) {
   const shareRoom = async () => { if (!inviteLink) return; try { if (navigator.share) await navigator.share({ title:"Footyverse", text:"Join my Footyverse match", url:inviteLink }); else { await navigator.clipboard.writeText(inviteLink); setStatus("Invite link copied — send it to your opponent."); } } catch { /* Share sheet dismissed. */ } };
 
   useEffect(() => {
-    const created = (code) => { setRoomCode(code); setIsRoomOwner(true); saveSession(code, playerName.trim()); window.history.replaceState({}, "", `?room=${code}`); setStatus("Room created — share the match link with your opponent."); };
+    const created = (code) => { setRoomCode(code); setIsRoomOwner(true); saveSession(code, playerName.trim()); setStatus("Room created — share the match link with your opponent."); };
     const ready = (room) => { saveSession(room.roomCode, playerName.trim()); setPlayers(room.players); setStatus("Opponent connected — preparing matchday."); setTimeout(() => setRoom(room), 750); };
     socket.on("roomCreated", created); socket.on("roomReady", ready); socket.on("errorMessage", alert);
     return () => { socket.off("roomCreated", created); socket.off("roomReady", ready); socket.off("errorMessage", alert); };

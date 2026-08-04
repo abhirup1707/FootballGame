@@ -6,7 +6,7 @@ export default function App() {
   const [room, setRoom] = useState(null);
 
   if (room) {
-    return <Draft room={room} />;
+    return <Draft room={room} onLeaveRoom={() => setRoom(null)} />;
   }
 
   return <Lobby setRoom={setRoom} />;

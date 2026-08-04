@@ -44,7 +44,7 @@ function Rulebook({ onConfirm }) {
   return <main className="rulebook-page"><div className="rulebook-glow one" /><div className="rulebook-glow two" /><section className="rulebook-card"><div className="rulebook-kicker"><span>⚽</span> FOOTYVERSE MATCHDAY</div><h1>How to play</h1><p className="rulebook-lead">A quick guide before the draft begins.</p><ul className="rule-list"><li><b>Draft your XI</b><span>Take turns choosing unique legends from four-player packs.</span></li><li><b>Build the best team</b><span>Complete all 11 picks, review both squads, then each manager presses Ready.</span></li><li><b>Pass with purpose</b><span>The ball carrier can pass only to the three nearest teammates. Predict the pass to intercept it.</span></li><li><b>Make five passes</b><span>Complete five clean passes to unlock a shot on goal.</span></li><li><b>Choose your corner</b><span>For shots, attacker and defender secretly select left, centre, or right.</span></li><li><b>Win the shootout</b><span>If needed, choose a taker and a hidden direction; the keeper moves only after both choices lock.</span></li></ul><button className="rulebook-confirm" onClick={onConfirm}>I understand <span>→</span></button></section></main>;
 }
 
-export default function Draft({ room }) {
+export default function Draft({ room, onLeaveRoom }) {
   const [draft, setDraft] = useState({ turnId:null, round:0, category:null, picks:{}, complete:false });
   const [pack, setPack] = useState([]);
   const [opening, setOpening] = useState(false);
@@ -55,6 +55,9 @@ export default function Draft({ room }) {
   const [celebration, setCelebration] = useState(null);
   const [rulesAccepted, setRulesAccepted] = useState(false);
   const [myPositions, setMyPositions] = useState(emptyPositions);
+  const [rematchRequested, setRematchRequested] = useState(false);
+  const [rematchCount, setRematchCount] = useState(0);
+  const [opponentLeft, setOpponentLeft] = useState(false);
   const me = room.players.find((player) => player.id === socket.id);
   const turnPlayer = room.players.find((player) => player.id === draft.turnId);
   const myPicks = draft.picks[socket.id] || EMPTY_PLAYERS;
@@ -71,9 +74,21 @@ export default function Draft({ room }) {
     const onReady = setReadyCount;
     const onMatch = (data) => setMatchData(data);
     const onFinished = (data) => { setCelebration(data); setTimeout(() => { setFinished(data); setCelebration(null); }, 2600); };
+    const onRematchRequested = ({ count }) => setRematchCount(count);
+    const onRematchConfirmed = () => {
+      setDraft({ turnId:null, round:0, category:null, picks:{}, complete:false });
+      setPack([]); setOpening(false); setWaiting(false); setReadyCount(0);
+      setMatchData(null); setFinished(null); setCelebration(null);
+      setRulesAccepted(false); setMyPositions(emptyPositions);
+      setRematchRequested(false); setRematchCount(0);
+      setTimeout(() => socket.emit("getDraftState", { roomCode: room.roomCode }), 100);
+    };
+    const onOpponentLeft = () => setOpponentLeft(true);
     socket.on("draftState", onDraft); socket.on("draftPack", onPack); socket.on("readyCount", onReady);
     socket.on("enterMatch", onMatch); socket.on("matchFinished", onFinished);
-    return () => { socket.off("draftState", onDraft); socket.off("draftPack", onPack); socket.off("readyCount", onReady); socket.off("enterMatch", onMatch); socket.off("matchFinished", onFinished); };
+    socket.on("rematchRequested", onRematchRequested); socket.on("rematchConfirmed", onRematchConfirmed);
+    socket.on("opponentLeft", onOpponentLeft);
+    return () => { socket.off("draftState", onDraft); socket.off("draftPack", onPack); socket.off("readyCount", onReady); socket.off("enterMatch", onMatch); socket.off("matchFinished", onFinished); socket.off("rematchRequested", onRematchRequested); socket.off("rematchConfirmed", onRematchConfirmed); socket.off("opponentLeft", onOpponentLeft); };
   }, []);
 
   useEffect(() => { socket.emit("getDraftState", { roomCode: room.roomCode }); }, [room.roomCode]);
@@ -90,6 +105,9 @@ export default function Draft({ room }) {
     const winner = shootout ? room.players[score(room.players[0].id) > score(room.players[1].id) ? 0 : 1]?.name : room.players[celebration.scoreA > celebration.scoreB ? 0 : 1]?.name;
     return <main className="winner-celebration"><div className="fireworks">{Array.from({ length:18 }, (_, index) => <i key={index} style={{ "--spark":index }} />)}</div><motion.div initial={{ scale:.4, opacity:0 }} animate={{ scale:1, opacity:1 }} className="winner-announcement"><span>🏆</span><small>FULL TIME</small><h1>{winner} wins!</h1><p>{shootout ? "Penalty shootout secured" : "The final whistle blows"}</p></motion.div></main>;
   }
+  if (opponentLeft) {
+    return <div className="fulltime"><motion.div initial={{ scale:.5, opacity:0 }} animate={{ scale:1, opacity:1 }} className="fulltime-card final-scoreboard"><div className="trophy">👋</div><p>OPPONENT LEFT</p><h1>Your opponent left the match</h1><h2>Return to the lobby to create or join a new room.</h2><button className="primary-btn" onClick={() => { localStorage.removeItem(`footyverse-room-${room.roomCode}`); window.history.replaceState({}, "", window.location.pathname); onLeaveRoom(); }}>Back to lobby</button></motion.div></div>;
+  }
   if (finished) {
     const shootout = finished.shootout;
     const penaltyScore = (id) => shootout?.kicks?.[id]?.filter(Boolean).length || 0;
@@ -97,7 +115,7 @@ export default function Draft({ room }) {
     const winner = shootoutWinnerId ? `${room.players.find((player) => player.id === shootoutWinnerId)?.name} wins on penalties (${penaltyScore(room.players[0].id)}–${penaltyScore(room.players[1].id)})` : finished.scoreA === finished.scoreB ? "Draw" : room.players[finished.scoreA > finished.scoreB ? 0 : 1]?.name;
     const rows = room.players.map((player) => ({ player, ...(finished.stats?.[player.id] || { passes:0, interceptions:0, goals:[] }) }));
     const mvp = [...rows].sort((a,b) => (b.goals.length * 5 + b.passes + b.interceptions * 2) - (a.goals.length * 5 + a.passes + a.interceptions * 2))[0];
-    return <div className="fulltime"><motion.div initial={{ scale:.5, opacity:0 }} animate={{ scale:1, opacity:1 }} className="fulltime-card final-scoreboard"><div className="trophy">🏆</div><p>FULL TIME</p><h1>{finished.scoreA} <span>–</span> {finished.scoreB}</h1><h2>{winner === "Draw" ? "It ends level" : `${winner} wins the match!`}</h2><div className="mvp-card"><small>MATCH MVP</small><b>{mvp?.goals?.[0] || mvp?.player.name}</b><span>{mvp?.goals?.length || 0} goal{mvp?.goals?.length === 1 ? "" : "s"} · {mvp?.passes || 0} passes</span></div><div className="stats-table">{rows.map((row) => <div key={row.player.id}><b>{row.player.name}</b><span>{row.passes} passes</span><span>{row.interceptions} interceptions</span><span>{row.goals.length ? row.goals.join(", ") : "No goals"}</span></div>)}</div><button className="primary-btn" onClick={() => window.location.reload()}>Start a new game</button></motion.div></div>;
+    return <div className="fulltime"><motion.div initial={{ scale:.5, opacity:0 }} animate={{ scale:1, opacity:1 }} className="fulltime-card final-scoreboard"><div className="trophy">🏆</div><p>FULL TIME</p><h1>{finished.scoreA} <span>–</span> {finished.scoreB}</h1><h2>{winner === "Draw" ? "It ends level" : `${winner} wins the match!`}</h2><div className="mvp-card"><small>MATCH MVP</small><b>{mvp?.goals?.[0] || mvp?.player.name}</b><span>{mvp?.goals?.length || 0} goal{mvp?.goals?.length === 1 ? "" : "s"} · {mvp?.passes || 0} passes</span></div><div className="stats-table">{rows.map((row) => <div key={row.player.id}><b>{row.player.name}</b><span>{row.passes} passes</span><span>{row.interceptions} interceptions</span><span>{row.goals.length ? row.goals.join(", ") : "No goals"}</span></div>)}</div><div className="post-match-actions">{rematchCount > 0 && !rematchRequested && <p className="rematch-hint">Your opponent wants a rematch!</p>}{rematchRequested ? <button className="primary-btn" disabled>Waiting for opponent · {rematchCount}/2</button> : <button className="primary-btn" onClick={() => { setRematchRequested(true); socket.emit("requestRematch", { roomCode:room.roomCode }); }}>Play again</button>}<button className="secondary-btn" onClick={() => { socket.emit("leaveRoom", { roomCode:room.roomCode }); localStorage.removeItem(`footyverse-room-${room.roomCode}`); window.history.replaceState({}, "", window.location.pathname); onLeaveRoom(); }}>Make another room</button></div></motion.div></div>;
   }
   if (matchData) return <Match room={{ ...room, teams:matchData.teams }} initialData={matchData} />;
   if (!rulesAccepted) return <Rulebook onConfirm={() => setRulesAccepted(true)} />;

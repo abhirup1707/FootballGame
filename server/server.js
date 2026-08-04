@@ -230,7 +230,7 @@ function resolveShot(room) {
 io.on("connection", (socket) => {
   socket.on("createRoom", ({ playerName, goalLimit, matchMode, timeLimit, resumeToken }) => {
     const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-    rooms[roomCode] = { roomCode, goalLimit:[1,3,5].includes(Number(goalLimit)) ? Number(goalLimit) : 3, matchMode:matchMode === "time" ? "time" : "goals", timeLimit:[90,120,150,180].includes(Number(timeLimit)) ? Number(timeLimit) : 90, players:[{ id:socket.id, name:playerName, resumeToken }], readyPlayers:0, teams:{}, scoreA:0, scoreB:0, possession:null, commentary:[], stats:{}, draft:{ round:0, turnId:socket.id, picks:{}, takenIds:[] }, match:null, timer:null, finished:false, shootout:null, reconnectTimers:{} };
+    rooms[roomCode] = { roomCode, goalLimit:[1,3,5].includes(Number(goalLimit)) ? Number(goalLimit) : 3, matchMode:matchMode === "time" ? "time" : "goals", timeLimit:[90,120,150,180].includes(Number(timeLimit)) ? Number(timeLimit) : 90, players:[{ id:socket.id, name:playerName, resumeToken }], readyPlayers:0, teams:{}, scoreA:0, scoreB:0, possession:null, commentary:[], stats:{}, draft:{ round:0, turnId:socket.id, picks:{}, takenIds:[] }, match:null, timer:null, finished:false, shootout:null, reconnectTimers:{}, rematchVotes:[] };
     socket.join(roomCode); socket.emit("roomCreated", roomCode);
   });
   socket.on("joinRoom", ({ roomCode, playerName, resumeToken }) => {
@@ -241,6 +241,7 @@ io.on("connection", (socket) => {
       const previousId = returningPlayer.id;
       if (room.reconnectTimers?.[previousId]) { clearTimeout(room.reconnectTimers[previousId]); delete room.reconnectTimers[previousId]; }
       returningPlayer.id = socket.id; movePlayerState(room, previousId, socket.id); socket.join(roomCode);
+      room.rematchVotes = room.rematchVotes.filter((id) => id !== previousId);
       socket.emit("roomReady", room); return;
     }
     if (room.players.length >= 2) return socket.emit("errorMessage", "Room full");
@@ -305,7 +306,31 @@ io.on("connection", (socket) => {
     shootout.choices[socket.id] = direction;
     if (Object.keys(shootout.choices).length === 2) resolvePenalty(room); else sendMatch(room);
   });
-  socket.on("disconnect", () => { Object.keys(rooms).forEach((code) => { const room = rooms[code]; const player = room.players.find((participant) => participant.id === socket.id); if (!player) return; room.reconnectTimers ||= {}; room.reconnectTimers[socket.id] = setTimeout(() => { const currentRoom = rooms[code]; if (!currentRoom) return; currentRoom.players = currentRoom.players.filter((participant) => participant.id !== socket.id); delete currentRoom.reconnectTimers[socket.id]; if (!currentRoom.players.length) { if (currentRoom.timer) clearInterval(currentRoom.timer); delete rooms[code]; } }, 60000); }); });
+  socket.on("requestRematch", ({ roomCode }) => {
+    const room = rooms[roomCode]; if (!room || !room.players.some((player) => player.id === socket.id)) return;
+    if (room.rematchVotes.includes(socket.id)) return;
+    room.rematchVotes.push(socket.id);
+    io.to(roomCode).emit("rematchRequested", { count:room.rematchVotes.length, total:room.players.length });
+    if (room.rematchVotes.length < room.players.length) return;
+    if (room.timer) clearInterval(room.timer);
+    const reset = {
+      roomCode:room.roomCode, goalLimit:room.goalLimit, matchMode:room.matchMode, timeLimit:room.timeLimit, players:room.players,
+      readyPlayers:0, teams:{}, scoreA:0, scoreB:0, possession:null, commentary:[], stats:{},
+      draft:{ round:0, turnId:room.players[0].id, picks:{}, takenIds:[] },
+      match:null, timer:null, finished:false, shootout:null, reconnectTimers:room.reconnectTimers, rematchVotes:[]
+    };
+    rooms[roomCode] = reset;
+    io.to(roomCode).emit("rematchConfirmed", { room });
+  });
+  socket.on("leaveRoom", ({ roomCode }) => {
+    const room = rooms[roomCode]; if (!room || !room.players.some((player) => player.id === socket.id)) return;
+    if (room.timer) clearInterval(room.timer);
+    room.players = room.players.filter((player) => player.id !== socket.id);
+    delete room.reconnectTimers?.[socket.id];
+    if (!room.players.length) { delete rooms[roomCode]; return; }
+    io.to(roomCode).emit("opponentLeft", { name:room.players.find((player) => player.id !== socket.id)?.name });
+  });
+  socket.on("disconnect", () => { Object.keys(rooms).forEach((code) => { const room = rooms[code]; const player = room.players.find((participant) => participant.id === socket.id); if (!player) return; room.rematchVotes = room.rematchVotes.filter((id) => id !== socket.id); room.reconnectTimers ||= {}; room.reconnectTimers[socket.id] = setTimeout(() => { const currentRoom = rooms[code]; if (!currentRoom) return; currentRoom.players = currentRoom.players.filter((participant) => participant.id !== socket.id); delete currentRoom.reconnectTimers[socket.id]; if (!currentRoom.players.length) { if (currentRoom.timer) clearInterval(currentRoom.timer); delete rooms[code]; } }, 60000); }); });
 });
 const port = Number(process.env.PORT) || 5000;
 server.listen(port, () => console.log(`Server running on ${port}`));
