@@ -19,7 +19,7 @@ const PITCH_COORDINATES = { GK:[50,88], LB:[17,70], CB1:[38,74], CB2:[62,74], RB
 const FORMATION_CATEGORY = { GK:"GK", LB:"DEF", CB1:"DEF", CB2:"DEF", RB:"DEF", CM1:"MID", CM2:"MID", CAM:"MID", LW:"ATT", ST:"ATT", RW:"ATT" };
 const randomItem = (items) => items[Math.floor(Math.random() * items.length)];
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
-const MOVE_TIMEOUT = 10000;
+const MOVE_TIMEOUT = 7000;
 function validLineup(room, playerId, positions) {
   const drafted = room.draft.picks[playerId] || [];
   if (!positions || drafted.length !== Object.keys(FORMATION_CATEGORY).length) return false;
@@ -74,7 +74,7 @@ function matchPayload(room) {
   return { teams:room.teams, scoreA:room.scoreA, scoreB:room.scoreB, possession:room.possession, commentary:room.commentary, stats:room.stats,
     config:{ mode:room.matchMode, goalLimit:room.goalLimit, timeLimit:room.timeLimit }, elapsedMs:Math.max(0, Date.now() - (room.matchStartedAt || Date.now())),
     shootout,
-    match: { phase:room.match.phase, passCount:room.match.passCount, carrier:room.match.carrier, lastPass:room.match.lastPass || null, options, choicesLocked:Object.keys(room.match.choices).length, deadline:room.match.deadline || null } };
+    match: { phase:room.match.phase, passCount:room.match.passCount, carrier:room.match.carrier, lastPass:room.match.lastPass || null, options, choicesLocked:Object.keys(room.match.choices).length, deadline:room.match.deadline || null, deadlineLeft:room.match.deadline ? Math.max(0, room.match.deadline - Date.now()) : null } };
 }
 function sendMatch(room, event = "matchUpdate") { io.to(room.roomCode).emit(event, matchPayload(room)); }
 function finishMatch(room) {
@@ -238,10 +238,10 @@ function autoPickMoves(room) {
   const attackId = room.possession;
   const defendId = room.players.find((player) => player.id !== attackId).id;
   const isGoal = room.match.phase === "GOAL";
-  const firstPass = isGoal ? null : passOptions(room)[0]?.id;
-  if (!room.match.choices[attackId]) room.match.choices[attackId] = isGoal ? "LEFT" : firstPass;
-  if (!room.match.choices[defendId]) room.match.choices[defendId] = isGoal ? "LEFT" : firstPass;
-  addStory(room, "⏰ Time up — the move was chosen automatically.");
+  const randomPass = () => randomItem(passOptions(room))?.id;
+  if (!room.match.choices[attackId]) room.match.choices[attackId] = isGoal ? randomItem(["LEFT", "CENTER", "RIGHT"]) : randomPass();
+  if (!room.match.choices[defendId]) room.match.choices[defendId] = isGoal ? randomItem(["LEFT", "CENTER", "RIGHT"]) : randomPass();
+  addStory(room, "⏰ Time up — a move was chosen automatically.");
   if (isGoal) { if (resolveShot(room)) return; }
   else resolvePass(room);
   if (room.match?.phase === "INTERCEPTION") return;
