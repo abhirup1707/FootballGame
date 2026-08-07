@@ -9,4 +9,11 @@ const socket = io(serverUrl, {
   reconnection: true,
 });
 
+socket.on("connect", () => {
+  try {
+    const raw = localStorage.getItem("footyverse-auth");
+    if (raw) socket.emit("authSocket", { token: JSON.parse(raw).token });
+  } catch { /* not signed in yet */ }
+});
+
 export default socket;

@@ -2,6 +2,13 @@ const express = require("express");
 const http = require("http");
 const cors = require("cors");
 const { Server } = require("socket.io");
+const routes = require("./routes");
+const { db } = require("./db");
+require("./seed");
+const { resolveMatchRewards } = require("./economy");
+const { userByToken } = require("./auth");
+const { computeOVR, effectiveStats, positionPenalty } = require("./ovr");
+const { DRAFT_POOL } = require("./draftPool");
 
 const app = express();
 const allowedOrigins = process.env.CLIENT_ORIGIN
@@ -10,19 +17,30 @@ const allowedOrigins = process.env.CLIENT_ORIGIN
 const corsOptions = { origin: allowedOrigins };
 
 app.use(cors(corsOptions));
+app.use(express.json());
+app.use("/api", routes);
 app.get("/health", (_req, res) => res.status(200).json({ status: "ok" }));
 const server = http.createServer(app);
 const io = new Server(server, { cors: corsOptions });
 const rooms = {};
+// 22 rounds: each manager drafts an 11-man starting XI.
 const DRAFT_ROUNDS = [...Array(6).fill("ATT"), ...Array(6).fill("MID"), ...Array(8).fill("DEF"), ...Array(2).fill("GK")];
+const STARTER_COUNT = 11;
 const PITCH_COORDINATES = { GK:[50,88], LB:[17,70], CB1:[38,74], CB2:[62,74], RB:[83,70], CM1:[32,53], CM2:[68,53], CAM:[50,43], LW:[19,25], ST:[50,18], RW:[81,25] };
 const FORMATION_CATEGORY = { GK:"GK", LB:"DEF", CB1:"DEF", CB2:"DEF", RB:"DEF", CM1:"MID", CM2:"MID", CAM:"MID", LW:"ATT", ST:"ATT", RW:"ATT" };
 const randomItem = (items) => items[Math.floor(Math.random() * items.length)];
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const MOVE_TIMEOUT = 7000;
+function cardPayload(card) {
+  return { id: card.id, name: card.name, season: card.season, club: card.club, position: card.category, rating: card.base_rating, tier: card.tier, image: card.image, pace: card.pace, shooting: card.shooting, passing: card.passing, dribbling: card.dribbling, defending: card.defending, physicality: card.physicality };
+}
+// A joined owned_cards row converted into the same shape the match engine uses.
+function ownedPlayer(row) {
+  return { id: row.id, name: row.name, season: row.season, club: row.club, position: row.category, rating: row.rating, tier: row.tier, image: row.image, pace: row.pace, shooting: row.shooting, passing: row.passing, dribbling: row.dribbling, defending: row.defending, physicality: row.physicality, owned: true };
+}
 function validLineup(room, playerId, positions) {
   const drafted = room.draft.picks[playerId] || [];
-  if (!positions || drafted.length !== Object.keys(FORMATION_CATEGORY).length) return false;
+  if (!positions || drafted.length < STARTER_COUNT) return false;
   const draftedById = new Map(drafted.map((player) => [player.id, player]));
   const usedIds = new Set();
   return Object.entries(FORMATION_CATEGORY).every(([slot, category]) => {
@@ -30,7 +48,19 @@ function validLineup(room, playerId, positions) {
     if (!draftedPlayer || draftedPlayer.position !== category || usedIds.has(player.id)) return false;
     usedIds.add(player.id);
     return true;
-  }) && usedIds.size === drafted.length;
+  }) && usedIds.size === STARTER_COUNT;
+}
+function buildTeam(positions) {
+  const copy = {};
+  for (const [slot, player] of Object.entries(positions)) {
+    copy[slot] = player ? { ...player, stamina: 100 } : null;
+  }
+  return copy;
+}
+function pickKickoff(room) {
+  const [first, second] = room.players.map((player) => player.id);
+  const chance = clamp(50 + (room.teams[first].overall - room.teams[second].overall) * 3, 25, 75);
+  return Math.random() * 100 < chance ? first : second;
 }
 function movePlayerState(room, previousId, nextId) {
   if (previousId === nextId) return;
@@ -81,7 +111,8 @@ function finishMatch(room) {
   if (room.finished) return;
   room.finished = true;
   if (room.timer) clearInterval(room.timer);
-  io.to(room.roomCode).emit("matchFinished", { scoreA:room.scoreA, scoreB:room.scoreB, stats:room.stats, shootout:room.shootout || null });
+  const rewards = resolveMatchRewards(room);
+  io.to(room.roomCode).emit("matchFinished", { scoreA:room.scoreA, scoreB:room.scoreB, stats:room.stats, shootout:room.shootout || null, rewards });
 }
 function shootoutScore(room, id) { return room.shootout.kicks[id].filter(Boolean).length; }
 function startShootout(room) {
@@ -107,10 +138,18 @@ function advanceShootout(room) {
 }
 function resolvePenalty(room) {
   const shootout = room.shootout, attackId = shootout.currentTeam, defendId = room.players.find((p) => p.id !== attackId).id;
-  const shot = shootout.choices[attackId], dive = shootout.choices[defendId], goal = shot !== dive;
-  shootout.kicks[attackId].push(goal); shootout.result = { attackId, shooter:shootout.selectedShooter, keeper:room.teams[defendId].positions.GK, shot, dive, goal };
+  const shot = shootout.choices[attackId], dive = shootout.choices[defendId];
+  const shooter = shootout.selectedShooter, keeper = room.teams[defendId].positions.GK;
+  const shooterSHO = effectiveStats(shooter, shooter.stamina).shooting;
+  const keeperREF = effectiveStats(keeper, keeper.stamina).defending;
+  // Diving the right way always saves the penalty — the mind-game is the core.
+  // Stats only move the odds when the keeper guesses wrong.
+  let goal;
+  if (shot === dive) goal = false;
+  else goal = Math.random() * 100 < clamp(70 + (shooterSHO - keeperREF) * 2, 40, 94);
+  shootout.kicks[attackId].push(goal); shootout.result = { attackId, shooter, keeper, shot, dive, goal };
   shootout.phase = "RESULT";
-  addStory(room, goal ? `GOAL! ${shootout.selectedShooter.name} sends ${room.teams[defendId].positions.GK.name} the wrong way.` : `SAVED! ${room.teams[defendId].positions.GK.name} reads the penalty.`);
+  addStory(room, goal ? `GOAL! ${shooter.name} sends ${keeper.name} the wrong way.` : `SAVED! ${keeper.name} reads the penalty.`);
   sendMatch(room, "penaltyResult");
   setTimeout(() => { if (!room.finished && room.shootout?.phase === "RESULT") advanceShootout(room); }, 1900);
 }
@@ -158,7 +197,8 @@ function midfieldKickoffPlayer(team) {
 }
 function averageDefence(team) {
   const players = [team.positions.GK, team.positions.LB, team.positions.CB1, team.positions.CB2, team.positions.RB].filter(Boolean);
-  return players.reduce((sum, player) => sum + player.rating, 0) / players.length;
+  if (!players.length) return 60;
+  return players.reduce((sum, player) => sum + effectiveStats(player, player.stamina).defending, 0) / players.length;
 }
 function resolvePass(room) {
   const attackId = room.possession;
@@ -168,12 +208,12 @@ function resolvePass(room) {
   if (!receiver) return;
   const carrier = room.match.carrier;
   const markedCorrectly = markedId === receiver.id;
-  const interceptionChance = clamp(35 + (averageDefence(room.teams[defendId]) - receiver.rating) * 2.5, 18, 72);
-  const intercepted = markedCorrectly;
-  room.match.choices = {};
-  room.match.deadline = Date.now() + MOVE_TIMEOUT;
-  if (intercepted) {
-    const interceptor = closestDefender(room, defendId, receiver);
+  const interceptor = closestDefender(room, defendId, receiver);
+  // Reading the pass correctly always wins the ball — the defender picked the
+  // exact teammate the carrier targeted. Stats only shape the unlucky cases.
+  if (markedCorrectly) {
+    room.match.choices = {};
+    room.match.deadline = Date.now() + MOVE_TIMEOUT;
     if (!interceptor) return;
     room.stats[defendId].interceptions += 1;
     room.match.phase = "INTERCEPTION";
@@ -187,15 +227,14 @@ function resolvePass(room) {
       sendMatch(room);
     }, 1050);
     return;
-    room.stats[defendId].interceptions += 1;
-    addStory(room, `🧤 READ PERFECTLY — ${room.players.find((p) => p.id === defendId).name} closes down ${receiver.name} and wins it.`);
-    startPossession(room, defendId);
-    return;
   }
+  // An unmarked pass can still be pressed into a giveaway, but far less often.
+  room.match.choices = {};
+  room.match.deadline = Date.now() + MOVE_TIMEOUT;
   room.match.carrier = receiver;
   room.match.passCount += 1;
   room.stats[attackId].passes += 1;
-  const flair = markedCorrectly ? "beats the marker" : "finds space";
+  const flair = "finds space";
   room.match.lastPass = { team:teamName(room, attackId), passer:carrier.name, receiver:receiver.name };
   addStory(room, `⚽ ${teamName(room, attackId)}: ${carrier.name} passes to ${receiver.name} — ${flair}.`);
   if (room.match.passCount >= 5) {
@@ -211,7 +250,8 @@ function resolveShot(room) {
   const shooter = room.match.carrier;
   const keeper = room.teams[defendId].positions.GK;
   const matched = shot === save;
-  // If the keeper covers the selected side, the shot is saved.
+  // The keeper covering the same corner always saves it. Stats only shape the
+  // cases where the keeper guessed wrong and has to react to the ball.
   const goal = !matched;
   room.match.choices = {};
   if (goal) {
@@ -249,9 +289,13 @@ function autoPickMoves(room) {
 }
 
 io.on("connection", (socket) => {
-  socket.on("createRoom", ({ playerName, goalLimit, matchMode, timeLimit, resumeToken }) => {
+  socket.on("authSocket", ({ token }) => {
+    const user = userByToken(token);
+    socket.data.userId = user ? user.id : undefined;
+  });
+  socket.on("createRoom", ({ playerName, goalLimit, matchMode, timeLimit, resumeToken, mode }) => {
     const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-    rooms[roomCode] = { roomCode, goalLimit:[1,3,5].includes(Number(goalLimit)) ? Number(goalLimit) : 3, matchMode:matchMode === "time" ? "time" : "goals", timeLimit:[90,120,150,180].includes(Number(timeLimit)) ? Number(timeLimit) : 90, players:[{ id:socket.id, name:playerName, resumeToken }], readyPlayers:0, teams:{}, scoreA:0, scoreB:0, possession:null, commentary:[], stats:{}, draft:{ round:0, turnId:socket.id, picks:{}, takenIds:[] }, match:null, timer:null, finished:false, shootout:null, reconnectTimers:{}, rematchVotes:[] };
+    rooms[roomCode] = { roomCode, mode: mode === "club" ? "club" : "draft", goalLimit:[1,3,5].includes(Number(goalLimit)) ? Number(goalLimit) : 3, matchMode:matchMode === "time" ? "time" : "goals", timeLimit:[90,120,150,180].includes(Number(timeLimit)) ? Number(timeLimit) : 90, players:[{ id:socket.id, name:playerName, resumeToken, userId:socket.data.userId }], readyPlayers:0, teams:{}, scoreA:0, scoreB:0, possession:null, commentary:[], stats:{}, draft:{ round:0, turnId:socket.id, picks:{}, takenIds:[] }, match:null, timer:null, finished:false, shootout:null, reconnectTimers:{}, rematchVotes:[] };
     socket.join(roomCode); socket.emit("roomCreated", roomCode);
   });
   socket.on("joinRoom", ({ roomCode, playerName, resumeToken }) => {
@@ -266,35 +310,69 @@ io.on("connection", (socket) => {
       socket.emit("roomReady", room); return;
     }
     if (room.players.length >= 2) return socket.emit("errorMessage", "Room full");
-    room.players.push({ id:socket.id, name:playerName, resumeToken }); socket.join(roomCode);
+    room.players.push({ id:socket.id, name:playerName, resumeToken, userId:socket.data.userId }); socket.join(roomCode);
     io.to(roomCode).emit("roomReady", room); sendDraftState(room);
   });
   socket.on("getDraftState", ({ roomCode }) => { const room = rooms[roomCode]; if (!room) return; socket.emit("draftState", draftPayload(room)); if (room.match) socket.emit("enterMatch", matchPayload(room)); });
-  socket.on("requestDraftPack", ({ roomCode, players }) => {
+  socket.on("requestDraftPack", ({ roomCode }) => {
     const room = rooms[roomCode]; if (!room || room.draft.turnId !== socket.id) return;
     const category = DRAFT_ROUNDS[room.draft.round];
-    const pack = (players || []).filter((player) => player.position === category && !room.draft.takenIds.includes(player.id)).sort(() => Math.random() - .5).slice(0, 4);
-    socket.emit("draftPack", { pack, category });
+    if (!category) return;
+    const taken = room.draft.takenIds || [];
+    const candidates = DRAFT_POOL.filter((card) => card.category === category && !taken.includes(card.id));
+    const pack = [];
+    const pool = [...candidates];
+    for (let i = 0; i < Math.min(4, pool.length); i++) {
+      const idx = Math.floor(Math.random() * pool.length);
+      pack.push(pool.splice(idx, 1)[0]);
+    }
+    socket.emit("draftPack", { pack: pack.map(cardPayload), category });
   });
-  socket.on("draftPick", ({ roomCode, player, allPlayers }) => {
+  socket.on("draftPick", ({ roomCode, player }) => {
     const room = rooms[roomCode], category = room && DRAFT_ROUNDS[room.draft.round];
     if (!room || room.draft.turnId !== socket.id || !player) return;
-    const valid = (allPlayers || []).find((candidate) => candidate.id === player.id && candidate.position === category);
-    if (!valid || room.draft.takenIds.includes(valid.id)) return;
-    room.draft.takenIds.push(valid.id); room.draft.picks[socket.id] = [...(room.draft.picks[socket.id] || []), valid]; room.draft.round += 1;
+    const card = DRAFT_POOL.find((c) => c.id === player.id && c.category === category);
+    if (!card || room.draft.takenIds.includes(card.id)) return;
+    room.draft.takenIds.push(card.id); room.draft.picks[socket.id] = [...(room.draft.picks[socket.id] || []), cardPayload(card)]; room.draft.round += 1;
     room.draft.turnId = room.players.find((participant) => participant.id !== socket.id)?.id || socket.id; sendDraftState(room);
   });
   socket.on("playerReady", ({ roomCode, positions, overall }) => {
     const room = rooms[roomCode]; if (!room || room.teams[socket.id]) return;
-    if (!validLineup(room, socket.id, positions)) return socket.emit("errorMessage", "Your lineup must keep each player in their own category.");
-    const verifiedOverall = Number((Object.keys(FORMATION_CATEGORY).reduce((sum, slot) => sum + positions[slot].rating, 0) / Object.keys(FORMATION_CATEGORY).length).toFixed(1));
-    room.teams[socket.id] = { positions, overall:verifiedOverall }; room.readyPlayers += 1; io.to(roomCode).emit("readyCount", room.readyPlayers);
+    let team;
+    if (room.mode === "club") {
+      // Own-team mode: the server builds the XI from the manager's saved squad,
+      // so the draft is skipped entirely and the lineup can't be tampered with.
+      if (!socket.data.userId) return socket.emit("errorMessage", "Log in to play with your own team.");
+      const ownedRows = db.prepare(`
+        SELECT oc.*, c.name, c.season, c.club, c.position, c.category, c.base_rating, c.tier, c.image, c.pace, c.shooting, c.passing, c.dribbling, c.defending, c.physicality
+        FROM owned_cards oc JOIN cards c ON c.id = oc.card_id
+        WHERE oc.user_id = ?
+      `).all(socket.data.userId);
+      const inXI = ownedRows.filter((row) => row.is_in_xi === 1);
+      if (inXI.length !== 11) return socket.emit("errorMessage", "Set your starting XI (11 players) in My Team before playing.");
+      const xiPositions = {};
+      for (const row of inXI) {
+        if (!row.slot || !FORMATION_CATEGORY[row.slot]) return socket.emit("errorMessage", "Your saved squad is invalid.");
+        if (xiPositions[row.slot]) return socket.emit("errorMessage", "Your saved squad has duplicate players.");
+        // Any player can play any slot; out-of-position players lose OVR here so
+        // the match sees the same rating penalty the team screen shows.
+        const penalty = positionPenalty(row.category, FORMATION_CATEGORY[row.slot]);
+        xiPositions[row.slot] = { ...ownedPlayer(row), rating: row.rating + penalty };
+      }
+      const verifiedOverall = Number((Object.values(xiPositions).reduce((sum, player) => sum + player.rating, 0) / STARTER_COUNT).toFixed(1));
+      team = { positions: buildTeam(xiPositions), overall: verifiedOverall };
+    } else {
+      if (!validLineup(room, socket.id, positions)) return socket.emit("errorMessage", "Your lineup must keep each player in their own category.");
+      const verifiedOverall = Number((Object.keys(FORMATION_CATEGORY).reduce((sum, slot) => sum + positions[slot].rating, 0) / STARTER_COUNT).toFixed(1));
+      team = { positions: buildTeam(positions), overall: verifiedOverall };
+    }
+    room.teams[socket.id] = team; room.readyPlayers += 1; io.to(roomCode).emit("readyCount", room.readyPlayers);
     if (room.readyPlayers === 2) {
       const [first, second] = room.players.map((player) => player.id);
       room.stats = { [first]:{ passes:0, interceptions:0, goals:[] }, [second]:{ passes:0, interceptions:0, goals:[] } };
-      const kickoffId = room.teams[first].overall >= room.teams[second].overall ? first : second;
+      const kickoffId = pickKickoff(room);
       room.nextKickoffCarrier = highestRatedPlayer(room.teams[kickoffId]);
-      startPossession(room, room.teams[first].overall >= room.teams[second].overall ? first : second, "🏟️ Kick-off! The higher-rated side starts from the back.");
+      startPossession(room, kickoffId, "🏟️ Kick-off! The stronger side starts from the back — for now.");
       startMatchClock(room);
       sendMatch(room, "enterMatch");
     }
@@ -335,7 +413,7 @@ io.on("connection", (socket) => {
     if (room.rematchVotes.length < room.players.length) return;
     if (room.timer) clearInterval(room.timer);
     const reset = {
-      roomCode:room.roomCode, goalLimit:room.goalLimit, matchMode:room.matchMode, timeLimit:room.timeLimit, players:room.players,
+      roomCode:room.roomCode, mode:room.mode, goalLimit:room.goalLimit, matchMode:room.matchMode, timeLimit:room.timeLimit, players:room.players,
       readyPlayers:0, teams:{}, scoreA:0, scoreB:0, possession:null, commentary:[], stats:{},
       draft:{ round:0, turnId:room.players[0].id, picks:{}, takenIds:[] },
       match:null, timer:null, finished:false, shootout:null, reconnectTimers:room.reconnectTimers, rematchVotes:[]

@@ -1,0 +1,301 @@
+# | Player | Nation | Position | OVR | PAC | SHO | PAS | DRI | DEF | PHY | League/Region | Status
+1 | Paolo Maldini | Italy | LB | 75 | 86 | 45 | 89 | 86 | 99 | 78 | Legacy | Icon
+2 | Franco Baresi | Italy | CB | 75 | 72 | 35 | 91 | 73 | 99 | 78 | Legacy | Icon
+3 | Alessandro Nesta | Italy | CB | 75 | 79 | 30 | 89 | 72 | 98 | 76 | Legacy | Icon
+4 | Fabio Cannavaro | Italy | CB | 74 | 91 | 35 | 78 | 69 | 99 | 88 | Legacy | Icon
+5 | Roberto Carlos | Brazil | LB | 75 | 97 | 82 | 89 | 91 | 88 | 88 | Legacy | Icon
+6 | Cafu | Brazil | RB | 75 | 95 | 62 | 90 | 88 | 91 | 84 | Legacy | Icon
+7 | Carlos Alberto | Brazil | RB | 74 | 91 | 59 | 88 | 87 | 92 | 84 | Legacy | Icon
+8 | Dani Alves | Brazil | RB | 73 | 89 | 61 | 94 | 94 | 82 | 68 | Legacy | Icon
+9 | Thiago Silva | Brazil | CB | 73 | 66 | 35 | 85 | 69 | 96 | 78 | Brazil | Veteran
+10 | Lúcio | Brazil | CB | 72 | 85 | 48 | 75 | 70 | 91 | 93 | Legacy | Icon
+11 | Aldair | Brazil | CB | 70 | 73 | 32 | 82 | 65 | 91 | 84 | Legacy | Icon
+12 | Juan | Brazil | CB | 69 | 72 | 30 | 79 | 63 | 90 | 82 | Legacy | Icon
+13 | Marcelo | Brazil | LB | 71 | 88 | 62 | 95 | 97 | 76 | 71 | Legacy | Icon
+14 | Maicon | Brazil | RB | 72 | 92 | 70 | 84 | 84 | 86 | 91 | Legacy | Icon
+15 | Alex Sandro | Brazil | LB | 67 | 77 | 32 | 76 | 77 | 82 | 81 | Brazil | Veteran
+16 | Miranda | Brazil | CB | 67 | 67 | 25 | 71 | 58 | 91 | 82 | Legacy | Veteran
+17 | Marquinhos | Brazil | CB | 73 | 82 | 30 | 88 | 78 | 94 | 74 | France | Current
+18 | Éder Militão | Brazil | CB | 73 | 94 | 25 | 78 | 71 | 92 | 87 | Spain | Current
+19 | Gabriel Magalhães | Brazil | CB | 71 | 70 | 25 | 68 | 57 | 93 | 91 | England | Current
+20 | Bremer | Brazil | CB | 71 | 79 | 26 | 69 | 56 | 94 | 92 | Italy | Current
+21 | Danilo | Brazil | RB | 68 | 71 | 43 | 76 | 72 | 84 | 80 | Brazil | Veteran
+22 | Alex Telles | Brazil | LB | 64 | 77 | 44 | 78 | 78 | 70 | 65 | Brazil | Veteran
+23 | Emerson Royal | Brazil | RB | 66 | 81 | 33 | 68 | 69 | 80 | 79 | Italy | Current
+24 | Renan Lodi | Brazil | LB | 66 | 87 | 40 | 75 | 78 | 68 | 65 | Saudi Pro League | Current
+25 | Wendell | Brazil | LB | 63 | 82 | 28 | 66 | 71 | 71 | 66 | Brazil | Veteran
+26 | David Luiz | Brazil | CB | 65 | 54 | 51 | 81 | 69 | 75 | 78 | Brazil | Veteran
+27 | Dante | Brazil | CB | 64 | 50 | 27 | 76 | 57 | 83 | 78 | Brazil | Veteran
+28 | Naldo | Brazil | CB | 63 | 62 | 43 | 74 | 58 | 86 | 82 | Legacy | Veteran
+29 | Miranda | Brazil | CB | 67 | 67 | 25 | 71 | 58 | 91 | 82 | Legacy | Veteran
+30 | Felipe | Brazil | CB | 62 | 57 | 31 | 66 | 53 | 79 | 84 | Brazil | Veteran
+31 | Sergio Ramos | Spain | CB | 75 | 81 | 55 | 82 | 73 | 96 | 91 | Legacy | Icon
+32 | Carles Puyol | Spain | CB | 73 | 82 | 35 | 75 | 62 | 98 | 90 | Legacy | Icon
+33 | Gerard Piqué | Spain | CB | 70 | 61 | 43 | 86 | 65 | 91 | 88 | Legacy | Icon
+34 | Fernando Hierro | Spain | CB | 71 | 64 | 76 | 85 | 67 | 91 | 88 | Legacy | Icon
+35 | Carlos Marchena | Spain | CB | 65 | 62 | 28 | 70 | 54 | 89 | 77 | Legacy | Veteran
+36 | Jordi Alba | Spain | LB | 71 | 94 | 58 | 87 | 90 | 78 | 64 | Spain | Veteran
+37 | Joan Capdevila | Spain | LB | 66 | 81 | 38 | 69 | 67 | 84 | 76 | Legacy | Icon
+38 | César Azpilicueta | Spain | RB | 68 | 69 | 28 | 78 | 66 | 91 | 74 | Spain | Veteran
+39 | Dani Carvajal | Spain | RB | 73 | 81 | 39 | 83 | 76 | 94 | 82 | Spain | Current
+40 | Juanfran | Spain | RB | 67 | 83 | 29 | 77 | 70 | 88 | 77 | Legacy | Veteran
+41 | Gerard Piqué | Spain | CB | 70 | 61 | 43 | 86 | 65 | 91 | 88 | Legacy | Icon
+42 | Eric García | Spain | CB | 63 | 61 | 23 | 77 | 58 | 75 | 62 | Spain | Current
+43 | Pau Torres | Spain | CB | 70 | 69 | 27 | 83 | 63 | 86 | 78 | England | Current
+44 | Aymeric Laporte | Spain | CB | 71 | 61 | 29 | 82 | 61 | 91 | 82 | Saudi Pro League | Veteran
+45 | Robin Le Normand | Spain | CB | 69 | 59 | 26 | 68 | 53 | 92 | 84 | Spain | Current
+46 | Marc Cucurella | Spain | LB | 70 | 84 | 30 | 78 | 80 | 82 | 69 | England | Current
+47 | Alejandro Grimaldo | Spain | LB | 71 | 84 | 50 | 91 | 88 | 76 | 59 | Germany | Current
+48 | Pedro Porro | Spain | RB | 69 | 87 | 48 | 83 | 84 | 71 | 66 | England | Current
+49 | Álex Baena | Spain | LB | 64 | 83 | 27 | 73 | 77 | 65 | 57 | Spain | Current
+50 | Héctor Bellerín | Spain | RB | 63 | 91 | 23 | 67 | 75 | 68 | 58 | Spain | Veteran
+51 | Franz Beckenbauer | Germany | CB | 75 | 83 | 55 | 97 | 91 | 96 | 81 | Legacy | Icon
+52 | Philipp Lahm | Germany | RB | 75 | 91 | 38 | 94 | 91 | 97 | 68 | Legacy | Icon
+53 | Matthias Sammer | Germany | CB | 72 | 76 | 46 | 84 | 72 | 94 | 84 | Legacy | Icon
+54 | Jürgen Kohler | Germany | CB | 71 | 70 | 25 | 67 | 55 | 97 | 94 | Legacy | Icon
+55 | Andreas Brehme | Germany | LB | 71 | 84 | 51 | 89 | 82 | 87 | 75 | Legacy | Icon
+56 | Per Mertesacker | Germany | CB | 67 | 43 | 20 | 64 | 46 | 89 | 92 | Legacy | Veteran
+57 | Jerome Boateng | Germany | CB | 68 | 63 | 25 | 82 | 65 | 88 | 83 | Legacy | Veteran
+58 | Mats Hummels | Germany | CB | 71 | 57 | 35 | 87 | 61 | 94 | 84 | Germany | Veteran
+59 | Antonio Rüdiger | Germany | CB | 74 | 91 | 31 | 74 | 67 | 94 | 96 | Spain | Current
+60 | Niklas Süle | Germany | CB | 67 | 72 | 25 | 72 | 54 | 82 | 94 | Germany | Current
+61 | Jonathan Tah | Germany | CB | 70 | 66 | 25 | 75 | 55 | 90 | 91 | Germany | Current
+62 | Nico Schlotterbeck | Germany | CB | 72 | 83 | 28 | 78 | 61 | 88 | 87 | Germany | Current
+63 | David Raum | Germany | LB | 68 | 87 | 31 | 78 | 80 | 70 | 64 | Germany | Current
+64 | Benjamin Henrichs | Germany | RB | 66 | 84 | 27 | 72 | 75 | 74 | 69 | Germany | Current
+65 | Robin Gosens | Germany | LB | 67 | 83 | 52 | 74 | 72 | 73 | 77 | Italy | Veteran
+66 | Lukas Klostermann | Germany | RB | 64 | 88 | 25 | 67 | 63 | 76 | 75 | Germany | Current
+67 | Waldemar Anton | Germany | CB | 66 | 69 | 25 | 66 | 52 | 84 | 83 | Germany | Current
+68 | Niklas Stark | Germany | CB | 62 | 57 | 20 | 63 | 48 | 76 | 79 | Germany | Veteran
+69 | Nico Elvedi | Switzerland | CB | 66 | 67 | 27 | 74 | 54 | 84 | 78 | Germany | Current
+70 | Manuel Akanji | Switzerland | CB | 71 | 81 | 23 | 79 | 66 | 89 | 86 | England | Current
+71 | Ricardo Carvalho | Portugal | CB | 72 | 80 | 28 | 83 | 67 | 94 | 78 | Legacy | Icon
+72 | Pepe | Portugal | CB | 72 | 71 | 30 | 66 | 51 | 96 | 92 | Portugal | Icon
+73 | João Cancelo | Portugal | RB | 72 | 91 | 48 | 89 | 92 | 71 | 68 | Spain | Current
+74 | Nuno Mendes | Portugal | LB | 73 | 96 | 34 | 79 | 86 | 84 | 77 | France | Current
+75 | Raphaël Guerreiro | Portugal | LB | 69 | 82 | 48 | 90 | 89 | 67 | 56 | Germany | Veteran
+76 | Rúben Dias | Portugal | CB | 73 | 68 | 25 | 78 | 54 | 96 | 89 | England | Current
+77 | Gonçalo Inácio | Portugal | CB | 70 | 72 | 26 | 86 | 62 | 85 | 72 | Portugal | Current
+78 | António Silva | Portugal | CB | 71 | 76 | 21 | 78 | 57 | 89 | 76 | Portugal | Current
+79 | Diogo Dalot | Portugal | RB | 69 | 84 | 33 | 78 | 77 | 77 | 74 | England | Current
+80 | Nelson Semedo | Portugal | RB | 68 | 93 | 25 | 69 | 77 | 75 | 69 | England | Current
+81 | Raphaël Guerreiro | Portugal | LB | 69 | 82 | 48 | 90 | 89 | 67 | 56 | Germany | Veteran
+82 | Ricardo Pereira | Portugal | RB | 65 | 88 | 30 | 75 | 79 | 72 | 65 | Portugal | Veteran
+83 | Fábio Coentrão | Portugal | LB | 65 | 91 | 27 | 74 | 80 | 72 | 65 | Legacy | Veteran
+84 | Bruno Alves | Portugal | CB | 65 | 55 | 43 | 61 | 45 | 89 | 91 | Legacy | Veteran
+85 | Jorge Costa | Portugal | CB | 64 | 55 | 21 | 52 | 41 | 92 | 90 | Legacy | Icon
+86 | Lilian Thuram | France | RB | 74 | 90 | 42 | 79 | 72 | 97 | 91 | Legacy | Icon
+87 | Marcel Desailly | France | CB | 74 | 78 | 34 | 74 | 61 | 98 | 94 | Legacy | Icon
+88 | Laurent Blanc | France | CB | 72 | 65 | 39 | 85 | 62 | 94 | 89 | Legacy | Icon
+89 | Patrice Evra | France | LB | 70 | 91 | 35 | 80 | 79 | 91 | 81 | Legacy | Icon
+90 | Bixente Lizarazu | France | LB | 69 | 90 | 34 | 79 | 77 | 89 | 72 | Legacy | Icon
+91 | William Gallas | France | CB | 69 | 81 | 29 | 68 | 60 | 89 | 82 | Legacy | Veteran
+92 | Raphaël Varane | France | CB | 73 | 85 | 25 | 78 | 61 | 93 | 87 | Legacy | Icon
+93 | Samuel Umtiti | France | CB | 66 | 70 | 28 | 73 | 58 | 87 | 83 | France | Veteran
+94 | Dayot Upamecano | France | CB | 72 | 88 | 22 | 75 | 64 | 90 | 88 | Germany | Current
+95 | William Saliba | France | CB | 74 | 89 | 23 | 85 | 66 | 94 | 89 | England | Current
+96 | Ibrahima Konaté | France | CB | 72 | 82 | 21 | 72 | 53 | 91 | 94 | England | Current
+97 | Jules Koundé | France | RB | 72 | 90 | 27 | 83 | 79 | 92 | 72 | Spain | Current
+98 | Theo Hernández | France | LB | 74 | 98 | 53 | 81 | 91 | 83 | 86 | Italy | Current
+99 | Benjamin Pavard | France | RB | 70 | 74 | 43 | 80 | 69 | 89 | 80 | Italy | Current
+100 | Lucas Hernández | France | CB | 69 | 82 | 31 | 70 | 61 | 89 | 81 | France | Current
+101 | Jean-Clair Todibo | France | CB | 68 | 81 | 22 | 72 | 61 | 86 | 82 | France | Current
+102 | Ferland Mendy | France | LB | 69 | 93 | 22 | 76 | 84 | 84 | 79 | Saudi Pro League | Current
+103 | Jonathan Clauss | France | RB | 67 | 89 | 42 | 80 | 81 | 72 | 65 | France | Veteran
+104 | Benjamin Mendy | France | LB | 61 | 80 | 22 | 67 | 76 | 62 | 72 | France | Veteran
+105 | Mamadou Sakho | France | CB | 61 | 56 | 24 | 56 | 43 | 82 | 88 | Legacy | Veteran
+106 | Giorgio Chiellini | Italy | CB | 71 | 63 | 38 | 63 | 51 | 98 | 94 | Legacy | Icon
+107 | Leonardo Bonucci | Italy | CB | 71 | 54 | 47 | 90 | 58 | 91 | 86 | Legacy | Icon
+108 | Gianluca Zambrotta | Italy | RB | 72 | 90 | 44 | 80 | 81 | 91 | 78 | Legacy | Icon
+109 | Alessandro Costacurta | Italy | CB | 71 | 66 | 29 | 75 | 58 | 96 | 77 | Legacy | Icon
+110 | Gianluca Pessotto | Italy | LB | 64 | 72 | 22 | 68 | 66 | 84 | 70 | Legacy | Veteran
+111 | Marco Materazzi | Italy | CB | 66 | 52 | 40 | 61 | 44 | 88 | 93 | Legacy | Icon
+112 | Christian Panucci | Italy | RB | 66 | 77 | 33 | 69 | 61 | 86 | 81 | Legacy | Icon
+113 | Fabio Grosso | Italy | LB | 67 | 84 | 46 | 74 | 78 | 80 | 68 | Legacy | Icon
+114 | Walter Samuel | Argentina | CB | 71 | 64 | 29 | 60 | 45 | 97 | 94 | Legacy | Icon
+115 | Javier Zanetti | Argentina | RB | 73 | 91 | 38 | 87 | 86 | 94 | 80 | Legacy | Icon
+116 | Gabriel Heinze | Argentina | LB | 66 | 73 | 24 | 63 | 54 | 91 | 84 | Legacy | Icon
+117 | Roberto Ayala | Argentina | CB | 69 | 72 | 24 | 71 | 52 | 96 | 82 | Legacy | Icon
+118 | Nicolás Otamendi | Argentina | CB | 69 | 59 | 26 | 66 | 48 | 94 | 89 | Portugal | Veteran
+119 | Cristian Romero | Argentina | CB | 74 | 84 | 29 | 77 | 61 | 95 | 91 | England | Current
+120 | Lisandro Martínez | Argentina | CB | 72 | 76 | 27 | 87 | 67 | 93 | 76 | England | Current
+121 | Marcos Acuña | Argentina | LB | 68 | 83 | 32 | 78 | 81 | 78 | 76 | Argentina | Veteran
+122 | Nahuel Molina | Argentina | RB | 70 | 90 | 34 | 76 | 79 | 80 | 73 | Spain | Current
+123 | Gonzalo Montiel | Argentina | RB | 66 | 77 | 29 | 67 | 66 | 84 | 76 | Argentina | Current
+124 | Nicolás Tagliafico | Argentina | LB | 69 | 79 | 28 | 71 | 72 | 89 | 73 | France | Veteran
+125 | Facundo Medina | Argentina | CB | 68 | 82 | 24 | 78 | 62 | 87 | 81 | France | Current
+126 | Germán Pezzella | Argentina | CB | 65 | 51 | 23 | 69 | 47 | 86 | 82 | Argentina | Veteran
+127 | Lucas Martínez Quarta | Argentina | CB | 66 | 68 | 21 | 75 | 55 | 85 | 75 | Argentina | Current
+128 | Marcos Rojo | Argentina | CB | 62 | 59 | 27 | 55 | 47 | 81 | 83 | Argentina | Veteran
+129 | Gabriel Mercado | Argentina | RB | 61 | 68 | 22 | 58 | 49 | 83 | 82 | Argentina | Veteran
+130 | Fabricio Coloccini | Argentina | CB | 61 | 47 | 20 | 54 | 42 | 88 | 77 | Legacy | Veteran
+131 | Virgil van Dijk | Netherlands | CB | 75 | 79 | 40 | 88 | 72 | 97 | 95 | England | Current
+132 | Jaap Stam | Netherlands | CB | 72 | 82 | 27 | 65 | 52 | 97 | 96 | Legacy | Icon
+133 | Ronald Koeman | Netherlands | CB | 72 | 64 | 77 | 94 | 66 | 87 | 82 | Legacy | Icon
+134 | Frank de Boer | Netherlands | CB | 70 | 61 | 42 | 87 | 60 | 90 | 78 | Legacy | Icon
+135 | Ruud Krol | Netherlands | LB | 71 | 86 | 36 | 88 | 81 | 91 | 76 | Legacy | Icon
+136 | Giovanni van Bronckhorst | Netherlands | LB | 68 | 82 | 45 | 83 | 80 | 78 | 69 | Legacy | Icon
+137 | Matthijs de Ligt | Netherlands | CB | 72 | 71 | 35 | 74 | 53 | 92 | 91 | Germany | Current
+138 | Stefan de Vrij | Netherlands | CB | 69 | 60 | 26 | 78 | 52 | 91 | 83 | Italy | Veteran
+139 | Nathan Aké | Netherlands | CB | 70 | 81 | 26 | 83 | 65 | 88 | 76 | England | Current
+140 | Denzel Dumfries | Netherlands | RB | 71 | 96 | 45 | 72 | 76 | 79 | 87 | Italy | Current
+141 | Micky van de Ven | Netherlands | CB | 74 | 99 | 20 | 75 | 63 | 88 | 88 | England | Current
+142 | Jeremie Frimpong | Netherlands | RB | 73 | 99 | 56 | 79 | 92 | 63 | 69 | England | Current
+143 | Ian Maatsen | Netherlands | LB | 67 | 91 | 27 | 75 | 83 | 69 | 60 | England | Current
+144 | Jurrien Timber | Netherlands | CB | 71 | 86 | 21 | 83 | 79 | 86 | 72 | England | Current
+145 | Sven Botman | Netherlands | CB | 67 | 51 | 19 | 70 | 47 | 87 | 91 | England | Current
+146 | Daley Blind | Netherlands | LB | 67 | 48 | 30 | 89 | 65 | 79 | 57 | Spain | Veteran
+147 | Bruno Martins Indi | Netherlands | CB | 61 | 55 | 18 | 61 | 44 | 78 | 82 | Netherlands | Veteran
+148 | Milan Škriniar | Slovakia | CB | 69 | 63 | 23 | 72 | 49 | 91 | 91 | France | Veteran
+149 | Martin Dúbravka | Slovakia | CB | 60 | 45 | 20 | 51 | 36 | 77 | 75 | Slovakia | Veteran
+150 | Dávid Hancko | Slovakia | CB | 69 | 76 | 28 | 74 | 58 | 88 | 80 | Spain | Current
+151 | Paolo Maldini | Italy | CB | 75 | 86 | 45 | 89 | 86 | 99 | 78 | Legacy | Icon
+152 | Alessandro Nesta | Italy | CB | 75 | 79 | 30 | 89 | 72 | 98 | 76 | Legacy | Icon
+153 | Fabio Cannavaro | Italy | CB | 74 | 91 | 35 | 78 | 69 | 99 | 88 | Legacy | Icon
+154 | Marco Materazzi | Italy | CB | 66 | 52 | 40 | 61 | 44 | 88 | 93 | Legacy | Icon
+155 | Alessandro Bastoni | Italy | CB | 73 | 72 | 27 | 91 | 68 | 91 | 80 | Italy | Current
+156 | Francesco Acerbi | Italy | CB | 67 | 50 | 22 | 67 | 47 | 91 | 86 | Italy | Veteran
+157 | Leonardo Bonucci | Italy | CB | 71 | 54 | 47 | 90 | 58 | 91 | 86 | Legacy | Icon
+158 | Giorgio Chiellini | Italy | CB | 71 | 63 | 38 | 63 | 51 | 98 | 94 | Legacy | Icon
+159 | Federico Dimarco | Italy | LB | 72 | 90 | 58 | 90 | 88 | 73 | 62 | Italy | Current
+160 | Giovanni Di Lorenzo | Italy | RB | 69 | 81 | 37 | 79 | 73 | 87 | 77 | Italy | Veteran
+161 | Matteo Darmian | Italy | RB | 66 | 72 | 27 | 77 | 67 | 86 | 71 | Italy | Veteran
+162 | Davide Calabria | Italy | RB | 63 | 75 | 24 | 68 | 69 | 74 | 62 | Italy | Current
+163 | Cristiano Biraghi | Italy | LB | 62 | 71 | 30 | 75 | 71 | 68 | 62 | Italy | Veteran
+164 | Emerson Palmieri | Italy | LB | 64 | 83 | 26 | 70 | 73 | 71 | 67 | England | Veteran
+165 | Andrea Barzagli | Italy | CB | 69 | 61 | 22 | 63 | 46 | 94 | 91 | Legacy | Icon
+166 | Giorgio Chiellini | Italy | CB | 71 | 63 | 38 | 63 | 51 | 98 | 94 | Legacy | Icon
+167 | Daniele Rugani | Italy | CB | 62 | 55 | 20 | 61 | 42 | 79 | 76 | Italy | Veteran
+168 | Alessio Romagnoli | Italy | CB | 65 | 58 | 21 | 68 | 46 | 85 | 79 | Italy | Current
+169 | Gianluca Mancini | Italy | CB | 67 | 65 | 28 | 63 | 48 | 89 | 85 | Italy | Current
+170 | Riccardo Calafiori | Italy | CB | 71 | 82 | 27 | 88 | 75 | 87 | 78 | England | Current
+171 | Reece James | England | RB | 71 | 82 | 44 | 85 | 85 | 83 | 82 | England | Current
+172 | Trent Alexander-Arnold | England | RB | 74 | 81 | 56 | 98 | 91 | 68 | 66 | Spain | Current
+173 | Kyle Walker | England | RB | 73 | 95 | 25 | 74 | 68 | 90 | 90 | England | Veteran
+174 | Ashley Cole | England | LB | 73 | 95 | 34 | 80 | 86 | 96 | 73 | Legacy | Icon
+175 | Gary Neville | England | RB | 67 | 72 | 27 | 77 | 63 | 91 | 77 | Legacy | Icon
+176 | Rio Ferdinand | England | CB | 74 | 83 | 28 | 88 | 72 | 94 | 86 | Legacy | Icon
+177 | John Terry | England | CB | 73 | 58 | 34 | 70 | 49 | 98 | 94 | Legacy | Icon
+178 | Sol Campbell | England | CB | 71 | 74 | 28 | 65 | 50 | 95 | 96 | Legacy | Icon
+179 | Tony Adams | England | CB | 68 | 53 | 26 | 62 | 43 | 94 | 94 | Legacy | Icon
+180 | Stuart Pearce | England | LB | 67 | 84 | 45 | 66 | 68 | 89 | 84 | Legacy | Icon
+181 | Kieran Trippier | England | RB | 68 | 62 | 41 | 91 | 80 | 77 | 64 | England | Veteran
+182 | Ben White | England | RB | 72 | 79 | 26 | 86 | 75 | 88 | 80 | England | Current
+183 | John Stones | England | CB | 71 | 72 | 30 | 89 | 69 | 88 | 82 | England | Current
+184 | Marc Guéhi | England | CB | 70 | 75 | 19 | 75 | 61 | 89 | 79 | England | Current
+185 | Ezri Konsa | England | CB | 69 | 66 | 18 | 71 | 49 | 90 | 80 | England | Current
+186 | Levi Colwill | England | CB | 68 | 73 | 19 | 82 | 61 | 82 | 78 | England | Current
+187 | Luke Shaw | England | LB | 68 | 84 | 30 | 78 | 82 | 78 | 75 | England | Current
+188 | Ben Chilwell | England | LB | 64 | 84 | 37 | 76 | 77 | 70 | 70 | England | Veteran
+189 | Tyrick Mitchell | England | LB | 63 | 87 | 18 | 63 | 69 | 74 | 66 | England | Current
+190 | Aaron Wan-Bissaka | England | RB | 67 | 90 | 19 | 63 | 70 | 91 | 71 | England | Veteran
+191 | Harry Maguire | England | CB | 67 | 48 | 31 | 68 | 45 | 86 | 91 | England | Veteran
+192 | Chris Smalling | England | CB | 63 | 55 | 23 | 61 | 43 | 84 | 88 | Italy | Veteran
+193 | Eric Dier | England | CB | 61 | 47 | 31 | 64 | 45 | 78 | 79 | Germany | Veteran
+194 | Conor Coady | England | CB | 60 | 44 | 18 | 63 | 43 | 74 | 69 | England | Veteran
+195 | Joe Gomez | England | CB | 67 | 84 | 16 | 72 | 59 | 80 | 80 | England | Current
+196 | Ashley Young | England | LB | 61 | 69 | 29 | 76 | 69 | 65 | 61 | England | Veteran
+197 | Ben Davies | Wales | LB | 65 | 72 | 25 | 75 | 63 | 83 | 72 | England | Veteran
+198 | Chris Gunter | Wales | RB | 60 | 69 | 18 | 63 | 52 | 71 | 66 | Wales | Veteran
+199 | James Collins | Wales | CB | 61 | 51 | 25 | 58 | 41 | 77 | 84 | Wales | Veteran
+200 | Ethan Ampadu | Wales | CB | 68 | 70 | 24 | 78 | 60 | 84 | 73 | England | Current
+201 | John O'Shea | Ireland | CB | 62 | 54 | 23 | 59 | 44 | 84 | 81 | Legacy | Icon
+202 | Richard Dunne | Ireland | CB | 61 | 48 | 30 | 49 | 37 | 85 | 91 | Legacy | Icon
+203 | Seamus Coleman | Ireland | RB | 62 | 74 | 29 | 66 | 71 | 79 | 68 | England | Veteran
+204 | Stephen Ward | Ireland | LB | 60 | 69 | 22 | 59 | 55 | 72 | 69 | Legacy | Veteran
+205 | Ciaran Clark | Ireland | CB | 60 | 49 | 21 | 58 | 39 | 76 | 77 | Legacy | Veteran
+206 | Virgil van Dijk | Netherlands | CB | 75 | 79 | 40 | 88 | 72 | 97 | 95 | England | Current
+207 | Jaap Stam | Netherlands | CB | 72 | 82 | 27 | 65 | 52 | 97 | 96 | Legacy | Icon
+208 | Ronald Koeman | Netherlands | CB | 72 | 64 | 77 | 94 | 66 | 87 | 82 | Legacy | Icon
+209 | Frank de Boer | Netherlands | CB | 70 | 61 | 42 | 87 | 60 | 90 | 78 | Legacy | Icon
+210 | Joris Mathijsen | Netherlands | CB | 62 | 51 | 19 | 59 | 41 | 80 | 76 | Legacy | Veteran
+211 | Jan Vertonghen | Belgium | CB | 68 | 58 | 25 | 77 | 58 | 88 | 80 | Belgium | Veteran
+212 | Toby Alderweireld | Belgium | CB | 68 | 53 | 38 | 86 | 50 | 87 | 79 | Belgium | Veteran
+213 | Vincent Kompany | Belgium | CB | 72 | 68 | 31 | 76 | 56 | 95 | 93 | Legacy | Icon
+214 | Thomas Vermaelen | Belgium | CB | 64 | 65 | 31 | 68 | 52 | 87 | 77 | Legacy | Veteran
+215 | Arthur Theate | Belgium | CB | 68 | 74 | 24 | 67 | 49 | 87 | 82 | Germany | Current
+216 | Zeno Debast | Belgium | CB | 66 | 72 | 18 | 74 | 54 | 78 | 73 | Portugal | Current
+217 | Timothy Castagne | Belgium | RB | 67 | 81 | 24 | 72 | 69 | 77 | 68 | England | Current
+218 | Thomas Meunier | Belgium | RB | 63 | 73 | 32 | 74 | 68 | 75 | 78 | Turkey | Veteran
+219 | Yannick Carrasco | Belgium | LB | 66 | 91 | 53 | 78 | 88 | 51 | 62 | Saudi Pro League | Veteran
+220 | Jan Vertonghen | Belgium | CB | 68 | 58 | 25 | 77 | 58 | 88 | 80 | Legacy | Veteran
+221 | Stefan de Vrij | Netherlands | CB | 69 | 60 | 26 | 78 | 52 | 91 | 83 | Italy | Veteran
+222 | Daley Blind | Netherlands | CB | 67 | 48 | 30 | 89 | 65 | 79 | 57 | Spain | Veteran
+223 | Nathan Aké | Netherlands | LB | 70 | 81 | 26 | 83 | 65 | 88 | 76 | England | Current
+224 | Owen Wijndal | Netherlands | LB | 63 | 86 | 17 | 70 | 76 | 68 | 57 | Netherlands | Current
+225 | Lutsharel Geertruida | Netherlands | RB | 68 | 81 | 24 | 80 | 70 | 83 | 76 | Germany | Current
+226 | Mats Hummels | Germany | CB | 71 | 57 | 35 | 87 | 61 | 94 | 84 | Germany | Veteran
+227 | Antonio Rüdiger | Germany | CB | 74 | 91 | 31 | 74 | 67 | 94 | 96 | Spain | Current
+228 | Jérôme Boateng | Germany | CB | 68 | 63 | 25 | 82 | 65 | 88 | 83 | Legacy | Veteran
+229 | Shkodran Mustafi | Germany | CB | 61 | 48 | 21 | 57 | 41 | 76 | 78 | Legacy | Veteran
+230 | Matthias Ginter | Germany | CB | 65 | 55 | 22 | 71 | 48 | 82 | 79 | Germany | Veteran
+231 | Kosta Manolas | Greece | CB | 64 | 91 | 17 | 55 | 48 | 83 | 87 | Greece | Veteran
+232 | Sokratis Papastathopoulos | Greece | CB | 62 | 49 | 17 | 55 | 42 | 87 | 89 | Legacy | Veteran
+233 | Kostas Tsimikas | Greece | LB | 66 | 84 | 26 | 78 | 75 | 70 | 67 | England | Current
+234 | George Baldock | Greece | RB | 62 | 79 | 20 | 66 | 65 | 71 | 68 | Legacy | Veteran
+235 | Kyriakos Papadopoulos | Greece | CB | 60 | 50 | 17 | 51 | 38 | 78 | 87 | Greece | Veteran
+236 | Branislav Ivanović | Serbia | RB | 67 | 58 | 42 | 66 | 54 | 88 | 88 | Legacy | Icon
+237 | Nemanja Vidić | Serbia | CB | 73 | 67 | 39 | 62 | 42 | 99 | 96 | Legacy | Icon
+238 | Aleksandar Kolarov | Serbia | LB | 66 | 71 | 55 | 81 | 74 | 73 | 78 | Legacy | Icon
+239 | Duško Tošić | Serbia | CB | 61 | 58 | 19 | 54 | 42 | 79 | 79 | Legacy | Veteran
+240 | Strahinja Pavlović | Serbia | CB | 68 | 78 | 22 | 62 | 51 | 88 | 89 | Austria | Current
+241 | Filip Mladenović | Serbia | LB | 63 | 79 | 25 | 70 | 69 | 70 | 61 | Greece | Veteran
+242 | Nikola Milenković | Serbia | CB | 70 | 61 | 26 | 61 | 46 | 89 | 93 | England | Current
+243 | Miloš Veljković | Serbia | CB | 65 | 54 | 20 | 64 | 45 | 80 | 78 | Germany | Current
+244 | Ivan Strinić | Croatia | LB | 60 | 62 | 19 | 63 | 51 | 75 | 67 | Legacy | Veteran
+245 | Domagoj Vida | Croatia | CB | 65 | 55 | 31 | 57 | 40 | 87 | 86 | Croatia | Veteran
+246 | Dejan Lovren | Croatia | CB | 66 | 55 | 26 | 65 | 44 | 87 | 88 | Greece | Veteran
+247 | Josko Gvardiol | Croatia | CB | 74 | 91 | 29 | 84 | 72 | 91 | 85 | England | Current
+248 | Ivan Perišić | Croatia | LB | 65 | 88 | 50 | 75 | 81 | 57 | 76 | Netherlands | Veteran
+249 | Borna Sosa | Croatia | LB | 67 | 86 | 30 | 82 | 81 | 67 | 64 | Italy | Current
+250 | Šime Vrsaljko | Croatia | RB | 62 | 78 | 23 | 70 | 65 | 79 | 73 | Legacy | Veteran
+251 | Dani Carvajal | Spain | RB | 73 | 81 | 39 | 83 | 76 | 94 | 82 | Spain | Current
+252 | Lucas Vázquez | Spain | RB | 65 | 86 | 30 | 76 | 80 | 62 | 61 | Spain | Veteran
+253 | Nacho Fernández | Spain | CB | 67 | 65 | 20 | 70 | 49 | 89 | 75 | Saudi Pro League | Veteran
+254 | Diego Llorente | Spain | CB | 64 | 67 | 22 | 67 | 51 | 78 | 77 | Spain | Current
+255 | Mario Hermoso | Spain | CB | 66 | 65 | 31 | 79 | 59 | 80 | 73 | Mexico | Current
+256 | César Azpilicueta | Spain | CB | 68 | 69 | 28 | 78 | 66 | 91 | 74 | Spain | Veteran
+257 | Sergio Reguilón | Spain | LB | 63 | 89 | 25 | 72 | 75 | 67 | 61 | England | Current
+258 | Marcos Alonso | Spain | LB | 64 | 63 | 41 | 79 | 72 | 75 | 76 | Spain | Veteran
+259 | Héctor Bellerín | Spain | RB | 63 | 91 | 23 | 67 | 75 | 68 | 58 | Spain | Veteran
+260 | Marc Cucurella | Spain | LB | 70 | 84 | 30 | 78 | 80 | 82 | 69 | England | Current
+261 | Mário Rui | Portugal | LB | 61 | 74 | 23 | 68 | 70 | 68 | 56 | Italy | Veteran
+262 | Pepe | Portugal | CB | 72 | 71 | 30 | 66 | 51 | 96 | 92 | Legacy | Icon
+263 | Rúben Semedo | Portugal | CB | 61 | 60 | 18 | 55 | 40 | 75 | 81 | Portugal | Veteran
+264 | Domingos Duarte | Portugal | CB | 62 | 49 | 18 | 57 | 42 | 79 | 77 | Spain | Veteran
+265 | Nélson Semedo | Portugal | RB | 68 | 93 | 25 | 69 | 77 | 75 | 69 | England | Current
+266 | Diogo Dalot | Portugal | RB | 69 | 84 | 33 | 78 | 77 | 77 | 74 | England | Current
+267 | Nuno Mendes | Portugal | LB | 73 | 96 | 34 | 79 | 86 | 84 | 77 | France | Current
+268 | Raphaël Guerreiro | Portugal | LB | 69 | 82 | 48 | 90 | 89 | 67 | 56 | Germany | Veteran
+269 | João Cancelo | Portugal | RB | 72 | 91 | 48 | 89 | 92 | 71 | 68 | Spain | Current
+270 | Gonçalo Inácio | Portugal | CB | 70 | 72 | 26 | 86 | 62 | 85 | 72 | Portugal | Current
+271 | Rúben Dias | Portugal | CB | 73 | 68 | 25 | 78 | 54 | 96 | 89 | England | Current
+272 | António Silva | Portugal | CB | 71 | 76 | 21 | 78 | 57 | 89 | 76 | Portugal | Current
+273 | Diogo Leite | Portugal | CB | 64 | 57 | 18 | 70 | 48 | 80 | 74 | Germany | Current
+274 | Nelson Oliveira | Portugal | CB | 60 | 55 | 16 | 51 | 36 | 72 | 72 | Portugal | Veteran
+275 | Mehdi Benatia | Morocco | CB | 68 | 67 | 33 | 65 | 48 | 92 | 91 | Legacy | Icon
+276 | Achraf Hakimi | Morocco | RB | 74 | 99 | 42 | 88 | 94 | 76 | 81 | France | Current
+277 | Noussair Mazraoui | Morocco | RB | 69 | 86 | 29 | 83 | 86 | 77 | 66 | England | Current
+278 | Nayef Aguerd | Morocco | CB | 68 | 65 | 27 | 72 | 50 | 88 | 84 | Saudi Pro League | Current
+279 | Romain Saïss | Morocco | CB | 65 | 48 | 35 | 62 | 42 | 87 | 85 | Saudi Pro League | Veteran
+280 | Jawad El Yamiq | Morocco | CB | 61 | 50 | 25 | 54 | 38 | 76 | 82 | Spain | Veteran
+281 | Kalidou Koulibaly | Senegal | CB | 70 | 70 | 25 | 71 | 49 | 93 | 94 | Saudi Pro League | Veteran
+282 | Édouard Mendy | Senegal | CB | 60 | 49 | 17 | 51 | 38 | 72 | 76 | Saudi Pro League | Veteran
+283 | Moussa Niakhaté | Senegal | CB | 66 | 68 | 18 | 62 | 45 | 82 | 86 | England | Current
+284 | Fodé Ballo-Touré | Senegal | LB | 62 | 84 | 17 | 58 | 68 | 65 | 65 | Italy | Veteran
+285 | Abdou Diallo | Senegal | CB | 63 | 65 | 24 | 65 | 50 | 79 | 73 | Qatar | Veteran
+286 | Éric Bailly | Ivory Coast | CB | 62 | 66 | 21 | 56 | 43 | 79 | 85 | Spain | Veteran
+287 | Serge Aurier | Ivory Coast | RB | 62 | 78 | 32 | 64 | 60 | 77 | 78 | Turkey | Veteran
+288 | Willy Boly | Ivory Coast | CB | 61 | 49 | 19 | 56 | 38 | 79 | 88 | England | Veteran
+289 | Evan Ndicka | Ivory Coast | CB | 69 | 76 | 18 | 76 | 53 | 88 | 85 | Italy | Current
+290 | Wilfried Singo | Ivory Coast | RB | 67 | 88 | 28 | 67 | 70 | 78 | 87 | France | Current
+291 | Ahmed Hegazi | Egypt | CB | 61 | 43 | 25 | 55 | 37 | 82 | 88 | Egypt | Veteran
+292 | Mohamed Abdelmonem | Egypt | CB | 65 | 69 | 24 | 62 | 44 | 82 | 79 | France | Current
+293 | Ali Maâloul | Tunisia | LB | 64 | 76 | 36 | 78 | 77 | 67 | 60 | Egypt | Veteran
+294 | Yassine Meriah | Tunisia | CB | 60 | 47 | 20 | 54 | 39 | 76 | 75 | Tunisia | Veteran
+295 | Wataru Endo | Japan | CB | 64 | 54 | 31 | 72 | 50 | 83 | 77 | England | Veteran
+296 | Maya Yoshida | Japan | CB | 63 | 47 | 24 | 67 | 42 | 82 | 81 | USA | Veteran
+297 | Takehiro Tomiyasu | Japan | CB | 70 | 82 | 22 | 75 | 58 | 91 | 78 | England | Current
+298 | Hiroki Ito | Japan | CB | 68 | 81 | 18 | 75 | 59 | 84 | 76 | Germany | Current
+299 | Kim Min-jae | South Korea | CB | 74 | 90 | 18 | 72 | 56 | 95 | 93 | Germany | Current
+300 | Kim Young-gwon | South Korea | CB | 64 | 53 | 22 | 70 | 44 | 86 | 79 | South Korea | Veteran

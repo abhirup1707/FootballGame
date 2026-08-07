@@ -1,0 +1,101 @@
+# | Player | Nation | Position | OVR | DIV | HAN | KIC | REF | SPD | POS | League/Region | Status
+1 | Lev Yashin | Soviet Union | GK | 75 | 97 | 98 | 86 | 99 | 88 | 99 | Legacy | Icon
+2 | Gianluigi Buffon | Italy | GK | 75 | 96 | 97 | 90 | 98 | 82 | 99 | Legacy | Icon
+3 | Iker Casillas | Spain | GK | 74 | 95 | 96 | 88 | 99 | 93 | 97 | Legacy | Icon
+4 | Manuel Neuer | Germany | GK | 75 | 96 | 95 | 95 | 97 | 91 | 99 | Germany | Icon
+5 | Peter Schmeichel | Denmark | GK | 74 | 97 | 98 | 84 | 97 | 83 | 98 | Legacy | Icon
+6 | Oliver Kahn | Germany | GK | 74 | 98 | 97 | 80 | 98 | 78 | 99 | Legacy | Icon
+7 | Edwin van der Sar | Netherlands | GK | 73 | 94 | 97 | 91 | 96 | 82 | 98 | Legacy | Icon
+8 | Petr Čech | Czech Republic | GK | 73 | 98 | 97 | 87 | 98 | 79 | 97 | Legacy | Icon
+9 | Dino Zoff | Italy | GK | 72 | 95 | 97 | 78 | 96 | 75 | 98 | Legacy | Icon
+10 | Gordon Banks | England | GK | 72 | 96 | 98 | 80 | 99 | 78 | 98 | Legacy | Icon
+11 | José Luis Chilavert | Paraguay | GK | 70 | 92 | 94 | 96 | 91 | 76 | 91 | Legacy | Icon
+12 | Claudio Taffarel | Brazil | GK | 70 | 91 | 95 | 88 | 94 | 79 | 95 | Legacy | Icon
+13 | Dida | Brazil | GK | 70 | 94 | 95 | 84 | 95 | 76 | 96 | Legacy | Icon
+14 | Walter Zenga | Italy | GK | 69 | 95 | 94 | 79 | 96 | 80 | 96 | Legacy | Icon
+15 | Andoni Zubizarreta | Spain | GK | 68 | 91 | 94 | 80 | 93 | 75 | 95 | Legacy | Icon
+16 | Rinat Dasayev | Soviet Union | GK | 69 | 95 | 96 | 78 | 97 | 81 | 97 | Legacy | Icon
+17 | Sepp Maier | Germany | GK | 70 | 94 | 97 | 82 | 97 | 80 | 97 | Legacy | Icon
+18 | Ricardo Zamora | Spain | GK | 67 | 93 | 95 | 72 | 94 | 72 | 96 | Legacy | Icon
+19 | Thomas N'Kono | Cameroon | GK | 68 | 91 | 94 | 78 | 96 | 84 | 94 | Legacy | Icon
+20 | Roger Milla | Cameroon | GK | 62 | 86 | 89 | 65 | 88 | 70 | 87 | Legacy | Veteran
+21 | Alisson Becker | Brazil | GK | 75 | 96 | 97 | 95 | 98 | 89 | 98 | England | Current
+22 | Ederson | Brazil | GK | 74 | 94 | 96 | 99 | 94 | 89 | 96 | England | Current
+23 | Júlio César | Brazil | GK | 69 | 93 | 95 | 82 | 95 | 83 | 94 | Legacy | Icon
+24 | Rogério Ceni | Brazil | GK | 68 | 90 | 92 | 98 | 88 | 76 | 89 | Legacy | Icon
+25 | Marcos | Brazil | GK | 68 | 92 | 94 | 80 | 95 | 82 | 94 | Legacy | Icon
+26 | Wéverton | Brazil | GK | 68 | 91 | 94 | 84 | 95 | 84 | 94 | Brazil | Veteran
+27 | Cláudio Bravo | Chile | GK | 69 | 93 | 94 | 92 | 94 | 81 | 95 | Legacy | Veteran
+28 | Jorge Campos | Mexico | GK | 67 | 88 | 90 | 78 | 93 | 90 | 89 | Legacy | Icon
+29 | Guillermo Ochoa | Mexico | GK | 68 | 92 | 94 | 80 | 96 | 82 | 94 | Mexico | Veteran
+30 | Keylor Navas | Costa Rica | GK | 71 | 96 | 96 | 83 | 98 | 88 | 96 | Legacy | Icon
+31 | David Seaman | England | GK | 70 | 95 | 96 | 83 | 96 | 79 | 97 | Legacy | Icon
+32 | Ray Clemence | England | GK | 69 | 94 | 96 | 79 | 96 | 81 | 97 | Legacy | Icon
+33 | Peter Shilton | England | GK | 70 | 95 | 97 | 78 | 96 | 79 | 97 | Legacy | Icon
+34 | David James | England | GK | 67 | 89 | 93 | 78 | 93 | 79 | 91 | Legacy | Veteran
+35 | Joe Hart | England | GK | 67 | 91 | 94 | 82 | 94 | 81 | 94 | Legacy | Veteran
+36 | Jordan Pickford | England | GK | 73 | 94 | 94 | 97 | 96 | 90 | 95 | England | Current
+37 | Aaron Ramsdale | England | GK | 68 | 90 | 92 | 91 | 91 | 84 | 89 | England | Current
+38 | Nick Pope | England | GK | 67 | 92 | 94 | 77 | 94 | 67 | 92 | England | Current
+39 | Dean Henderson | England | GK | 67 | 89 | 91 | 79 | 92 | 81 | 91 | England | Current
+40 | Robert Green | England | GK | 61 | 84 | 88 | 74 | 88 | 72 | 85 | Legacy | Veteran
+41 | Peter Bonetti | England | GK | 65 | 91 | 94 | 76 | 94 | 79 | 95 | Legacy | Icon
+42 | Gordon Banks | England | GK | 72 | 96 | 98 | 80 | 99 | 78 | 98 | Legacy | Icon
+43 | David James | England | GK | 67 | 89 | 93 | 78 | 93 | 79 | 91 | Legacy | Veteran
+44 | Kasper Schmeichel | Denmark | GK | 69 | 93 | 94 | 82 | 94 | 78 | 94 | Scotland | Veteran
+45 | Peter Schmeichel | Denmark | GK | 74 | 97 | 98 | 84 | 97 | 83 | 98 | Legacy | Icon
+46 | Thomas Sørensen | Denmark | GK | 64 | 89 | 93 | 75 | 91 | 74 | 91 | Legacy | Veteran
+47 | Anders Lindegaard | Denmark | GK | 61 | 85 | 89 | 71 | 87 | 70 | 85 | Legacy | Veteran
+48 | Jan Oblak | Slovenia | GK | 75 | 98 | 97 | 84 | 99 | 88 | 99 | Spain | Current
+49 | Samir Handanović | Slovenia | GK | 69 | 95 | 96 | 82 | 97 | 78 | 96 | Legacy | Veteran
+50 | Gregor Kobel | Switzerland | GK | 73 | 94 | 95 | 82 | 96 | 87 | 95 | Germany | Current
+51 | Yann Sommer | Switzerland | GK | 71 | 93 | 95 | 91 | 97 | 85 | 96 | Italy | Veteran
+52 | Roman Bürki | Switzerland | GK | 62 | 86 | 90 | 79 | 89 | 76 | 87 | Legacy | Veteran
+53 | Thibaut Courtois | Belgium | GK | 75 | 98 | 98 | 91 | 99 | 84 | 99 | Spain | Current
+54 | Simon Mignolet | Belgium | GK | 65 | 90 | 93 | 80 | 93 | 77 | 91 | Belgium | Veteran
+55 | Koen Casteels | Belgium | GK | 66 | 91 | 94 | 83 | 94 | 79 | 91 | Saudi Pro League | Veteran
+56 | Mike Maignan | France | GK | 74 | 95 | 96 | 94 | 98 | 91 | 96 | Italy | Current
+57 | Hugo Lloris | France | GK | 71 | 93 | 94 | 88 | 96 | 89 | 95 | Legacy | Icon
+58 | Fabien Barthez | France | GK | 70 | 93 | 95 | 84 | 96 | 91 | 94 | Legacy | Icon
+59 | Steve Mandanda | France | GK | 67 | 91 | 93 | 81 | 94 | 79 | 92 | France | Veteran
+60 | Alphonse Areola | France | GK | 65 | 88 | 92 | 81 | 92 | 79 | 88 | England | Current
+61 | Brice Samba | France | GK | 67 | 90 | 93 | 84 | 94 | 78 | 92 | France | Current
+62 | Gianluigi Donnarumma | Italy | GK | 74 | 96 | 97 | 88 | 98 | 87 | 96 | France | Current
+63 | Walter Zenga | Italy | GK | 69 | 95 | 94 | 79 | 96 | 80 | 96 | Legacy | Icon
+64 | Salvatore Schillaci | Italy | GK | 60 | 82 | 88 | 66 | 86 | 68 | 84 | Legacy | Veteran
+65 | Angelo Peruzzi | Italy | GK | 69 | 94 | 96 | 80 | 97 | 77 | 96 | Legacy | Icon
+66 | Francesco Toldo | Italy | GK | 68 | 92 | 95 | 81 | 95 | 78 | 95 | Legacy | Icon
+67 | Emiliano Martínez | Argentina | GK | 74 | 94 | 96 | 91 | 97 | 86 | 97 | England | Current
+68 | Sergio Goycochea | Argentina | GK | 67 | 91 | 93 | 76 | 94 | 80 | 92 | Legacy | Icon
+69 | Roberto Abbondanzieri | Argentina | GK | 65 | 89 | 92 | 79 | 91 | 74 | 91 | Legacy | Veteran
+70 | Franco Armani | Argentina | GK | 66 | 91 | 93 | 80 | 94 | 76 | 92 | Argentina | Veteran
+71 | Sergio Romero | Argentina | GK | 65 | 89 | 92 | 82 | 93 | 79 | 91 | Legacy | Veteran
+72 | Nery Pumpido | Argentina | GK | 64 | 87 | 92 | 72 | 91 | 75 | 90 | Legacy | Icon
+73 | Emiliano Viviano | Italy | GK | 61 | 85 | 89 | 72 | 88 | 70 | 85 | Legacy | Veteran
+74 | Rui Patrício | Portugal | GK | 70 | 92 | 95 | 84 | 95 | 82 | 94 | Portugal | Veteran
+75 | Vítor Baía | Portugal | GK | 69 | 93 | 95 | 85 | 96 | 81 | 96 | Legacy | Icon
+76 | José Sá | Portugal | GK | 65 | 87 | 91 | 80 | 90 | 78 | 89 | Portugal | Current
+77 | Diogo Costa | Portugal | GK | 73 | 94 | 95 | 96 | 96 | 90 | 94 | Portugal | Current
+78 | Anthony Lopes | Portugal | GK | 64 | 90 | 92 | 79 | 92 | 87 | 91 | Portugal | Veteran
+79 | Ricardo Pereira | Portugal | GK | 60 | 81 | 87 | 68 | 85 | 68 | 82 | Legacy | Veteran
+80 | Manuel Neuer | Germany | GK | 75 | 96 | 95 | 95 | 97 | 91 | 99 | Germany | Icon
+81 | Marc-André ter Stegen | Germany | GK | 74 | 95 | 95 | 97 | 96 | 90 | 97 | Spain | Current
+82 | Bernd Leno | Germany | GK | 68 | 91 | 93 | 85 | 93 | 81 | 91 | England | Current
+83 | Kevin Trapp | Germany | GK | 67 | 90 | 93 | 85 | 93 | 78 | 91 | Germany | Veteran
+84 | Oliver Baumann | Germany | GK | 65 | 87 | 91 | 78 | 91 | 76 | 89 | Germany | Veteran
+85 | Roman Weidenfeller | Germany | GK | 64 | 87 | 91 | 77 | 92 | 75 | 90 | Legacy | Veteran
+86 | Miodrag Džudžak | Hungary | GK | 60 | 82 | 87 | 67 | 85 | 66 | 82 | Legacy | Veteran
+87 | Gábor Király | Hungary | GK | 62 | 87 | 90 | 67 | 89 | 68 | 85 | Legacy | Icon
+88 | Péter Gulácsi | Hungary | GK | 69 | 92 | 94 | 83 | 94 | 79 | 93 | Germany | Veteran
+89 | Wojciech Szczęsny | Poland | GK | 72 | 95 | 96 | 88 | 97 | 86 | 96 | Legacy | Veteran
+90 | Łukasz Fabiański | Poland | GK | 65 | 91 | 93 | 79 | 94 | 80 | 91 | England | Veteran
+91 | Jan Tomaszewski | Poland | GK | 64 | 90 | 93 | 69 | 92 | 72 | 91 | Legacy | Icon
+92 | André Onana | Cameroon | GK | 71 | 91 | 93 | 96 | 92 | 89 | 91 | England | Current
+93 | Joseph-Antoine Bell | Cameroon | GK | 66 | 89 | 93 | 74 | 92 | 77 | 91 | Legacy | Icon
+94 | Carlos Kameni | Cameroon | GK | 64 | 88 | 91 | 75 | 92 | 83 | 89 | Legacy | Veteran
+95 | Essam El Hadary | Egypt | GK | 65 | 89 | 94 | 71 | 93 | 74 | 91 | Legacy | Icon
+96 | Mohamed El Shenawy | Egypt | GK | 67 | 91 | 93 | 78 | 94 | 79 | 91 | Egypt | Veteran
+97 | André Onana | Cameroon | GK | 71 | 91 | 93 | 96 | 92 | 89 | 91 | England | Current
+98 | Kim Seung-gyu | South Korea | GK | 63 | 87 | 90 | 76 | 91 | 77 | 88 | Saudi Pro League | Veteran
+99 | Mathew Ryan | Australia | GK | 64 | 88 | 91 | 80 | 91 | 78 | 89 | Italy | Veteran
+100 | Keylor Navas | Costa Rica | GK | 71 | 96 | 96 | 83 | 98 | 88 | 96 | Legacy | Icon

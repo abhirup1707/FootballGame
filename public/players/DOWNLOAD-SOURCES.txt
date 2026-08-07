@@ -1,4 +1,510 @@
-Player portraits downloaded from Wikimedia/Wikipedia thumbnails on 2026-08-03T17:02:36.357Z.
+Club-roster portraits downloaded from Wikimedia/Wikipedia thumbnails on 2026-08-07T19:56:50.365Z.
 
 Failures:
-None
+Raúl: No portrait thumbnail found
+Lautaro Martínez: Search request failed (429)
+Rafael Leão: Search request failed (429)
+Paulo Dybala: Search request failed (429)
+Marcus Rashford: Search request failed (429)
+Darwin Núñez: Search request failed (429)
+Diogo Jota: Search request failed (429)
+Pedro Neto: Search request failed (429)
+Anthony Gordon: Search request failed (429)
+Hirving Lozano: Search request failed (429)
+Jamal Musiala: Search request failed (429)
+Florian Wirtz: Search request failed (429)
+Serge Gnabry: Search request failed (429)
+Leroy Sané: Search request failed (429)
+Kingsley Coman: Search request failed (429)
+Michael Olise: Search request failed (429)
+Thomas Müller: Search request failed (429)
+Marco Reus: Search request failed (429)
+Karim Adeyemi: Search request failed (429)
+Serhou Guirassy: Search request failed (429)
+Loïs Openda: Search request failed (429)
+Jonathan Burkardt: No portrait thumbnail found
+Jonathan David: Search request failed (429)
+Amine Gouiri: Search request failed (429)
+Elye Wahi: Search request failed (429)
+Moses Simon: Search request failed (429)
+Terem Moffi: Search request failed (429)
+Ángel Di María: Search request failed (429)
+Takefusa Kubo: Search request failed (429)
+Bryan Zaragoza: No portrait thumbnail found
+Bryan Gil: Image request failed (429)
+Iago Aspas: Search request failed (429)
+Sergio Canales: Search request failed (429)
+Héctor Herrera: Search request failed (429)
+Alexis Vega: Search request failed (429)
+Giorgian de Arrascaeta: Search request failed (429)
+Everton Ribeiro: Search request failed (429)
+Gabigol: Search request failed (429)
+Hulk: Search request failed (429)
+Paulinho: Search request failed (429)
+Dudu: Search request failed (429)
+Wesley: Search request failed (429)
+Savarino: Search request failed (429)
+Luciano: Search request failed (429)
+Pedro: No portrait thumbnail found
+Rony: No portrait thumbnail found
+Luis Henrique: No portrait thumbnail found
+Jonathan Rodríguez: No portrait thumbnail found
+Jhon Córdoba: Image request failed (429)
+Jhon Arias: Search request failed (429)
+Luis Sinisterra: Search request failed (429)
+Duván Zapata: Search request failed (429)
+Pedro Gonçalves: Search request failed (429)
+Diogo Gonçalves: Search request failed (429)
+Rafa Silva: Search request failed (429)
+Ricardo Horta: Search request failed (429)
+Trincão: Search request failed (429)
+Viktor Gyökeres: Search request failed (429)
+Fábio Silva: Search request failed (429)
+Gonçalo Ramos: Search request failed (429)
+Francisco Conceição: Search request failed (429)
+Otávio: Search request failed (429)
+Galeno: Search request failed (429)
+Mehdi Taremi: Search request failed (429)
+Hákon Arnar Haraldsson: Image request failed (429)
+Orkun Kökçü: Image request failed (429)
+Barış Alper Yılmaz: Image request failed (429)
+Enner Valencia: Image request failed (429)
+Mauro Icardi: Image request failed (429)
+Yannick Bolasie: Image request failed (429)
+Mbaye Diagne: Search request failed (429)
+Abderrazak Hamdallah: Search request failed (429)
+Salem Al-Dawsari: Search request failed (429)
+Malcom: Search request failed (429)
+Anderson Talisca: Search request failed (429)
+Allan Saint-Maximin: Search request failed (429)
+Christian Benteke: Search request failed (429)
+Denis Bouanga: Search request failed (429)
+Riqui Puig: Search request failed (429)
+Federico Bernardeschi: Search request failed (429)
+Cucho Hernández: Search request failed (429)
+Djordje Mihailovic: Search request failed (429)
+Jordan Morris: Search request failed (429)
+Brian White: No portrait thumbnail found
+Tai Baribo: Image request failed (429)
+Fafà Picault: Image request failed (429)
+Kei Kamara: Image request failed (429)
+Yuya Kubo: Image request failed (429)
+Wesley Sneijder: Image request failed (429)
+Roberto Baggio: Image request failed (429)
+Rui Costa: Search request failed (429)
+Jay-Jay Okocha: Search request failed (429)
+Nwankwo Kanu: Search request failed (429)
+Victor Ikpeba: Search request failed (429)
+Pierre-Emerick Aubameyang: Search request failed (429)
+Wilfried Zaha: Search request failed (429)
+Nicolas Pépé: Search request failed (429)
+Maxwel Cornet: Search request failed (429)
+Ismaïla Sarr: Search request failed (429)
+Moussa Diarra: Search request failed (429)
+Victor Osimhen: Search request failed (429)
+Samuel Chukwueze: Search request failed (429)
+Kelechi Iheanacho: Search request failed (429)
+Shoya Nakajima: Image request failed (429)
+Keita Baldé: Image request failed (429)
+Moussa Dembélé: Image request failed (429)
+Shuto Machino: Search request failed (429)
+Daichi Kamada: Search request failed (429)
+Takumi Minamino: Search request failed (429)
+Junya Ito: Search request failed (429)
+Ayase Ueda: Search request failed (429)
+Lee Kang-in: Search request failed (429)
+Hwang Hee-chan: Search request failed (429)
+Cho Gue-sung: Search request failed (429)
+Son Jun-ho: Search request failed (429)
+Omar Marmoush: Search request failed (429)
+Mohammed Kudus: Search request failed (429)
+Thomas Partey: Search request failed (429)
+Youssef Msakni: Search request failed (429)
+Jonathan Ikoné: Image request failed (429)
+M'Bala Nzola: Image request failed (429)
+Bastian Schweinsteiger: Search request failed (429)
+Sócrates: Search request failed (429)
+Dunga: Search request failed (429)
+Riquelme: Search request failed (429)
+Juan Sebastián Verón: Search request failed (429)
+Javier Mascherano: Search request failed (429)
+Fernando Redondo: Search request failed (429)
+Juan Román Riquelme: Search request failed (429)
+Diego Simeone: Search request failed (429)
+Enzo Francescoli: Search request failed (429)
+Gheorghe Hagi: Search request failed (429)
+Pavel Nedvěd: Search request failed (429)
+Deco: Search request failed (429)
+Marco Tardelli: Image request failed (429)
+Gheorghe Popescu: Search request failed (429)
+Didi: Search request failed (429)
+Falcão: Search request failed (429)
+Zé Roberto: Search request failed (429)
+Juninho Pernambucano: Search request failed (429)
+Federico Valverde: Search request failed (429)
+Bernardo Silva: Search request failed (429)
+Martin Ødegaard: Search request failed (429)
+Declan Rice: Search request failed (429)
+Joshua Kimmich: Search request failed (429)
+Frenkie de Jong: Search request failed (429)
+Ilkay Gündogan: Search request failed (429)
+Sergej Milinković-Savić: Image request failed (429)
+Jorginho: Search request failed (429)
+Sandro Tonali: Search request failed (429)
+Lorenzo Pellegrini: Search request failed (429)
+Marco Asensio: Search request failed (429)
+Isco: Search request failed (429)
+Dani Parejo: Search request failed (429)
+Santi Cazorla: Search request failed (429)
+Thiago Almada: Search request failed (429)
+Alexis Mac Allister: Search request failed (429)
+Enzo Fernández: Search request failed (429)
+Rodrigo De Paul: Search request failed (429)
+Leandro Paredes: Search request failed (429)
+Giovani Lo Celso: Search request failed (429)
+Juan Fernando Quintero: Image request failed (429)
+Jefferson Lerma: Image request failed (429)
+Yangel Herrera: Image request failed (429)
+Wilmar Barrios: Image request failed (429)
+Richard Ríos: Search request failed (429)
+André Trindade: Search request failed (429)
+Gerson: Search request failed (429)
+Lucas Paquetá: Search request failed (429)
+Bruno Guimarães: Search request failed (429)
+Douglas Luiz: Search request failed (429)
+João Gomes: Search request failed (429)
+André Santos: Search request failed (429)
+Nicolás de la Cruz: Search request failed (429)
+Federico Viñas: Search request failed (429)
+Manuel Ugarte: Search request failed (429)
+Rodrigo Bentancur: Search request failed (429)
+Manuel Lanzini: Image request failed (429)
+Javier Pastore: Image request failed (429)
+Oscar: No portrait thumbnail found
+Matt O'Riley: Image request failed (429)
+Jesper Lindstrøm: Search request failed (429)
+Christian Nørgaard: Search request failed (429)
+Fabián Ruiz: Search request failed (429)
+Mikel Merino: Search request failed (429)
+Martín Zubimendi: Search request failed (429)
+Gavi: Search request failed (429)
+Fermín López: Search request failed (429)
+Pablo Torre: Search request failed (429)
+Ismael Bennacer: Search request failed (429)
+Houssem Aouar: Search request failed (429)
+Riyad Mahrez: Search request failed (429)
+Sofyan Amrabat: Search request failed (429)
+Hakim Ziyech: Search request failed (429)
+Wilfried Ndidi: No portrait thumbnail found
+Amadou Onana: Search request failed (429)
+Youri Tielemans: Search request failed (429)
+Leander Dendoncker: Search request failed (429)
+Charles De Ketelaere: Search request failed (429)
+Hans Vanaken: Search request failed (429)
+Arthur Vermeeren: Search request failed (429)
+Kevin Strootman: Search request failed (429)
+Donny van de Beek: Search request failed (429)
+Georginio Wijnaldum: Search request failed (429)
+Teun Koopmeiners: Search request failed (429)
+Ryan Gravenberch: Search request failed (429)
+Tijjani Reijnders: Search request failed (429)
+Xavi Simons: Search request failed (429)
+Dani de Wit: Image request failed (429)
+Lovro Majer: Image request failed (429)
+Mario Pašalić: Image request failed (429)
+Dušan Tadić: Image request failed (429)
+Luka Jović: Search request failed (429)
+Sasa Lukić: Search request failed (429)
+Hakan Çalhanoğlu: Search request failed (429)
+İsmail Yüksek: Search request failed (429)
+Salih Özcan: Search request failed (429)
+Kerem Demirbay: Search request failed (429)
+Yusuf Yazıcı: Search request failed (429)
+Arda Güler: Search request failed (429)
+İrfan Can Kahveci: Search request failed (429)
+Yacine Brahimi: Search request failed (429)
+Adel Taarabt: Search request failed (429)
+Salem Al-Najdi: Search request failed (429)
+Salman Al-Faraj: Search request failed (429)
+Ashkan Dejagah: Image request failed (429)
+Ali Karimi: Image request failed (429)
+Shinji Kagawa: Image request failed (429)
+Ao Tanaka: Search request failed (429)
+Hwang In-beom: Search request failed (429)
+Lee Jae-sung: Search request failed (429)
+Ki Sung-yueng: Search request failed (429)
+Koo Ja-cheol: Search request failed (429)
+Park Ji-sung: Search request failed (429)
+Shinji Ono: Search request failed (429)
+Yasuhito Endo: Search request failed (429)
+Yuto Nagatomo: Search request failed (429)
+Ramires: Search request failed (429)
+Fernandinho: Search request failed (429)
+Elano: Search request failed (429)
+Alex: Search request failed (429)
+Lincoln: No portrait thumbnail found
+Federico Insúa: No portrait thumbnail found
+Hristo Stoichkov: Search request failed (429)
+Zvonimir Boban: Search request failed (429)
+Dragan Stojković: Search request failed (429)
+Dejan Savićević: Search request failed (429)
+Robert Prosinečki: Search request failed (429)
+Tomáš Rosický: Search request failed (429)
+Maniche: Search request failed (429)
+Tiago Mendes: Search request failed (429)
+João Moutinho: Search request failed (429)
+Renato Sanches: Search request failed (429)
+Rúben Neves: Search request failed (429)
+João Mário: Search request failed (429)
+Vitinha: Search request failed (429)
+João Palhinha: Search request failed (429)
+Adrien Rabiot: Search request failed (429)
+Eduardo Camavinga: Search request failed (429)
+Aurélien Tchouaméni: Search request failed (429)
+Youssouf Fofana: Search request failed (429)
+Mattéo Guendouzi: Search request failed (429)
+Corentin Tolisso: Search request failed (429)
+Leon Goretzka: Search request failed (429)
+Julian Brandt: Search request failed (429)
+Mario Götze: Search request failed (429)
+Dani Alves: Search request failed (429)
+Lúcio: Search request failed (429)
+Aldair: Search request failed (429)
+Juan: Search request failed (429)
+Miranda: No portrait thumbnail found
+Bremer: No portrait thumbnail found
+Danilo: No portrait thumbnail found
+Emerson Royal: Image request failed (429)
+Wendell: Search request failed (429)
+David Luiz: Search request failed (429)
+Dante: Search request failed (429)
+Naldo: Search request failed (429)
+Felipe: Search request failed (429)
+Fernando Hierro: Search request failed (429)
+Carlos Marchena: Search request failed (429)
+Jordi Alba: Search request failed (429)
+Joan Capdevila: Search request failed (429)
+César Azpilicueta: Search request failed (429)
+Dani Carvajal: Search request failed (429)
+Juanfran: Search request failed (429)
+Eric García: Search request failed (429)
+Pau Torres: Search request failed (429)
+Aymeric Laporte: fetch failed
+Robin Le Normand: fetch failed
+Marc Cucurella: fetch failed
+Alejandro Grimaldo: fetch failed
+Pedro Porro: fetch failed
+Álex Baena: fetch failed
+Héctor Bellerín: fetch failed
+Matthias Sammer: fetch failed
+Jürgen Kohler: fetch failed
+Andreas Brehme: fetch failed
+Per Mertesacker: fetch failed
+Jerome Boateng: fetch failed
+Mats Hummels: fetch failed
+Antonio Rüdiger: fetch failed
+Niklas Süle: fetch failed
+Jonathan Tah: fetch failed
+Nico Schlotterbeck: fetch failed
+David Raum: fetch failed
+Benjamin Henrichs: fetch failed
+Robin Gosens: fetch failed
+Lukas Klostermann: fetch failed
+Waldemar Anton: fetch failed
+Niklas Stark: fetch failed
+Nico Elvedi: fetch failed
+Manuel Akanji: fetch failed
+Ricardo Carvalho: fetch failed
+Pepe: fetch failed
+João Cancelo: fetch failed
+Nuno Mendes: fetch failed
+Raphaël Guerreiro: fetch failed
+Gonçalo Inácio: fetch failed
+António Silva: fetch failed
+Diogo Dalot: fetch failed
+Nelson Semedo: fetch failed
+Ricardo Pereira: fetch failed
+Fábio Coentrão: fetch failed
+Bruno Alves: fetch failed
+Jorge Costa: fetch failed
+Marcel Desailly: fetch failed
+Patrice Evra: fetch failed
+Bixente Lizarazu: fetch failed
+William Gallas: fetch failed
+Raphaël Varane: fetch failed
+Samuel Umtiti: fetch failed
+Dayot Upamecano: fetch failed
+William Saliba: fetch failed
+Ibrahima Konaté: fetch failed
+Jules Koundé: fetch failed
+Theo Hernández: fetch failed
+Benjamin Pavard: fetch failed
+Lucas Hernández: fetch failed
+Jean-Clair Todibo: fetch failed
+Ferland Mendy: fetch failed
+Jonathan Clauss: fetch failed
+Benjamin Mendy: fetch failed
+Mamadou Sakho: fetch failed
+Giorgio Chiellini: fetch failed
+Leonardo Bonucci: fetch failed
+Gianluca Zambrotta: fetch failed
+Alessandro Costacurta: fetch failed
+Gianluca Pessotto: fetch failed
+Marco Materazzi: fetch failed
+Christian Panucci: fetch failed
+Fabio Grosso: fetch failed
+Walter Samuel: fetch failed
+Gabriel Heinze: fetch failed
+Roberto Ayala: fetch failed
+Nicolás Otamendi: fetch failed
+Cristian Romero: fetch failed
+Lisandro Martínez: fetch failed
+Marcos Acuña: fetch failed
+Nahuel Molina: fetch failed
+Gonzalo Montiel: fetch failed
+Nicolás Tagliafico: fetch failed
+Facundo Medina: fetch failed
+Germán Pezzella: fetch failed
+Lucas Martínez Quarta: fetch failed
+Marcos Rojo: fetch failed
+Gabriel Mercado: fetch failed
+Fabricio Coloccini: fetch failed
+Ronald Koeman: fetch failed
+Frank de Boer: fetch failed
+Ruud Krol: fetch failed
+Giovanni van Bronckhorst: fetch failed
+Matthijs de Ligt: fetch failed
+Stefan de Vrij: fetch failed
+Nathan Aké: fetch failed
+Denzel Dumfries: fetch failed
+Micky van de Ven: fetch failed
+Jeremie Frimpong: fetch failed
+Ian Maatsen: fetch failed
+Jurrien Timber: fetch failed
+Sven Botman: fetch failed
+Daley Blind: fetch failed
+Bruno Martins Indi: fetch failed
+Milan Škriniar: fetch failed
+Martin Dúbravka: fetch failed
+Dávid Hancko: fetch failed
+Alessandro Bastoni: fetch failed
+Francesco Acerbi: fetch failed
+Federico Dimarco: fetch failed
+Giovanni Di Lorenzo: fetch failed
+Emerson Palmieri: Image request failed (429)
+Kyle Walker: Search request failed (429)
+Gary Neville: Search request failed (429)
+Sol Campbell: Search request failed (429)
+Tony Adams: Search request failed (429)
+Stuart Pearce: Search request failed (429)
+Kieran Trippier: Search request failed (429)
+Ben White: Search request failed (429)
+John Stones: Search request failed (429)
+Conor Coady: Search request failed (429)
+Joe Gomez: Search request failed (429)
+Ashley Young: Search request failed (429)
+Ben Davies: Search request failed (429)
+Chris Gunter: Search request failed (429)
+James Collins: Search request failed (429)
+Ethan Ampadu: Search request failed (429)
+John O'Shea: Search request failed (429)
+Richard Dunne: Search request failed (429)
+Seamus Coleman: Search request failed (429)
+Stephen Ward: Search request failed (429)
+Ciaran Clark: Search request failed (429)
+Thomas Vermaelen: Image request failed (429)
+Zeno Debast: Image request failed (429)
+Owen Wijndal: Search request failed (429)
+Lutsharel Geertruida: Search request failed (429)
+Shkodran Mustafi: Search request failed (429)
+Matthias Ginter: Search request failed (429)
+Kosta Manolas: Search request failed (429)
+Sokratis Papastathopoulos: Search request failed (429)
+Kostas Tsimikas: Search request failed (429)
+George Baldock: Search request failed (429)
+Kyriakos Papadopoulos: Search request failed (429)
+Branislav Ivanović: Search request failed (429)
+Aleksandar Kolarov: Search request failed (429)
+Filip Mladenović: Image request failed (429)
+Dejan Lovren: Image request failed (429)
+Borna Sosa: Image request failed (429)
+Šime Vrsaljko: Search request failed (429)
+Lucas Vázquez: Search request failed (429)
+Nacho Fernández: Search request failed (429)
+Diego Llorente: Search request failed (429)
+Mario Hermoso: Search request failed (429)
+Sergio Reguilón: Search request failed (429)
+Marcos Alonso: Search request failed (429)
+Mário Rui: Search request failed (429)
+Rúben Semedo: Search request failed (429)
+Domingos Duarte: Search request failed (429)
+Diogo Leite: Search request failed (429)
+Nelson Oliveira: Search request failed (429)
+Mehdi Benatia: Search request failed (429)
+Romain Saïss: Image request failed (429)
+Jawad El Yamiq: Image request failed (429)
+Kalidou Koulibaly: Image request failed (429)
+Édouard Mendy: Image request failed (429)
+Moussa Niakhaté: Image request failed (429)
+Fodé Ballo-Touré: Image request failed (429)
+Éric Bailly: Search request failed (429)
+Serge Aurier: Search request failed (429)
+Willy Boly: Search request failed (429)
+Evan Ndicka: Search request failed (429)
+Wilfried Singo: Search request failed (429)
+Ahmed Hegazi: Search request failed (429)
+Mohamed Abdelmonem: Search request failed (429)
+Ali Maâloul: Search request failed (429)
+Yassine Meriah: Search request failed (429)
+Maya Yoshida: Search request failed (429)
+Takehiro Tomiyasu: Search request failed (429)
+Hiroki Ito: Search request failed (429)
+Ricardo Zamora: Search request failed (429)
+Thomas N'Kono: Search request failed (429)
+Roger Milla: Search request failed (429)
+Ederson: Search request failed (429)
+Júlio César: Search request failed (429)
+Rogério Ceni: Search request failed (429)
+Marcos: Search request failed (429)
+Wéverton: Search request failed (429)
+Cláudio Bravo: Search request failed (429)
+Jorge Campos: Search request failed (429)
+David James: No portrait thumbnail found
+Robert Green: Search request failed (429)
+Peter Bonetti: Search request failed (429)
+Kasper Schmeichel: Search request failed (429)
+Thomas Sørensen: Search request failed (429)
+Anders Lindegaard: Search request failed (429)
+Samir Handanović: Search request failed (429)
+Gregor Kobel: Search request failed (429)
+Yann Sommer: Search request failed (429)
+Roman Bürki: Search request failed (429)
+Simon Mignolet: Search request failed (429)
+Koen Casteels: Search request failed (429)
+Fabien Barthez: Image request failed (429)
+Gianluigi Donnarumma: Image request failed (429)
+Sergio Goycochea: Search request failed (429)
+Roberto Abbondanzieri: Search request failed (429)
+Franco Armani: Search request failed (429)
+Sergio Romero: Search request failed (429)
+Nery Pumpido: Search request failed (429)
+Emiliano Viviano: Search request failed (429)
+Rui Patrício: Search request failed (429)
+Vítor Baía: Search request failed (429)
+José Sá: Search request failed (429)
+Diogo Costa: Search request failed (429)
+Anthony Lopes: Search request failed (429)
+Oliver Baumann: Image request failed (429)
+Roman Weidenfeller: Image request failed (429)
+Miodrag Džudžak: No portrait thumbnail found
+Gábor Király: Image request failed (429)
+Péter Gulácsi: Image request failed (429)
+Łukasz Fabiański: Image request failed (429)
+Jan Tomaszewski: Search request failed (429)
+André Onana: Search request failed (429)
+Joseph-Antoine Bell: Search request failed (429)
+Carlos Kameni: Search request failed (429)
+Essam El Hadary: Search request failed (429)
+Mohamed El Shenawy: Search request failed (429)
+Kim Seung-gyu: Search request failed (429)
+Mathew Ryan: Search request failed (429)

@@ -1,0 +1,301 @@
+# | Player | Nation | Position | OVR | PAC | SHO | PAS | DRI | PHY | League/Region | Status
+1 | Cristiano Ronaldo | Portugal | ST | 75 | 78 | 91 | 79 | 82 | 78 | Saudi Pro League | Icon/Active
+2 | Lionel Messi | Argentina | RW | 75 | 72 | 89 | 94 | 96 | 65 | MLS | Icon/Active
+3 | Neymar | Brazil | LW | 74 | 80 | 84 | 90 | 94 | 62 | Brazil | Icon/Active
+4 | Luis Suárez | Uruguay | ST | 74 | 67 | 91 | 82 | 84 | 78 | MLS | Icon/Active
+5 | Robert Lewandowski | Poland | ST | 74 | 69 | 94 | 82 | 83 | 84 | MLS | Veteran
+6 | Karim Benzema | France | ST | 73 | 65 | 89 | 84 | 84 | 76 | Saudi Pro League | Veteran
+7 | Antoine Griezmann | France | CF | 73 | 76 | 84 | 88 | 88 | 70 | MLS | Veteran
+8 | Edinson Cavani | Uruguay | ST | 72 | 65 | 88 | 75 | 74 | 82 | Legacy | Icon
+9 | Gonzalo Higuaín | Argentina | ST | 71 | 64 | 88 | 72 | 76 | 79 | Legacy | Icon
+10 | Sergio Agüero | Argentina | ST | 71 | 75 | 91 | 77 | 86 | 72 | Legacy | Icon
+11 | Zlatan Ibrahimović | Sweden | ST | 75 | 65 | 94 | 84 | 89 | 88 | Legacy | Icon
+12 | Wayne Rooney | England | CF | 74 | 83 | 90 | 87 | 87 | 84 | Legacy | Icon
+13 | Thierry Henry | France | ST | 75 | 94 | 93 | 88 | 93 | 78 | Legacy | Icon
+14 | Didier Drogba | Ivory Coast | ST | 74 | 79 | 92 | 76 | 78 | 94 | Legacy | Icon
+15 | Samuel Eto'o | Cameroon | ST | 74 | 95 | 93 | 75 | 89 | 78 | Legacy | Icon
+16 | David Villa | Spain | ST | 73 | 88 | 91 | 82 | 88 | 72 | Legacy | Icon
+17 | Fernando Torres | Spain | ST | 73 | 93 | 88 | 75 | 86 | 74 | Legacy | Icon
+18 | Raúl | Spain | CF | 73 | 81 | 87 | 83 | 86 | 70 | Legacy | Icon
+19 | Francesco Totti | Italy | CF | 73 | 70 | 89 | 94 | 91 | 68 | Legacy | Icon
+20 | Alessandro Del Piero | Italy | CF | 74 | 82 | 91 | 88 | 94 | 66 | Legacy | Icon
+21 | Filippo Inzaghi | Italy | ST | 71 | 82 | 91 | 65 | 74 | 65 | Legacy | Icon
+22 | Ronaldo Nazário | Brazil | ST | 75 | 97 | 95 | 82 | 97 | 85 | Legacy | Icon
+23 | Romário | Brazil | ST | 74 | 92 | 96 | 75 | 95 | 68 | Legacy | Icon
+24 | Rivaldo | Brazil | CF | 73 | 84 | 91 | 90 | 91 | 78 | Legacy | Icon
+25 | Kaká | Brazil | CAM | 73 | 91 | 87 | 91 | 93 | 74 | Legacy | Icon
+26 | Ronaldinho | Brazil | LW | 75 | 92 | 86 | 94 | 97 | 70 | Legacy | Icon
+27 | George Weah | Liberia | ST | 73 | 94 | 89 | 74 | 87 | 91 | Legacy | Icon
+28 | Michael Owen | England | ST | 71 | 96 | 88 | 69 | 82 | 64 | Legacy | Icon
+29 | Alan Shearer | England | ST | 72 | 72 | 94 | 69 | 73 | 91 | Legacy | Icon
+30 | Eric Cantona | France | CF | 73 | 78 | 87 | 88 | 88 | 83 | Legacy | Icon
+31 | Dennis Bergkamp | Netherlands | CF | 73 | 75 | 86 | 93 | 95 | 69 | Legacy | Icon
+32 | Ruud van Nistelrooy | Netherlands | ST | 72 | 71 | 94 | 70 | 79 | 79 | Legacy | Icon
+33 | Robin van Persie | Netherlands | ST | 72 | 82 | 92 | 85 | 90 | 67 | Legacy | Icon
+34 | Arjen Robben | Netherlands | RW | 73 | 94 | 90 | 85 | 94 | 65 | Legacy | Icon
+35 | Franck Ribéry | France | LW | 72 | 93 | 82 | 87 | 94 | 64 | Legacy | Icon
+36 | Luis Figo | Portugal | RW | 73 | 88 | 84 | 93 | 94 | 70 | Legacy | Icon
+37 | Gabriel Batistuta | Argentina | ST | 73 | 82 | 96 | 72 | 77 | 91 | Legacy | Icon
+38 | Hernán Crespo | Argentina | ST | 71 | 79 | 93 | 69 | 78 | 78 | Legacy | Icon
+39 | Javier Saviola | Argentina | CF | 67 | 86 | 79 | 73 | 87 | 55 | Legacy | Cult Icon
+40 | Miroslav Klose | Germany | ST | 71 | 78 | 91 | 70 | 75 | 79 | Legacy | Icon
+41 | Mario Kempes | Argentina | ST | 71 | 84 | 91 | 69 | 77 | 82 | Legacy | Icon
+42 | Oleg Blokhin | Ukraine | LW | 70 | 96 | 86 | 70 | 84 | 70 | Legacy | Icon
+43 | George Best | Northern Ireland | RW | 74 | 93 | 89 | 91 | 97 | 68 | Legacy | Icon
+44 | Bobby Charlton | England | CAM | 73 | 82 | 92 | 89 | 85 | 74 | Legacy | Icon
+45 | Kevin Keegan | England | CF | 71 | 87 | 86 | 82 | 88 | 70 | Legacy | Icon
+46 | Marco van Basten | Netherlands | ST | 74 | 83 | 96 | 82 | 88 | 82 | Legacy | Icon
+47 | Gerd Müller | Germany | ST | 75 | 82 | 97 | 68 | 80 | 80 | Legacy | Icon
+48 | Eusébio | Portugal | ST | 75 | 97 | 96 | 79 | 92 | 78 | Legacy | Icon
+49 | Johan Cruyff | Netherlands | CF | 75 | 92 | 91 | 95 | 97 | 72 | Legacy | Icon
+50 | Pelé | Brazil | CF | 75 | 95 | 96 | 96 | 98 | 76 | Legacy | Icon
+51 | Kylian Mbappé | France | ST | 75 | 97 | 92 | 83 | 94 | 77 | La Liga | Current
+52 | Vinícius Júnior | Brazil | LW | 75 | 98 | 86 | 82 | 96 | 68 | La Liga | Current
+53 | Mohamed Salah | Egypt | RW | 75 | 91 | 91 | 83 | 91 | 73 | Premier League | Current
+54 | Harry Kane | England | ST | 74 | 69 | 94 | 89 | 86 | 84 | Bundesliga | Current
+55 | Erling Haaland | Norway | ST | 75 | 94 | 96 | 76 | 85 | 94 | Premier League | Current
+56 | Bukayo Saka | England | RW | 73 | 87 | 81 | 88 | 90 | 65 | Premier League | Current
+57 | Son Heung-min | South Korea | LW | 72 | 90 | 89 | 82 | 88 | 70 | MLS | Veteran
+58 | Ousmane Dembélé | France | RW | 74 | 97 | 82 | 87 | 95 | 64 | Ligue 1 | Current
+59 | Raphinha | Brazil | LW | 73 | 91 | 84 | 86 | 91 | 67 | La Liga | Current
+60 | Rodrygo | Brazil | RW | 72 | 90 | 80 | 85 | 91 | 61 | La Liga | Current
+61 | Lautaro Martínez | Argentina | ST | 73 | 82 | 91 | 78 | 86 | 82 | Serie A | Current
+62 | Rafael Leão | Portugal | LW | 72 | 95 | 83 | 78 | 93 | 75 | Serie A | Current
+63 | Paulo Dybala | Argentina | CF | 71 | 79 | 84 | 90 | 94 | 59 | Serie A | Veteran
+64 | Marcus Rashford | England | LW | 70 | 91 | 82 | 75 | 86 | 70 | Premier League | Current
+65 | Jack Grealish | England | LW | 69 | 79 | 71 | 88 | 92 | 61 | Premier League | Veteran
+66 | Raheem Sterling | England | LW | 69 | 89 | 79 | 77 | 88 | 63 | Premier League | Veteran
+67 | Gabriel Martinelli | Brazil | LW | 70 | 94 | 80 | 74 | 88 | 69 | Premier League | Current
+68 | Gabriel Jesus | Brazil | ST | 68 | 87 | 78 | 82 | 90 | 63 | Premier League | Current
+69 | Kai Havertz | Germany | CF | 70 | 78 | 82 | 84 | 84 | 75 | Premier League | Current
+70 | Leandro Trossard | Belgium | LW | 69 | 81 | 82 | 84 | 86 | 63 | Premier League | Veteran
+71 | Nicolas Jackson | Senegal | ST | 69 | 93 | 79 | 66 | 81 | 76 | Premier League | Current
+72 | Christopher Nkunku | France | CF | 70 | 85 | 81 | 86 | 90 | 61 | Premier League | Current
+73 | Cody Gakpo | Netherlands | LW | 71 | 84 | 84 | 81 | 86 | 77 | Premier League | Current
+74 | Luis Díaz | Colombia | LW | 72 | 94 | 82 | 77 | 92 | 70 | Premier League | Current
+75 | Darwin Núñez | Uruguay | ST | 70 | 94 | 84 | 66 | 80 | 85 | Saudi Pro League | Current
+76 | Diogo Jota | Portugal | ST | 69 | 84 | 85 | 74 | 83 | 76 | Premier League | Current
+77 | Pedro Neto | Portugal | RW | 69 | 94 | 77 | 80 | 88 | 60 | Premier League | Current
+78 | Anthony Gordon | England | LW | 69 | 92 | 77 | 75 | 85 | 67 | Premier League | Current
+79 | Jarrod Bowen | England | RW | 68 | 86 | 78 | 73 | 82 | 69 | Premier League | Current
+80 | Ollie Watkins | England | ST | 70 | 90 | 84 | 70 | 80 | 76 | Premier League | Current
+81 | Dominic Solanke | England | ST | 68 | 78 | 80 | 68 | 78 | 82 | Premier League | Current
+82 | Richarlison | Brazil | ST | 68 | 83 | 81 | 65 | 76 | 84 | Brazil | Current
+83 | Marcus Thuram | France | ST | 71 | 91 | 84 | 74 | 83 | 87 | Serie A | Current
+84 | Dusan Vlahovic | Serbia | ST | 70 | 78 | 87 | 67 | 76 | 89 | Serie A | Current
+85 | Rasmus Højlund | Denmark | ST | 67 | 91 | 76 | 60 | 74 | 82 | Serie A | Current
+86 | Moise Kean | Italy | ST | 69 | 88 | 83 | 63 | 76 | 79 | Serie A | Current
+87 | Ademola Lookman | Nigeria | LW | 72 | 91 | 85 | 79 | 91 | 68 | Serie A | Current
+88 | Christian Pulisic | USA | LW | 71 | 89 | 83 | 84 | 90 | 65 | Serie A | Current
+89 | Federico Chiesa | Italy | LW | 69 | 92 | 79 | 76 | 87 | 66 | Serie A | Current
+90 | Nicolò Zaniolo | Italy | RW | 66 | 79 | 71 | 68 | 79 | 79 | Serie A | Current
+91 | Mateo Retegui | Italy | ST | 70 | 78 | 88 | 67 | 76 | 83 | Serie A | Current
+92 | Giacomo Raspadori | Italy | CF | 67 | 78 | 76 | 82 | 84 | 59 | Serie A | Current
+93 | Artem Dovbyk | Ukraine | ST | 69 | 79 | 86 | 65 | 74 | 85 | Serie A | Current
+94 | Romelu Lukaku | Belgium | ST | 71 | 77 | 90 | 74 | 79 | 91 | Belgium | Veteran
+95 | Dries Mertens | Belgium | CF | 67 | 83 | 80 | 85 | 89 | 59 | Belgium | Veteran
+96 | Noa Lang | Netherlands | LW | 68 | 85 | 77 | 80 | 89 | 58 | Netherlands | Current
+97 | Steven Bergwijn | Netherlands | LW | 67 | 87 | 76 | 70 | 83 | 66 | Saudi Pro League | Current
+98 | Hirving Lozano | Mexico | RW | 68 | 92 | 78 | 69 | 83 | 64 | MLS | Current
+99 | Jamal Musiala | Germany | CAM | 73 | 88 | 82 | 91 | 96 | 60 | Bundesliga | Current
+100 | Florian Wirtz | Germany | CAM | 74 | 83 | 82 | 94 | 95 | 61 | Premier League | Current
+101 | Serge Gnabry | Germany | RW | 69 | 86 | 81 | 78 | 86 | 68 | Bundesliga | Veteran
+102 | Leroy Sané | Germany | RW | 70 | 95 | 81 | 81 | 89 | 63 | Bundesliga | Veteran
+103 | Kingsley Coman | France | LW | 69 | 94 | 78 | 79 | 91 | 62 | Saudi Pro League | Current
+104 | Michael Olise | France | RW | 72 | 82 | 82 | 91 | 93 | 64 | Bundesliga | Current
+105 | Thomas Müller | Germany | CF | 69 | 68 | 81 | 88 | 82 | 66 | MLS | Veteran
+106 | Marco Reus | Germany | CAM | 67 | 75 | 82 | 88 | 86 | 61 | MLS | Veteran
+107 | Karim Adeyemi | Germany | LW | 68 | 96 | 75 | 67 | 84 | 67 | Bundesliga | Current
+108 | Serhou Guirassy | Guinea | ST | 70 | 78 | 88 | 67 | 75 | 83 | Bundesliga | Current
+109 | Loïs Openda | Belgium | ST | 70 | 94 | 84 | 65 | 79 | 72 | Bundesliga | Current
+110 | Benjamin Šeško | Slovenia | ST | 70 | 92 | 82 | 65 | 76 | 84 | Premier League | Current
+111 | Victor Boniface | Nigeria | ST | 69 | 83 | 82 | 69 | 80 | 87 | Bundesliga | Current
+112 | Patrik Schick | Czech Republic | ST | 69 | 72 | 87 | 67 | 75 | 81 | Bundesliga | Veteran
+113 | Deniz Undav | Germany | ST | 67 | 70 | 82 | 69 | 76 | 75 | Bundesliga | Current
+114 | Tim Kleindienst | Germany | ST | 65 | 62 | 80 | 60 | 67 | 85 | Bundesliga | Current
+115 | Jonathan Burkardt | Germany | ST | 67 | 83 | 77 | 64 | 74 | 68 | Bundesliga | Current
+116 | Chris Führich | Germany | LW | 65 | 87 | 70 | 73 | 83 | 55 | Bundesliga | Current
+117 | Donyell Malen | Netherlands | RW | 68 | 91 | 79 | 67 | 82 | 66 | Premier League | Current
+118 | Alassane Pléa | France | CF | 65 | 77 | 75 | 79 | 83 | 60 | Bundesliga | Veteran
+119 | Randal Kolo Muani | France | ST | 68 | 90 | 77 | 68 | 82 | 72 | Serie A | Current
+120 | Bradley Barcola | France | LW | 72 | 96 | 80 | 78 | 94 | 61 | Ligue 1 | Current
+121 | Khvicha Kvaratskhelia | Georgia | LW | 73 | 91 | 83 | 87 | 95 | 65 | Ligue 1 | Current
+122 | Rayan Cherki | France | CAM | 70 | 79 | 77 | 91 | 94 | 55 | Premier League | Current
+123 | Désiré Doué | France | LW | 71 | 90 | 79 | 83 | 92 | 61 | Ligue 1 | Current
+124 | Warren Zaïre-Emery | France | CAM | 68 | 77 | 66 | 87 | 88 | 73 | Ligue 1 | Current
+125 | Moussa Diaby | France | RW | 68 | 95 | 76 | 75 | 87 | 56 | Saudi Pro League | Current
+126 | Alexandre Lacazette | France | ST | 68 | 72 | 83 | 73 | 77 | 76 | Ligue 1 | Veteran
+127 | Florian Thauvin | France | RW | 67 | 78 | 77 | 81 | 86 | 59 | Ligue 1 | Veteran
+128 | Jonathan David | Canada | ST | 72 | 89 | 88 | 76 | 84 | 70 | Ligue 1 | Current
+129 | Amine Gouiri | Algeria | CF | 67 | 76 | 76 | 79 | 84 | 60 | Ligue 1 | Current
+130 | Elye Wahi | France | ST | 65 | 89 | 70 | 59 | 77 | 64 | Ligue 1 | Current
+131 | Moses Simon | Nigeria | LW | 66 | 91 | 70 | 71 | 84 | 55 | Ligue 1 | Veteran
+132 | Terem Moffi | Nigeria | ST | 65 | 86 | 76 | 57 | 69 | 77 | Ligue 1 | Current
+133 | Ludovic Ajorque | France | ST | 64 | 57 | 76 | 55 | 61 | 85 | Ligue 1 | Veteran
+134 | Wissam Ben Yedder | France | ST | 68 | 75 | 85 | 76 | 84 | 59 | Ligue 1 | Veteran
+135 | Ángel Di María | Argentina | RW | 72 | 82 | 82 | 94 | 94 | 60 | Argentina | Veteran
+136 | Ángel Correa | Argentina | CF | 68 | 83 | 76 | 81 | 89 | 59 | La Liga | Current
+137 | Alexander Sørloth | Norway | ST | 69 | 77 | 86 | 63 | 72 | 88 | La Liga | Current
+138 | Iñaki Williams | Ghana | RW | 69 | 95 | 77 | 67 | 80 | 72 | La Liga | Veteran
+139 | Nico Williams | Spain | LW | 73 | 97 | 80 | 82 | 94 | 61 | La Liga | Current
+140 | Ferran Torres | Spain | RW | 68 | 87 | 77 | 75 | 84 | 63 | La Liga | Current
+141 | Mikel Oyarzabal | Spain | LW | 70 | 76 | 82 | 84 | 85 | 64 | La Liga | Current
+142 | Dani Olmo | Spain | CAM | 71 | 79 | 80 | 90 | 91 | 58 | La Liga | Current
+143 | Takefusa Kubo | Japan | RW | 70 | 89 | 75 | 86 | 93 | 55 | La Liga | Current
+144 | Yeremy Pino | Spain | RW | 67 | 88 | 70 | 77 | 84 | 58 | La Liga | Current
+145 | Bryan Zaragoza | Spain | LW | 65 | 94 | 67 | 70 | 88 | 49 | La Liga | Current
+146 | Abde Ezzalzouli | Morocco | LW | 66 | 93 | 68 | 67 | 87 | 52 | La Liga | Current
+147 | Viktor Tsyhankov | Ukraine | RW | 67 | 78 | 76 | 82 | 86 | 61 | La Liga | Current
+148 | Samu Omorodion | Spain | ST | 69 | 90 | 80 | 58 | 69 | 87 | La Liga | Current
+149 | Borja Iglesias | Spain | ST | 67 | 68 | 82 | 64 | 70 | 82 | La Liga | Veteran
+150 | Gerard Moreno | Spain | ST | 68 | 71 | 82 | 78 | 80 | 65 | La Liga | Veteran
+151 | Ayoze Pérez | Spain | CF | 67 | 76 | 79 | 76 | 82 | 60 | La Liga | Veteran
+152 | Bryan Gil | Spain | LW | 66 | 89 | 66 | 76 | 88 | 48 | La Liga | Current
+153 | Lucas Pérez | Spain | ST | 63 | 62 | 76 | 66 | 68 | 67 | La Liga | Veteran
+154 | Iago Aspas | Spain | CF | 69 | 70 | 83 | 88 | 87 | 57 | La Liga | Veteran
+155 | Sergio Canales | Spain | CAM | 68 | 67 | 74 | 91 | 84 | 55 | Mexico | Veteran
+156 | Héctor Herrera | Mexico | CAM | 64 | 58 | 60 | 82 | 68 | 70 | Mexico | Veteran
+157 | Raúl Jiménez | Mexico | ST | 67 | 64 | 80 | 68 | 71 | 78 | Mexico | Veteran
+158 | Henry Martín | Mexico | ST | 66 | 70 | 80 | 59 | 67 | 75 | Mexico | Current
+159 | Germán Berterame | Argentina | ST | 65 | 76 | 75 | 60 | 66 | 72 | Mexico | Current
+160 | Julián Quiñones | Mexico | ST | 69 | 91 | 82 | 65 | 79 | 76 | Saudi Pro League | Current
+161 | André-Pierre Gignac | France | ST | 67 | 63 | 85 | 69 | 69 | 86 | Mexico | Veteran
+162 | Ángel Mena | Ecuador | RW | 63 | 67 | 68 | 76 | 78 | 51 | Ecuador | Veteran
+163 | Alexis Vega | Mexico | LW | 65 | 81 | 72 | 72 | 81 | 57 | Mexico | Current
+164 | Cristian Pavón | Argentina | RW | 64 | 87 | 67 | 65 | 79 | 55 | Argentina | Current
+165 | Giorgian de Arrascaeta | Uruguay | CAM | 70 | 76 | 79 | 91 | 92 | 56 | Brazil | Current
+166 | Everton Ribeiro | Brazil | CAM | 66 | 72 | 70 | 87 | 88 | 52 | Brazil | Veteran
+167 | Gabigol | Brazil | ST | 67 | 77 | 81 | 66 | 75 | 62 | Brazil | Current
+168 | Hulk | Brazil | RW | 69 | 79 | 88 | 75 | 82 | 91 | Brazil | Veteran
+169 | Paulinho | Brazil | ST | 66 | 81 | 77 | 63 | 73 | 78 | Brazil | Veteran
+170 | Dudu | Brazil | LW | 65 | 86 | 69 | 73 | 87 | 51 | Brazil | Veteran
+171 | Wesley | Brazil | RW | 67 | 91 | 70 | 68 | 84 | 58 | Brazil | Current
+172 | Savarino | Venezuela | RW | 67 | 84 | 75 | 77 | 86 | 54 | Brazil | Current
+173 | Luciano | Brazil | CF | 65 | 73 | 77 | 69 | 73 | 66 | Brazil | Veteran
+174 | Pedro | Brazil | ST | 70 | 69 | 90 | 72 | 76 | 82 | Brazil | Current
+175 | Everton Cebolinha | Brazil | LW | 64 | 87 | 69 | 65 | 81 | 51 | Brazil | Veteran
+176 | Rony | Brazil | ST | 64 | 91 | 69 | 57 | 68 | 68 | Brazil | Current
+177 | Tiquinho Soares | Brazil | ST | 64 | 64 | 79 | 59 | 67 | 80 | Brazil | Veteran
+178 | Luis Henrique | Brazil | RW | 67 | 91 | 73 | 66 | 83 | 57 | Brazil | Current
+179 | Igor Jesus | Brazil | ST | 65 | 80 | 72 | 59 | 65 | 78 | Brazil | Current
+180 | Juan Dinenno | Argentina | ST | 64 | 68 | 77 | 56 | 62 | 77 | Brazil | Veteran
+181 | Germán Cano | Argentina | ST | 68 | 63 | 87 | 60 | 69 | 74 | Brazil | Veteran
+182 | Jonathan Rodríguez | Uruguay | ST | 66 | 82 | 76 | 63 | 74 | 65 | Brazil | Current
+183 | Miguel Borja | Colombia | ST | 67 | 73 | 84 | 58 | 67 | 78 | Colombia | Veteran
+184 | Radamel Falcao | Colombia | ST | 67 | 64 | 83 | 61 | 68 | 72 | Colombia | Veteran
+185 | Luis Suárez Charris | Colombia | ST | 64 | 78 | 74 | 55 | 63 | 68 | Colombia | Current
+186 | Jhon Córdoba | Colombia | ST | 68 | 87 | 81 | 61 | 72 | 82 | Russia | Current
+187 | Jhon Arias | Colombia | RW | 69 | 87 | 77 | 82 | 88 | 58 | Brazil | Current
+188 | Luis Sinisterra | Colombia | LW | 65 | 89 | 67 | 63 | 82 | 49 | Serie A | Current
+189 | Rafael Borré | Colombia | ST | 67 | 81 | 77 | 65 | 73 | 65 | Brazil | Current
+190 | Duván Zapata | Colombia | ST | 66 | 65 | 82 | 55 | 66 | 85 | Serie A | Veteran
+191 | Pedro Gonçalves | Portugal | CAM | 70 | 83 | 82 | 86 | 91 | 57 | Portugal | Current
+192 | Diogo Gonçalves | Portugal | RW | 62 | 80 | 62 | 68 | 77 | 49 | Portugal | Current
+193 | Rafa Silva | Portugal | LW | 69 | 91 | 80 | 83 | 92 | 53 | Portugal | Veteran
+194 | Ricardo Horta | Portugal | LW | 68 | 80 | 79 | 83 | 86 | 56 | Portugal | Veteran
+195 | Trincão | Portugal | RW | 70 | 85 | 76 | 85 | 92 | 53 | Portugal | Current
+196 | Viktor Gyökeres | Sweden | ST | 73 | 94 | 88 | 70 | 82 | 88 | Premier League | Current
+197 | Fábio Silva | Portugal | ST | 64 | 78 | 70 | 57 | 68 | 63 | Portugal | Current
+198 | Gonçalo Ramos | Portugal | ST | 69 | 80 | 85 | 68 | 74 | 78 | Ligue 1 | Current
+199 | Francisco Conceição | Portugal | RW | 68 | 94 | 71 | 76 | 91 | 48 | Serie A | Current
+200 | Otávio | Portugal | CAM | 68 | 76 | 72 | 86 | 85 | 61 | Saudi Pro League | Veteran
+201 | Galeno | Brazil | LW | 68 | 94 | 76 | 66 | 86 | 55 | Saudi Pro League | Current
+202 | Mehdi Taremi | Iran | ST | 68 | 72 | 82 | 71 | 77 | 71 | Serie A | Veteran
+203 | Sardar Azmoun | Iran | ST | 67 | 76 | 82 | 63 | 75 | 70 | UAE Pro League | Veteran
+204 | Alireza Jahanbakhsh | Iran | RW | 64 | 76 | 68 | 71 | 78 | 55 | Netherlands | Veteran
+205 | Luuk de Jong | Netherlands | ST | 67 | 58 | 83 | 59 | 67 | 84 | Netherlands | Veteran
+206 | Brian Brobbey | Netherlands | ST | 67 | 89 | 78 | 59 | 72 | 82 | Netherlands | Current
+207 | Wout Weghorst | Netherlands | ST | 65 | 61 | 79 | 55 | 63 | 84 | Netherlands | Veteran
+208 | Steven Berghuis | Netherlands | RW | 66 | 70 | 73 | 85 | 83 | 51 | Netherlands | Veteran
+209 | Hugo Cuypers | Belgium | ST | 63 | 64 | 73 | 53 | 60 | 70 | Belgium | Current
+210 | Tobias Lauritsen | Norway | ST | 63 | 58 | 72 | 51 | 58 | 78 | Norway | Current
+211 | Santiago Giménez | Mexico | ST | 70 | 81 | 86 | 62 | 73 | 76 | Italy | Current
+212 | Hákon Arnar Haraldsson | Iceland | CF | 64 | 81 | 64 | 75 | 82 | 54 | France | Current
+213 | Orkun Kökçü | Turkey | CAM | 69 | 72 | 75 | 89 | 87 | 61 | Portugal | Current
+214 | Kerem Aktürkoğlu | Turkey | LW | 68 | 91 | 77 | 73 | 85 | 55 | Turkey | Current
+215 | Barış Alper Yılmaz | Turkey | RW | 68 | 93 | 75 | 65 | 79 | 76 | Turkey | Current
+216 | Cengiz Ünder | Turkey | RW | 64 | 79 | 73 | 71 | 82 | 51 | Turkey | Veteran
+217 | Enner Valencia | Ecuador | ST | 67 | 80 | 80 | 59 | 70 | 67 | Ecuador | Veteran
+218 | Mauro Icardi | Argentina | ST | 69 | 65 | 87 | 63 | 73 | 73 | Turkey | Veteran
+219 | Yannick Bolasie | DR Congo | LW | 63 | 79 | 65 | 58 | 76 | 61 | Turkey | Veteran
+220 | Mbaye Diagne | Senegal | ST | 62 | 64 | 75 | 50 | 59 | 73 | Saudi Pro League | Veteran
+221 | Abderrazak Hamdallah | Morocco | ST | 68 | 68 | 87 | 57 | 66 | 74 | Saudi Pro League | Veteran
+222 | Salem Al-Dawsari | Saudi Arabia | LW | 71 | 89 | 82 | 82 | 88 | 58 | Saudi Pro League | Current
+223 | Sadio Mané | Senegal | LW | 72 | 91 | 84 | 78 | 87 | 73 | Saudi Pro League | Veteran
+224 | Malcom | Brazil | RW | 70 | 88 | 83 | 79 | 90 | 62 | Saudi Pro League | Current
+225 | Anderson Talisca | Brazil | CAM | 68 | 78 | 84 | 73 | 83 | 79 | Saudi Pro League | Veteran
+226 | Allan Saint-Maximin | France | LW | 68 | 96 | 73 | 64 | 91 | 53 | Saudi Pro League | Current
+227 | Ivan Toney | England | ST | 71 | 78 | 89 | 68 | 75 | 87 | Saudi Pro League | Current
+228 | Moussa Marega | Mali | ST | 64 | 77 | 74 | 53 | 63 | 81 | Saudi Pro League | Veteran
+229 | Josef Martínez | Venezuela | ST | 65 | 84 | 77 | 55 | 68 | 65 | MLS | Veteran
+230 | Christian Benteke | Belgium | ST | 67 | 59 | 84 | 53 | 61 | 87 | MLS | Veteran
+231 | Denis Bouanga | Gabon | LW | 72 | 93 | 87 | 73 | 88 | 67 | MLS | Current
+232 | Riqui Puig | Spain | CAM | 69 | 78 | 69 | 91 | 94 | 48 | MLS | Current
+233 | Lorenzo Insigne | Italy | LW | 67 | 78 | 78 | 88 | 91 | 48 | MLS | Veteran
+234 | Federico Bernardeschi | Italy | RW | 66 | 80 | 70 | 81 | 86 | 58 | MLS | Veteran
+235 | Cucho Hernández | Colombia | ST | 68 | 84 | 80 | 64 | 77 | 70 | MLS | Current
+236 | Djordje Mihailovic | USA | CAM | 67 | 73 | 68 | 86 | 87 | 53 | MLS | Current
+237 | Jordan Morris | USA | ST | 65 | 88 | 73 | 55 | 65 | 73 | MLS | Veteran
+238 | Jesús Ferreira | USA | CF | 64 | 83 | 66 | 69 | 78 | 48 | MLS | Current
+239 | Brian White | USA | ST | 65 | 72 | 78 | 54 | 63 | 70 | MLS | Current
+240 | Hany Mukhtar | Germany | CAM | 68 | 76 | 77 | 87 | 88 | 53 | MLS | Veteran
+241 | Tai Baribo | Israel | ST | 64 | 73 | 76 | 52 | 62 | 71 | MLS | Current
+242 | Fafà Picault | Haiti | LW | 62 | 90 | 63 | 53 | 72 | 48 | MLS | Veteran
+243 | Kei Kamara | Sierra Leone | ST | 62 | 63 | 72 | 51 | 59 | 71 | MLS | Veteran
+244 | Yuya Kubo | Japan | CF | 62 | 75 | 67 | 60 | 69 | 57 | MLS | Veteran
+245 | Andrés Iniesta | Spain | CAM | 72 | 67 | 72 | 97 | 97 | 55 | Legacy | Icon
+246 | David Silva | Spain | CAM | 73 | 67 | 78 | 96 | 96 | 48 | Legacy | Icon
+247 | Eden Hazard | Belgium | LW | 73 | 91 | 84 | 91 | 96 | 61 | Legacy | Icon
+248 | Cesc Fàbregas | Spain | CAM | 69 | 62 | 71 | 96 | 87 | 52 | Legacy | Icon
+249 | Mesut Özil | Germany | CAM | 72 | 67 | 70 | 97 | 94 | 49 | Legacy | Icon
+250 | Wesley Sneijder | Netherlands | CAM | 70 | 72 | 82 | 94 | 91 | 59 | Legacy | Icon
+251 | Roberto Baggio | Italy | CF | 74 | 85 | 88 | 96 | 97 | 52 | Legacy | Icon
+252 | Rui Costa | Portugal | CAM | 70 | 72 | 74 | 94 | 94 | 51 | Legacy | Icon
+253 | Jay-Jay Okocha | Nigeria | CAM | 70 | 91 | 78 | 91 | 97 | 65 | Legacy | Icon
+254 | Nwankwo Kanu | Nigeria | ST | 69 | 72 | 78 | 82 | 91 | 78 | Legacy | Icon
+255 | Emmanuel Adebayor | Togo | ST | 65 | 75 | 79 | 63 | 68 | 83 | Legacy | Cult Icon
+256 | Obafemi Martins | Nigeria | ST | 64 | 97 | 75 | 56 | 69 | 62 | Legacy | Cult Icon
+257 | Victor Ikpeba | Nigeria | ST | 63 | 84 | 75 | 55 | 66 | 61 | Legacy | Cult Icon
+258 | Papiss Cissé | Senegal | ST | 64 | 69 | 79 | 55 | 63 | 69 | Turkey | Veteran
+259 | Demba Ba | Senegal | ST | 65 | 65 | 81 | 58 | 65 | 80 | Legacy | Veteran
+260 | Asamoah Gyan | Ghana | ST | 67 | 83 | 82 | 60 | 70 | 69 | Legacy | Icon
+261 | Pierre-Emerick Aubameyang | Gabon | ST | 71 | 91 | 86 | 67 | 77 | 70 | Saudi Pro League | Veteran
+262 | Wilfried Zaha | Ivory Coast | LW | 69 | 90 | 76 | 71 | 90 | 68 | MLS | Veteran
+263 | Nicolas Pépé | Ivory Coast | RW | 65 | 82 | 73 | 68 | 82 | 52 | La Liga | Current
+264 | Maxwel Cornet | Ivory Coast | LW | 64 | 84 | 65 | 61 | 75 | 60 | England | Veteran
+265 | Ismaïla Sarr | Senegal | RW | 68 | 94 | 76 | 66 | 80 | 63 | Premier League | Current
+266 | Moussa Diarra | Mali | ST | 61 | 78 | 61 | 47 | 57 | 66 | Africa | Current
+267 | Victor Osimhen | Nigeria | ST | 74 | 96 | 93 | 66 | 80 | 88 | Turkey | Current
+268 | Samuel Chukwueze | Nigeria | RW | 67 | 92 | 70 | 68 | 87 | 53 | Serie A | Current
+269 | Kelechi Iheanacho | Nigeria | ST | 64 | 70 | 75 | 68 | 72 | 58 | Spain | Veteran
+270 | Iliman Ndiaye | Senegal | CF | 68 | 86 | 76 | 75 | 88 | 54 | England | Current
+271 | Amine Harit | Morocco | CAM | 65 | 77 | 65 | 82 | 86 | 49 | France | Current
+272 | Youssef En-Nesyri | Morocco | ST | 69 | 82 | 83 | 58 | 69 | 80 | Turkey | Current
+273 | Shoya Nakajima | Japan | LW | 62 | 81 | 61 | 70 | 82 | 45 | Japan | Veteran
+274 | Keita Baldé | Senegal | LW | 63 | 86 | 68 | 60 | 78 | 57 | Spain | Veteran
+275 | Moussa Dembélé | France | ST | 64 | 71 | 79 | 57 | 68 | 76 | China | Veteran
+276 | Wu Lei | China | ST | 64 | 83 | 74 | 53 | 68 | 55 | China | Veteran
+277 | Anderson Lopes | Brazil | ST | 65 | 80 | 78 | 54 | 66 | 70 | Japan | Current
+278 | Yuki Soma | Japan | LW | 63 | 86 | 63 | 67 | 79 | 48 | Japan | Current
+279 | Yuya Osako | Japan | ST | 64 | 67 | 75 | 68 | 72 | 69 | Japan | Veteran
+280 | Shuto Machino | Japan | ST | 64 | 78 | 70 | 57 | 66 | 65 | Japan | Current
+281 | Daichi Kamada | Japan | CAM | 69 | 72 | 75 | 88 | 85 | 58 | Premier League | Current
+282 | Takumi Minamino | Japan | CF | 69 | 84 | 78 | 79 | 87 | 55 | Ligue 1 | Veteran
+283 | Junya Ito | Japan | RW | 67 | 94 | 71 | 74 | 86 | 53 | Japan | Veteran
+284 | Ayase Ueda | Japan | ST | 66 | 81 | 75 | 57 | 66 | 70 | Netherlands | Current
+285 | Lee Kang-in | South Korea | RW | 72 | 83 | 77 | 92 | 94 | 54 | Ligue 1 | Current
+286 | Hwang Hee-chan | South Korea | ST | 69 | 91 | 79 | 63 | 77 | 75 | Premier League | Current
+287 | Cho Gue-sung | South Korea | ST | 64 | 72 | 77 | 52 | 62 | 78 | Denmark | Current
+288 | Son Jun-ho | South Korea | CAM | 62 | 62 | 58 | 76 | 65 | 68 | South Korea | Veteran
+289 | Omar Marmoush | Egypt | ST | 73 | 95 | 88 | 80 | 91 | 64 | Premier League | Current
+290 | Mohammed Kudus | Ghana | CAM | 71 | 93 | 82 | 77 | 91 | 72 | Premier League | Current
+291 | Thomas Partey | Ghana | CAM | 63 | 61 | 56 | 76 | 65 | 82 | Spain | Veteran
+292 | Youssef Msakni | Tunisia | LW | 64 | 79 | 68 | 70 | 82 | 51 | Tunisia | Veteran
+293 | Achraf Bencharki | Morocco | LW | 63 | 81 | 68 | 63 | 78 | 51 | Egypt | Current
+294 | Percy Tau | South Africa | RW | 63 | 77 | 67 | 61 | 77 | 49 | South Africa | Current
+295 | Aboubakar Kamara | France | ST | 61 | 74 | 66 | 48 | 59 | 69 | France | Current
+296 | Sofiane Boufal | Morocco | LW | 65 | 82 | 69 | 77 | 89 | 48 | Belgium | Veteran
+297 | Dodi Lukebakio | Belgium | RW | 68 | 91 | 77 | 65 | 82 | 65 | La Liga | Current
+298 | Jonathan Ikoné | France | RW | 64 | 88 | 64 | 68 | 82 | 50 | Italy | Current
+299 | M'Bala Nzola | Angola | ST | 64 | 77 | 73 | 52 | 62 | 78 | Italy | Current
+300 | Anwar El Ghazi | Netherlands | RW | 62 | 77 | 66 | 59 | 75 | 57 | Netherlands | Veteran

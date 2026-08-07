@@ -1,0 +1,32 @@
+const API_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:5000";
+
+async function request(path, { method = "GET", body, token } = {}) {
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  const res = await fetch(`${API_URL}${path}`, {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
+  return data;
+}
+
+const api = {
+  register: (username, password) => request("/api/auth/register", { method: "POST", body: { username, password } }),
+  login: (username, password) => request("/api/auth/login", { method: "POST", body: { username, password } }),
+  logout: (token) => request("/api/auth/logout", { method: "POST", token }),
+  me: (token) => request("/api/me", { token }),
+  cards: () => request("/api/cards"),
+  inventory: (token) => request("/api/inventory", { token }),
+  team: (token) => request("/api/team", { token }),
+  saveTeam: (token, slots) => request("/api/team", { method: "POST", token, body: { slots } }),
+  packs: (token) => request("/api/packs", { token }),
+  openPack: (token, packKey) => request("/api/packs/open", { method: "POST", token, body: { packKey } }),
+  quests: (token) => request("/api/quests", { token }),
+  claimQuest: (token, questId) => request("/api/quests/claim", { method: "POST", token, body: { questId } }),
+  exchange: (token, ids) => request("/api/exchange", { method: "POST", token, body: { ids } }),
+};
+
+export default api;
