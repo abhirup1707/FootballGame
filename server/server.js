@@ -12,7 +12,7 @@ const { DRAFT_POOL } = require("./draftPool");
 
 const app = express();
 const allowedOrigins = process.env.CLIENT_ORIGIN
-  ? process.env.CLIENT_ORIGIN.split(",").map((origin) => origin.trim()).filter(Boolean)
+  ? process.env.CLIENT_ORIGIN.split(",").map((origin) => origin.trim().replace(/\/+$/, "")).filter(Boolean)
   : "*";
 const corsOptions = { origin: allowedOrigins };
 

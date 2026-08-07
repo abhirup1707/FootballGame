@@ -1,4 +1,5 @@
-const API_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:5000";
+const configuredApiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_SOCKET_URL;
+const API_URL = (configuredApiUrl || (import.meta.env.DEV ? "http://localhost:5000" : "")).replace(/\/+$/, "");
 
 async function request(path, { method = "GET", body, token } = {}) {
   const headers = { "Content-Type": "application/json" };
