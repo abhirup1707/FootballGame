@@ -31,7 +31,6 @@ function encode(value, into, offset) {
 async function loop() {
   while (true) {
     Atomics.wait(status, 0, IDLE);
-    const reqId = header[1];
     const qlen = header[2];
     const queryJson = Buffer.from(bytes).subarray(DATA_OFFSET, DATA_OFFSET + qlen).toString("utf8");
     let payload;
@@ -48,7 +47,12 @@ async function loop() {
     header[3] = plen;
     Atomics.store(status, 0, code);
     Atomics.notify(status, 0);
-    void reqId;
+    // Park until the main thread acknowledges by resetting to IDLE. This
+    // prevents the loop from re-reading the same request before the main
+    // thread has consumed the result.
+    while (Atomics.load(status, 0) !== IDLE) {
+      Atomics.wait(status, 0, Atomics.load(status, 0));
+    }
   }
 }
 
