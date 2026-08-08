@@ -21,9 +21,8 @@ function pgSql(sql, params, returning) {
 // This keeps the whole codebase's synchronous db.prepare(...) API intact
 // without spawning a new child process (and new pool + SSL handshake) per query.
 const PG_BUFFER_BYTES = 8 * 1024 * 1024;
-const PG_DATA_OFFSET = 16; // header[0]=status, [1]=reqId, [2]=queryLen, [3]=resultLen
-let pgStatus = null;
-let pgHeader = null;
+const PG_DATA_OFFSET = 16; // ints: [0]=reqReady, [1]=respReady, [2]=queryLen, [3]=resultLen
+let pgInts = null;
 let pgBytes = null;
 let pgWorker = null;
 let pgRequestId = 0;
@@ -31,11 +30,12 @@ let pgRequestId = 0;
 function ensurePgWorker() {
   if (pgWorker) return;
   const sab = new SharedArrayBuffer(PG_BUFFER_BYTES);
-  pgStatus = new Int32Array(sab);
-  pgHeader = new Int32Array(sab, 0, 4);
+  pgInts = new Int32Array(sab, 0, 4);
   pgBytes = new Uint8Array(sab);
   pgWorker = new Worker(path.join(__dirname, "pg-worker.js"), { workerData: { sab }, env: process.env });
   pgWorker.unref();
+  pgWorker.on("error", (err) => console.error("[pg-worker] error:", err.message));
+  pgWorker.on("exit", (code) => console.error(`[pg-worker] exited with code ${code}`));
 }
 
 function executePg(sql, params = [], returning = false) {
@@ -44,21 +44,22 @@ function executePg(sql, params = [], returning = false) {
   const qBuf = Buffer.from(query, "utf8");
   if (qBuf.length > PG_BUFFER_BYTES - PG_DATA_OFFSET) throw new Error("Query exceeds buffer size");
   pgBytes.set(qBuf, PG_DATA_OFFSET);
-  pgHeader[1] = ++pgRequestId;
-  pgHeader[2] = qBuf.length;
-  pgHeader[3] = 0;
-  Atomics.store(pgStatus, 0, 1); // BUSY
-  Atomics.notify(pgStatus, 0);
-  Atomics.wait(pgStatus, 0, 1, 30000); // wait until not BUSY
-  const code = Atomics.load(pgStatus, 0);
-  const rlen = pgHeader[3];
-  // Hand control back to the worker's idle loop before reading the result, so
-  // it parks instead of re-executing the same request.
-  Atomics.store(pgStatus, 0, 0);
-  Atomics.notify(pgStatus, 0);
+  Atomics.store(pgInts, 2, qBuf.length);
+  Atomics.store(pgInts, 3, 0);
+  // Signal a new request is ready.
+  Atomics.store(pgInts, 0, 1);
+  Atomics.notify(pgInts, 0);
+  // Wait for the worker to ACK (so it has read the request bytes).
+  while (Atomics.load(pgInts, 0) !== 0) Atomics.wait(pgInts, 0, 1, 30000);
+  // Wait for the response to be ready.
+  while (Atomics.load(pgInts, 1) !== 1) Atomics.wait(pgInts, 1, 0, 30000);
+  const rlen = Atomics.load(pgInts, 3);
   const resultBuf = Buffer.from(pgBytes.subarray(PG_DATA_OFFSET + qBuf.length, PG_DATA_OFFSET + qBuf.length + rlen)).toString("utf8");
   const result = JSON.parse(resultBuf || '{"error":"The database did not return a response."}');
-  if (code !== 2) throw new Error(result.error || "Database query failed");
+  // Consume the response so the worker can accept the next request.
+  Atomics.store(pgInts, 1, 0);
+  Atomics.notify(pgInts, 1);
+  if (result.error) throw new Error(result.error);
   return result;
 }
 

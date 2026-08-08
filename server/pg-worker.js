@@ -1,4 +1,4 @@
-const { workerData, parentPort } = require("worker_threads");
+const { workerData } = require("worker_threads");
 const { Pool } = require("pg");
 
 // One long-lived Postgres pool shared by every query from the main thread.
@@ -14,45 +14,42 @@ const pool = new Pool({
 });
 
 const sab = workerData.sab;
-const status = new Int32Array(sab);
-const header = new Int32Array(sab, 0, 4);
+const ints = new Int32Array(sab, 0, 4); // [0]=reqReady, [1]=respReady, [2]=queryLen, [3]=resultLen
 const bytes = new Uint8Array(sab);
 const DATA_OFFSET = 16;
 
-const IDLE = 0;
-const BUSY = 1;
-const DONE = 2;
-const ERROR = 3;
-
-function encode(value, into, offset) {
-  return Buffer.from(value, "utf8").copy(into, offset);
-}
-
 async function loop() {
   while (true) {
-    Atomics.wait(status, 0, IDLE);
-    const qlen = header[2];
+    // Wait for a request from the main thread.
+    while (Atomics.load(ints, 0) === 0) Atomics.wait(ints, 0, 0);
+
+    const qlen = Atomics.load(ints, 2);
     const queryJson = Buffer.from(bytes).subarray(DATA_OFFSET, DATA_OFFSET + qlen).toString("utf8");
+
+    // ACK the request before running it, so the main thread never writes a
+    // new query over bytes we are still reading.
+    Atomics.store(ints, 0, 0);
+    Atomics.notify(ints, 0);
+
     let payload;
-    let code = DONE;
+    let code = 1; // 1 = ok, 2 = error
     try {
       const { sql, params } = JSON.parse(queryJson);
       const result = await pool.query(sql, params);
       payload = JSON.stringify({ rows: result.rows || [], rowCount: result.rowCount || 0 });
     } catch (error) {
-      code = ERROR;
+      code = 2;
       payload = JSON.stringify({ error: error.message });
     }
-    const plen = encode(payload, bytes, DATA_OFFSET + qlen);
-    header[3] = plen;
-    Atomics.store(status, 0, code);
-    Atomics.notify(status, 0);
-    // Park until the main thread acknowledges by resetting to IDLE. This
-    // prevents the loop from re-reading the same request before the main
-    // thread has consumed the result.
-    while (Atomics.load(status, 0) !== IDLE) {
-      Atomics.wait(status, 0, Atomics.load(status, 0));
-    }
+
+    const payloadBuf = Buffer.from(payload, "utf8");
+    payloadBuf.copy(bytes, DATA_OFFSET + qlen);
+    Atomics.store(ints, 3, payloadBuf.length);
+
+    // Signal the response is ready, then wait for the main thread to consume it.
+    Atomics.store(ints, 1, 1);
+    Atomics.notify(ints, 1);
+    while (Atomics.load(ints, 1) === 1) Atomics.wait(ints, 1, 1);
   }
 }
 
