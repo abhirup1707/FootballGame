@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const { db } = require("./db");
+const { db, usingPostgres } = require("./db");
 const { buildCardStats } = require("./ovr");
 
 const CATEGORY_FILES = {
@@ -85,10 +85,20 @@ function seed(catalog) {
 // Additive sync: count-matched DBs skip the reseed above, so rows seeded
 // before the nation column existed stay blank. Backfill nation by matching
 // name + category against the club JSON whenever any card is missing it.
+// On Postgres each statement goes through a spawned child process, so the
+// backfill is batched into one multi-row UPDATE instead of one query per card.
 function syncNations(catalog) {
   if (!catalog.length) return 0;
   const missing = db.prepare("SELECT COUNT(*) AS c FROM cards WHERE nation = '' OR nation IS NULL").get().c;
   if (missing === 0) return 0;
+  if (usingPostgres) {
+    const rows = catalog.filter((card) => card.nation && card.name);
+    if (!rows.length) return 0;
+    const values = rows.flatMap((card) => [card.nation, card.name, card.category]);
+    const tuples = rows.map((_, i) => `($${i * 3 + 1}, $${i * 3 + 2}, $${i * 3 + 3})`).join(",");
+    const update = db.prepare(`UPDATE cards c SET nation = v.nation FROM (VALUES ${tuples}) AS v(nation, name, category) WHERE c.name = v.name AND c.category = v.category AND (c.nation = '' OR c.nation IS NULL)`);
+    return update.run(...values).changes;
+  }
   const upd = db.prepare("UPDATE cards SET nation = ? WHERE name = ? AND category = ?");
   let changed = 0;
   for (const card of catalog) {
@@ -104,6 +114,14 @@ function syncImages(catalog) {
   if (!catalog.length) return 0;
   const missing = db.prepare("SELECT COUNT(*) AS c FROM cards WHERE image IS NULL OR image = ''").get().c;
   if (missing === 0) return 0;
+  if (usingPostgres) {
+    const rows = catalog.filter((card) => card.image && card.name);
+    if (!rows.length) return 0;
+    const values = rows.flatMap((card) => [card.image, card.name, card.category]);
+    const tuples = rows.map((_, i) => `($${i * 3 + 1}, $${i * 3 + 2}, $${i * 3 + 3})`).join(",");
+    const update = db.prepare(`UPDATE cards c SET image = v.image FROM (VALUES ${tuples}) AS v(image, name, category) WHERE c.name = v.name AND c.category = v.category AND (c.image IS NULL OR c.image = '')`);
+    return update.run(...values).changes;
+  }
   const upd = db.prepare("UPDATE cards SET image = ? WHERE name = ? AND category = ? AND (image IS NULL OR image = '')");
   let changed = 0;
   for (const card of catalog) {

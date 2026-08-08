@@ -1,10 +1,11 @@
 const express = require("express");
 const http = require("http");
+const path = require("path");
+const { spawn } = require("child_process");
 const cors = require("cors");
 const { Server } = require("socket.io");
 const routes = require("./routes");
 const { db } = require("./db");
-require("./seed");
 const { resolveMatchRewards } = require("./economy");
 const { userByToken } = require("./auth");
 const { computeOVR, effectiveStats, positionPenalty } = require("./ovr");
@@ -432,4 +433,12 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => { Object.keys(rooms).forEach((code) => { const room = rooms[code]; const player = room.players.find((participant) => participant.id === socket.id); if (!player) return; room.rematchVotes = room.rematchVotes.filter((id) => id !== socket.id); room.reconnectTimers ||= {}; room.reconnectTimers[socket.id] = setTimeout(() => { const currentRoom = rooms[code]; if (!currentRoom) return; currentRoom.players = currentRoom.players.filter((participant) => participant.id !== socket.id); delete currentRoom.reconnectTimers[socket.id]; if (!currentRoom.players.length) { if (currentRoom.timer) clearInterval(currentRoom.timer); delete rooms[code]; } }, 60000); }); });
 });
 const port = Number(process.env.PORT) || 5000;
-server.listen(port, () => console.log(`Server running on ${port}`));
+server.listen(port, () => {
+  console.log(`Server running on ${port}`);
+  // Run catalog seeding in a background child process so the server's event
+  // loop stays responsive (and Render's /health check passes) while the DB
+  // is populated.
+  const seedChild = spawn(process.execPath, [path.join(__dirname, "seed.js")], { env: process.env, stdio: "inherit" });
+  seedChild.on("error", (err) => console.error("Seed process error:", err.message));
+  seedChild.on("exit", (code) => console.log(`Seed process exited with code ${code}`));
+});
