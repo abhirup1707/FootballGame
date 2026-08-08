@@ -44,12 +44,11 @@ function seed(catalog) {
   if (existing === catalog.length) return { seeded: false, cards: existing };
   db.exec("DELETE FROM pack_logs; DELETE FROM owned_cards; DELETE FROM cards; DELETE FROM sqlite_sequence WHERE name IN ('cards', 'owned_cards', 'pack_logs');");
 
-  const values = [];
-  const rows = [];
+  const seededRows = [];
   let count = 0;
   for (const card of catalog) {
     const stats = buildCardStats(card);
-    rows.push(
+    seededRows.push([
       card.name || "Unknown",
       card.season || "",
       card.club || "",
@@ -65,15 +64,19 @@ function seed(catalog) {
       stats.rating,
       stats.tier,
       card.image || null
-    );
-    values.push("(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    ]);
     count += 1;
   }
-  const insert = db.prepare(`
-    INSERT INTO cards (name, season, club, nation, position, category, pace, shooting, passing, dribbling, defending, physicality, base_rating, tier, image)
-    VALUES ${values.join(",")}
-  `);
-  insert.run(...rows);
+  // Postgres has a limit on parameters per query. Smaller batches also keep
+  // the first cloud deployment responsive while the catalog is created.
+  for (let start = 0; start < seededRows.length; start += 100) {
+    const batch = seededRows.slice(start, start + 100);
+    const insert = db.prepare(`
+      INSERT INTO cards (name, season, club, nation, position, category, pace, shooting, passing, dribbling, defending, physicality, base_rating, tier, image)
+      VALUES ${batch.map(() => "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)").join(",")}
+    `);
+    insert.run(...batch.flat());
+  }
   return { seeded: true, cards: count };
 }
 
