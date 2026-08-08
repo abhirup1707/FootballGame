@@ -973,7 +973,7 @@
     "nation": "Argentina",
     "club": "Serie A",
     "season": "Current",
-    "image": ""
+    "image": "/players/lautaro-martinez.png"
   },
   {
     "id": 62,
@@ -989,7 +989,7 @@
     "nation": "Portugal",
     "club": "Serie A",
     "season": "Current",
-    "image": ""
+    "image": "/players/rafael-leao.png"
   },
   {
     "id": 63,
@@ -1005,7 +1005,7 @@
     "nation": "Argentina",
     "club": "Serie A",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/paulo-dybala.png"
   },
   {
     "id": 64,
@@ -1021,7 +1021,7 @@
     "nation": "England",
     "club": "Premier League",
     "season": "Current",
-    "image": ""
+    "image": "/players/marcus-rashford.png"
   },
   {
     "id": 65,
@@ -1197,7 +1197,7 @@
     "nation": "Uruguay",
     "club": "Saudi Pro League",
     "season": "Current",
-    "image": ""
+    "image": "/players/darwin-nunez.png"
   },
   {
     "id": 76,
@@ -1213,7 +1213,7 @@
     "nation": "Portugal",
     "club": "Premier League",
     "season": "Current",
-    "image": ""
+    "image": "/players/diogo-jota.png"
   },
   {
     "id": 77,
@@ -1229,7 +1229,7 @@
     "nation": "Portugal",
     "club": "Premier League",
     "season": "Current",
-    "image": ""
+    "image": "/players/pedro-neto.png"
   },
   {
     "id": 78,
@@ -1245,7 +1245,7 @@
     "nation": "England",
     "club": "Premier League",
     "season": "Current",
-    "image": ""
+    "image": "/players/anthony-gordon.png"
   },
   {
     "id": 79,
@@ -1565,7 +1565,7 @@
     "nation": "Mexico",
     "club": "MLS",
     "season": "Current",
-    "image": ""
+    "image": "/players/hirving-lozano.png"
   },
   {
     "id": 99,
@@ -1581,7 +1581,7 @@
     "nation": "Germany",
     "club": "Bundesliga",
     "season": "Current",
-    "image": ""
+    "image": "/players/jamal-musiala.png"
   },
   {
     "id": 100,
@@ -1597,7 +1597,7 @@
     "nation": "Germany",
     "club": "Premier League",
     "season": "Current",
-    "image": ""
+    "image": "/players/florian-wirtz.png"
   },
   {
     "id": 101,
@@ -1613,7 +1613,7 @@
     "nation": "Germany",
     "club": "Bundesliga",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/serge-gnabry.png"
   },
   {
     "id": 102,
@@ -1629,7 +1629,7 @@
     "nation": "Germany",
     "club": "Bundesliga",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/leroy-sane.png"
   },
   {
     "id": 103,
@@ -1645,7 +1645,7 @@
     "nation": "France",
     "club": "Saudi Pro League",
     "season": "Current",
-    "image": ""
+    "image": "/players/kingsley-coman.png"
   },
   {
     "id": 104,
@@ -1661,7 +1661,7 @@
     "nation": "France",
     "club": "Bundesliga",
     "season": "Current",
-    "image": ""
+    "image": "/players/michael-olise.png"
   },
   {
     "id": 105,
@@ -1677,7 +1677,7 @@
     "nation": "Germany",
     "club": "MLS",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/thomas-muller.png"
   },
   {
     "id": 106,
@@ -1693,7 +1693,7 @@
     "nation": "Germany",
     "club": "MLS",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/marco-reus.png"
   },
   {
     "id": 107,
@@ -1709,7 +1709,7 @@
     "nation": "Germany",
     "club": "Bundesliga",
     "season": "Current",
-    "image": ""
+    "image": "/players/karim-adeyemi.png"
   },
   {
     "id": 108,
@@ -1725,7 +1725,7 @@
     "nation": "Guinea",
     "club": "Bundesliga",
     "season": "Current",
-    "image": ""
+    "image": "/players/serhou-guirassy.png"
   },
   {
     "id": 109,
@@ -1741,7 +1741,7 @@
     "nation": "Belgium",
     "club": "Bundesliga",
     "season": "Current",
-    "image": ""
+    "image": "/players/lois-openda.png"
   },
   {
     "id": 110,
@@ -2045,7 +2045,7 @@
     "nation": "Canada",
     "club": "Ligue 1",
     "season": "Current",
-    "image": ""
+    "image": "/players/jonathan-david.png"
   },
   {
     "id": 129,
@@ -2061,7 +2061,7 @@
     "nation": "Algeria",
     "club": "Ligue 1",
     "season": "Current",
-    "image": ""
+    "image": "/players/amine-gouiri.png"
   },
   {
     "id": 130,
@@ -2077,7 +2077,7 @@
     "nation": "France",
     "club": "Ligue 1",
     "season": "Current",
-    "image": ""
+    "image": "/players/elye-wahi.png"
   },
   {
     "id": 131,
@@ -2093,7 +2093,7 @@
     "nation": "Nigeria",
     "club": "Ligue 1",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/moses-simon.png"
   },
   {
     "id": 132,
@@ -2109,7 +2109,7 @@
     "nation": "Nigeria",
     "club": "Ligue 1",
     "season": "Current",
-    "image": ""
+    "image": "/players/terem-moffi.png"
   },
   {
     "id": 133,
@@ -2157,7 +2157,7 @@
     "nation": "Argentina",
     "club": "Argentina",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/angel-di-maria.png"
   },
   {
     "id": 136,
@@ -2285,7 +2285,7 @@
     "nation": "Japan",
     "club": "La Liga",
     "season": "Current",
-    "image": ""
+    "image": "/players/takefusa-kubo.png"
   },
   {
     "id": 144,
@@ -2429,7 +2429,7 @@
     "nation": "Spain",
     "club": "La Liga",
     "season": "Current",
-    "image": ""
+    "image": "/players/bryan-gil.png"
   },
   {
     "id": 153,
@@ -2461,7 +2461,7 @@
     "nation": "Spain",
     "club": "La Liga",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/iago-aspas.png"
   },
   {
     "id": 155,
@@ -2477,7 +2477,7 @@
     "nation": "Spain",
     "club": "Mexico",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/sergio-canales.png"
   },
   {
     "id": 156,
@@ -2493,7 +2493,7 @@
     "nation": "Mexico",
     "club": "Mexico",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/hector-herrera.png"
   },
   {
     "id": 157,
@@ -2605,7 +2605,7 @@
     "nation": "Mexico",
     "club": "Mexico",
     "season": "Current",
-    "image": ""
+    "image": "/players/alexis-vega.png"
   },
   {
     "id": 164,
@@ -2637,7 +2637,7 @@
     "nation": "Uruguay",
     "club": "Brazil",
     "season": "Current",
-    "image": ""
+    "image": "/players/giorgian-de-arrascaeta.png"
   },
   {
     "id": 166,
@@ -2653,7 +2653,7 @@
     "nation": "Brazil",
     "club": "Brazil",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/everton-ribeiro.png"
   },
   {
     "id": 167,
@@ -2669,7 +2669,7 @@
     "nation": "Brazil",
     "club": "Brazil",
     "season": "Current",
-    "image": ""
+    "image": "/players/gabigol.png"
   },
   {
     "id": 168,
@@ -2749,7 +2749,7 @@
     "nation": "Venezuela",
     "club": "Brazil",
     "season": "Current",
-    "image": ""
+    "image": "/players/savarino.png"
   },
   {
     "id": 173,
@@ -2973,7 +2973,7 @@
     "nation": "Colombia",
     "club": "Russia",
     "season": "Current",
-    "image": ""
+    "image": "/players/jhon-cordoba.png"
   },
   {
     "id": 187,
@@ -2989,7 +2989,7 @@
     "nation": "Colombia",
     "club": "Brazil",
     "season": "Current",
-    "image": ""
+    "image": "/players/jhon-arias.png"
   },
   {
     "id": 188,
@@ -3005,7 +3005,7 @@
     "nation": "Colombia",
     "club": "Serie A",
     "season": "Current",
-    "image": ""
+    "image": "/players/luis-sinisterra.png"
   },
   {
     "id": 189,
@@ -3037,7 +3037,7 @@
     "nation": "Colombia",
     "club": "Serie A",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/duvan-zapata.png"
   },
   {
     "id": 191,
@@ -3053,7 +3053,7 @@
     "nation": "Portugal",
     "club": "Portugal",
     "season": "Current",
-    "image": ""
+    "image": "/players/pedro-goncalves.png"
   },
   {
     "id": 192,
@@ -3069,7 +3069,7 @@
     "nation": "Portugal",
     "club": "Portugal",
     "season": "Current",
-    "image": ""
+    "image": "/players/diogo-goncalves.png"
   },
   {
     "id": 193,
@@ -3085,7 +3085,7 @@
     "nation": "Portugal",
     "club": "Portugal",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/rafa-silva.png"
   },
   {
     "id": 194,
@@ -3101,7 +3101,7 @@
     "nation": "Portugal",
     "club": "Portugal",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/ricardo-horta.png"
   },
   {
     "id": 195,
@@ -3117,7 +3117,7 @@
     "nation": "Portugal",
     "club": "Portugal",
     "season": "Current",
-    "image": ""
+    "image": "/players/trincao.png"
   },
   {
     "id": 196,
@@ -3133,7 +3133,7 @@
     "nation": "Sweden",
     "club": "Premier League",
     "season": "Current",
-    "image": ""
+    "image": "/players/viktor-gyokeres.png"
   },
   {
     "id": 197,
@@ -3149,7 +3149,7 @@
     "nation": "Portugal",
     "club": "Portugal",
     "season": "Current",
-    "image": ""
+    "image": "/players/fabio-silva.png"
   },
   {
     "id": 198,
@@ -3165,7 +3165,7 @@
     "nation": "Portugal",
     "club": "Ligue 1",
     "season": "Current",
-    "image": ""
+    "image": "/players/goncalo-ramos.png"
   },
   {
     "id": 199,
@@ -3181,7 +3181,7 @@
     "nation": "Portugal",
     "club": "Serie A",
     "season": "Current",
-    "image": ""
+    "image": "/players/francisco-conceicao.png"
   },
   {
     "id": 200,
@@ -3213,7 +3213,7 @@
     "nation": "Brazil",
     "club": "Saudi Pro League",
     "season": "Current",
-    "image": ""
+    "image": "/players/galeno.png"
   },
   {
     "id": 202,
@@ -3229,7 +3229,7 @@
     "nation": "Iran",
     "club": "Serie A",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/mehdi-taremi.png"
   },
   {
     "id": 203,
@@ -3389,7 +3389,7 @@
     "nation": "Iceland",
     "club": "France",
     "season": "Current",
-    "image": ""
+    "image": "/players/hakon-arnar-haraldsson.png"
   },
   {
     "id": 213,
@@ -3405,7 +3405,7 @@
     "nation": "Turkey",
     "club": "Portugal",
     "season": "Current",
-    "image": ""
+    "image": "/players/orkun-kokcu.png"
   },
   {
     "id": 214,
@@ -3437,7 +3437,7 @@
     "nation": "Turkey",
     "club": "Turkey",
     "season": "Current",
-    "image": ""
+    "image": "/players/bar-s-alper-y-lmaz.png"
   },
   {
     "id": 216,
@@ -3469,7 +3469,7 @@
     "nation": "Ecuador",
     "club": "Ecuador",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/enner-valencia.png"
   },
   {
     "id": 218,
@@ -3485,7 +3485,7 @@
     "nation": "Argentina",
     "club": "Turkey",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/mauro-icardi.png"
   },
   {
     "id": 219,
@@ -3501,7 +3501,7 @@
     "nation": "DR Congo",
     "club": "Turkey",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/yannick-bolasie.png"
   },
   {
     "id": 220,
@@ -3533,7 +3533,7 @@
     "nation": "Morocco",
     "club": "Saudi Pro League",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/abderrazak-hamdallah.png"
   },
   {
     "id": 222,
@@ -3549,7 +3549,7 @@
     "nation": "Saudi Arabia",
     "club": "Saudi Pro League",
     "season": "Current",
-    "image": ""
+    "image": "/players/salem-al-dawsari.png"
   },
   {
     "id": 223,
@@ -3581,7 +3581,7 @@
     "nation": "Brazil",
     "club": "Saudi Pro League",
     "season": "Current",
-    "image": ""
+    "image": "/players/malcom.png"
   },
   {
     "id": 225,
@@ -3597,7 +3597,7 @@
     "nation": "Brazil",
     "club": "Saudi Pro League",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/anderson-talisca.png"
   },
   {
     "id": 226,
@@ -3613,7 +3613,7 @@
     "nation": "France",
     "club": "Saudi Pro League",
     "season": "Current",
-    "image": ""
+    "image": "/players/allan-saint-maximin.png"
   },
   {
     "id": 227,
@@ -3677,7 +3677,7 @@
     "nation": "Belgium",
     "club": "MLS",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/christian-benteke.png"
   },
   {
     "id": 231,
@@ -3693,7 +3693,7 @@
     "nation": "Gabon",
     "club": "MLS",
     "season": "Current",
-    "image": ""
+    "image": "/players/denis-bouanga.png"
   },
   {
     "id": 232,
@@ -3709,7 +3709,7 @@
     "nation": "Spain",
     "club": "MLS",
     "season": "Current",
-    "image": ""
+    "image": "/players/riqui-puig.png"
   },
   {
     "id": 233,
@@ -3741,7 +3741,7 @@
     "nation": "Italy",
     "club": "MLS",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/federico-bernardeschi.png"
   },
   {
     "id": 235,
@@ -3757,7 +3757,7 @@
     "nation": "Colombia",
     "club": "MLS",
     "season": "Current",
-    "image": ""
+    "image": "/players/cucho-hernandez.png"
   },
   {
     "id": 236,
@@ -3773,7 +3773,7 @@
     "nation": "USA",
     "club": "MLS",
     "season": "Current",
-    "image": ""
+    "image": "/players/djordje-mihailovic.png"
   },
   {
     "id": 237,
@@ -3789,7 +3789,7 @@
     "nation": "USA",
     "club": "MLS",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/jordan-morris.png"
   },
   {
     "id": 238,
@@ -3853,7 +3853,7 @@
     "nation": "Israel",
     "club": "MLS",
     "season": "Current",
-    "image": ""
+    "image": "/players/tai-baribo.png"
   },
   {
     "id": 242,
@@ -3869,7 +3869,7 @@
     "nation": "Haiti",
     "club": "MLS",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/fafa-picault.png"
   },
   {
     "id": 243,
@@ -3885,7 +3885,7 @@
     "nation": "Sierra Leone",
     "club": "MLS",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/kei-kamara.png"
   },
   {
     "id": 244,
@@ -3901,7 +3901,7 @@
     "nation": "Japan",
     "club": "MLS",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/yuya-kubo.png"
   },
   {
     "id": 245,
@@ -3997,7 +3997,7 @@
     "nation": "Netherlands",
     "club": "Legacy",
     "season": "Icon",
-    "image": ""
+    "image": "/players/wesley-sneijder.png"
   },
   {
     "id": 251,
@@ -4013,7 +4013,7 @@
     "nation": "Italy",
     "club": "Legacy",
     "season": "Icon",
-    "image": ""
+    "image": "/players/roberto-baggio.png"
   },
   {
     "id": 252,
@@ -4029,7 +4029,7 @@
     "nation": "Portugal",
     "club": "Legacy",
     "season": "Icon",
-    "image": ""
+    "image": "/players/rui-costa.png"
   },
   {
     "id": 253,
@@ -4045,7 +4045,7 @@
     "nation": "Nigeria",
     "club": "Legacy",
     "season": "Icon",
-    "image": ""
+    "image": "/players/jay-jay-okocha.png"
   },
   {
     "id": 254,
@@ -4061,7 +4061,7 @@
     "nation": "Nigeria",
     "club": "Legacy",
     "season": "Icon",
-    "image": ""
+    "image": "/players/nwankwo-kanu.png"
   },
   {
     "id": 255,
@@ -4173,7 +4173,7 @@
     "nation": "Gabon",
     "club": "Saudi Pro League",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/pierre-emerick-aubameyang.png"
   },
   {
     "id": 262,
@@ -4189,7 +4189,7 @@
     "nation": "Ivory Coast",
     "club": "MLS",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/wilfried-zaha.png"
   },
   {
     "id": 263,
@@ -4205,7 +4205,7 @@
     "nation": "Ivory Coast",
     "club": "La Liga",
     "season": "Current",
-    "image": ""
+    "image": "/players/nicolas-pepe.png"
   },
   {
     "id": 264,
@@ -4221,7 +4221,7 @@
     "nation": "Ivory Coast",
     "club": "England",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/maxwel-cornet.png"
   },
   {
     "id": 265,
@@ -4237,7 +4237,7 @@
     "nation": "Senegal",
     "club": "Premier League",
     "season": "Current",
-    "image": ""
+    "image": "/players/ismaila-sarr.png"
   },
   {
     "id": 266,
@@ -4269,7 +4269,7 @@
     "nation": "Nigeria",
     "club": "Turkey",
     "season": "Current",
-    "image": ""
+    "image": "/players/victor-osimhen.png"
   },
   {
     "id": 268,
@@ -4285,7 +4285,7 @@
     "nation": "Nigeria",
     "club": "Serie A",
     "season": "Current",
-    "image": ""
+    "image": "/players/samuel-chukwueze.png"
   },
   {
     "id": 269,
@@ -4301,7 +4301,7 @@
     "nation": "Nigeria",
     "club": "Spain",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/kelechi-iheanacho.png"
   },
   {
     "id": 270,
@@ -4365,7 +4365,7 @@
     "nation": "Japan",
     "club": "Japan",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/shoya-nakajima.png"
   },
   {
     "id": 274,
@@ -4381,7 +4381,7 @@
     "nation": "Senegal",
     "club": "Spain",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/keita-balde.png"
   },
   {
     "id": 275,
@@ -4397,7 +4397,7 @@
     "nation": "France",
     "club": "China",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/moussa-dembele.png"
   },
   {
     "id": 276,
@@ -4477,7 +4477,7 @@
     "nation": "Japan",
     "club": "Japan",
     "season": "Current",
-    "image": ""
+    "image": "/players/shuto-machino.png"
   },
   {
     "id": 281,
@@ -4493,7 +4493,7 @@
     "nation": "Japan",
     "club": "Premier League",
     "season": "Current",
-    "image": ""
+    "image": "/players/daichi-kamada.png"
   },
   {
     "id": 282,
@@ -4509,7 +4509,7 @@
     "nation": "Japan",
     "club": "Ligue 1",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/takumi-minamino.png"
   },
   {
     "id": 283,
@@ -4525,7 +4525,7 @@
     "nation": "Japan",
     "club": "Japan",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/junya-ito.png"
   },
   {
     "id": 284,
@@ -4541,7 +4541,7 @@
     "nation": "Japan",
     "club": "Netherlands",
     "season": "Current",
-    "image": ""
+    "image": "/players/ayase-ueda.png"
   },
   {
     "id": 285,
@@ -4557,7 +4557,7 @@
     "nation": "South Korea",
     "club": "Ligue 1",
     "season": "Current",
-    "image": ""
+    "image": "/players/lee-kang-in.png"
   },
   {
     "id": 286,
@@ -4573,7 +4573,7 @@
     "nation": "South Korea",
     "club": "Premier League",
     "season": "Current",
-    "image": ""
+    "image": "/players/hwang-hee-chan.png"
   },
   {
     "id": 287,
@@ -4589,7 +4589,7 @@
     "nation": "South Korea",
     "club": "Denmark",
     "season": "Current",
-    "image": ""
+    "image": "/players/cho-gue-sung.png"
   },
   {
     "id": 288,
@@ -4605,7 +4605,7 @@
     "nation": "South Korea",
     "club": "South Korea",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/son-jun-ho.png"
   },
   {
     "id": 289,
@@ -4621,7 +4621,7 @@
     "nation": "Egypt",
     "club": "Premier League",
     "season": "Current",
-    "image": ""
+    "image": "/players/omar-marmoush.png"
   },
   {
     "id": 290,
@@ -4637,7 +4637,7 @@
     "nation": "Ghana",
     "club": "Premier League",
     "season": "Current",
-    "image": ""
+    "image": "/players/mohammed-kudus.png"
   },
   {
     "id": 291,
@@ -4653,7 +4653,7 @@
     "nation": "Ghana",
     "club": "Spain",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/thomas-partey.png"
   },
   {
     "id": 292,
@@ -4669,7 +4669,7 @@
     "nation": "Tunisia",
     "club": "Tunisia",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/youssef-msakni.png"
   },
   {
     "id": 293,
@@ -4765,7 +4765,7 @@
     "nation": "France",
     "club": "Italy",
     "season": "Current",
-    "image": ""
+    "image": "/players/jonathan-ikone.png"
   },
   {
     "id": 299,
@@ -4781,7 +4781,7 @@
     "nation": "Angola",
     "club": "Italy",
     "season": "Current",
-    "image": ""
+    "image": "/players/m-bala-nzola.png"
   },
   {
     "id": 300,

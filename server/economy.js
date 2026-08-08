@@ -29,7 +29,7 @@ const EXCHANGE_MAX_RATING = 69;
 const EXCHANGE_REWARD_MIN_RATING = 72;
 
 function ownedCount(userId) {
-  return db.prepare("SELECT COUNT(*) AS c FROM owned_cards WHERE user_id = ?").get(userId).c;
+  return Number(db.prepare("SELECT COUNT(*) AS c FROM owned_cards WHERE user_id = ?").get(userId).c);
 }
 
 // Trade ten 60-69 rated players for one guaranteed 72+ card. The submitted

@@ -37,21 +37,19 @@ function loadCatalog() {
 
 function seed(catalog) {
   if (catalog.length === 0) return { seeded: false, cards: 0 };
-  const existing = db.prepare("SELECT COUNT(*) AS count FROM cards").get().count;
+  const existing = Number(db.prepare("SELECT COUNT(*) AS count FROM cards").get().count);
   // The club JSON is the single source of truth. Whenever the catalog size
   // differs from what the DB holds (stale legacy pool, partial seed, old
   // season), wipe and reseed so the game always plays off the club rosters.
   if (existing === catalog.length) return { seeded: false, cards: existing };
   db.exec("DELETE FROM pack_logs; DELETE FROM owned_cards; DELETE FROM cards; DELETE FROM sqlite_sequence WHERE name IN ('cards', 'owned_cards', 'pack_logs');");
 
-  const insert = db.prepare(`
-    INSERT INTO cards (name, season, club, nation, position, category, pace, shooting, passing, dribbling, defending, physicality, base_rating, tier, image)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `);
+  const values = [];
+  const rows = [];
   let count = 0;
   for (const card of catalog) {
     const stats = buildCardStats(card);
-    insert.run(
+    rows.push(
       card.name || "Unknown",
       card.season || "",
       card.club || "",
@@ -68,8 +66,14 @@ function seed(catalog) {
       stats.tier,
       card.image || null
     );
+    values.push("(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     count += 1;
   }
+  const insert = db.prepare(`
+    INSERT INTO cards (name, season, club, nation, position, category, pace, shooting, passing, dribbling, defending, physicality, base_rating, tier, image)
+    VALUES ${values.join(",")}
+  `);
+  insert.run(...rows);
   return { seeded: true, cards: count };
 }
 

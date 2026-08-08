@@ -303,7 +303,7 @@
     "nation": "Spain",
     "club": "Legacy",
     "season": "Icon",
-    "image": ""
+    "image": "/players/ricardo-zamora.png"
   },
   {
     "id": 19,
@@ -320,7 +320,7 @@
     "nation": "Cameroon",
     "club": "Legacy",
     "season": "Icon",
-    "image": ""
+    "image": "/players/thomas-n-kono.png"
   },
   {
     "id": 20,
@@ -337,7 +337,7 @@
     "nation": "Cameroon",
     "club": "Legacy",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/roger-milla.png"
   },
   {
     "id": 21,
@@ -371,7 +371,7 @@
     "nation": "Brazil",
     "club": "England",
     "season": "Current",
-    "image": ""
+    "image": "/players/ederson.png"
   },
   {
     "id": 23,
@@ -388,7 +388,7 @@
     "nation": "Brazil",
     "club": "Legacy",
     "season": "Icon",
-    "image": ""
+    "image": "/players/julio-cesar.png"
   },
   {
     "id": 24,
@@ -405,7 +405,7 @@
     "nation": "Brazil",
     "club": "Legacy",
     "season": "Icon",
-    "image": ""
+    "image": "/players/rogerio-ceni.png"
   },
   {
     "id": 25,
@@ -422,7 +422,7 @@
     "nation": "Brazil",
     "club": "Legacy",
     "season": "Icon",
-    "image": ""
+    "image": "/players/marcos.png"
   },
   {
     "id": 26,
@@ -439,7 +439,7 @@
     "nation": "Brazil",
     "club": "Brazil",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/weverton.png"
   },
   {
     "id": 27,
@@ -456,7 +456,7 @@
     "nation": "Chile",
     "club": "Legacy",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/claudio-bravo.png"
   },
   {
     "id": 28,
@@ -473,7 +473,7 @@
     "nation": "Mexico",
     "club": "Legacy",
     "season": "Icon",
-    "image": ""
+    "image": "/players/jorge-campos.png"
   },
   {
     "id": 29,
@@ -677,7 +677,7 @@
     "nation": "England",
     "club": "Legacy",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/robert-green.png"
   },
   {
     "id": 41,
@@ -694,7 +694,7 @@
     "nation": "England",
     "club": "Legacy",
     "season": "Icon",
-    "image": ""
+    "image": "/players/peter-bonetti.png"
   },
   {
     "id": 42,
@@ -745,7 +745,7 @@
     "nation": "Denmark",
     "club": "Scotland",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/kasper-schmeichel.png"
   },
   {
     "id": 45,
@@ -779,7 +779,7 @@
     "nation": "Denmark",
     "club": "Legacy",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/thomas-s-rensen.png"
   },
   {
     "id": 47,
@@ -796,7 +796,7 @@
     "nation": "Denmark",
     "club": "Legacy",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/anders-lindegaard.png"
   },
   {
     "id": 48,
@@ -830,7 +830,7 @@
     "nation": "Slovenia",
     "club": "Legacy",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/samir-handanovic.png"
   },
   {
     "id": 50,
@@ -847,7 +847,7 @@
     "nation": "Switzerland",
     "club": "Germany",
     "season": "Current",
-    "image": ""
+    "image": "/players/gregor-kobel.png"
   },
   {
     "id": 51,
@@ -864,7 +864,7 @@
     "nation": "Switzerland",
     "club": "Italy",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/yann-sommer.png"
   },
   {
     "id": 52,
@@ -881,7 +881,7 @@
     "nation": "Switzerland",
     "club": "Legacy",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/roman-burki.png"
   },
   {
     "id": 53,
@@ -915,7 +915,7 @@
     "nation": "Belgium",
     "club": "Belgium",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/simon-mignolet.png"
   },
   {
     "id": 55,
@@ -1255,7 +1255,7 @@
     "nation": "Portugal",
     "club": "Portugal",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/rui-patricio.png"
   },
   {
     "id": 75,
@@ -1272,7 +1272,7 @@
     "nation": "Portugal",
     "club": "Legacy",
     "season": "Icon",
-    "image": ""
+    "image": "/players/vitor-baia.png"
   },
   {
     "id": 76,
@@ -1289,7 +1289,7 @@
     "nation": "Portugal",
     "club": "Portugal",
     "season": "Current",
-    "image": ""
+    "image": "/players/jose-sa.png"
   },
   {
     "id": 77,
@@ -1306,7 +1306,7 @@
     "nation": "Portugal",
     "club": "Portugal",
     "season": "Current",
-    "image": ""
+    "image": "/players/diogo-costa.png"
   },
   {
     "id": 78,
@@ -1323,7 +1323,7 @@
     "nation": "Portugal",
     "club": "Portugal",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/anthony-lopes.png"
   },
   {
     "id": 79,
@@ -1340,7 +1340,7 @@
     "nation": "Portugal",
     "club": "Legacy",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/ricardo-pereira.png"
   },
   {
     "id": 80,
@@ -1425,7 +1425,7 @@
     "nation": "Germany",
     "club": "Germany",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/oliver-baumann.png"
   },
   {
     "id": 85,
@@ -1442,7 +1442,7 @@
     "nation": "Germany",
     "club": "Legacy",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/roman-weidenfeller.png"
   },
   {
     "id": 86,
@@ -1476,7 +1476,7 @@
     "nation": "Hungary",
     "club": "Legacy",
     "season": "Icon",
-    "image": ""
+    "image": "/players/gabor-kiraly.png"
   },
   {
     "id": 88,
@@ -1493,7 +1493,7 @@
     "nation": "Hungary",
     "club": "Germany",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/peter-gulacsi.png"
   },
   {
     "id": 89,
@@ -1527,7 +1527,7 @@
     "nation": "Poland",
     "club": "England",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/ukasz-fabianski.png"
   },
   {
     "id": 91,
@@ -1544,7 +1544,7 @@
     "nation": "Poland",
     "club": "Legacy",
     "season": "Icon",
-    "image": ""
+    "image": "/players/jan-tomaszewski.png"
   },
   {
     "id": 92,
@@ -1561,7 +1561,7 @@
     "nation": "Cameroon",
     "club": "England",
     "season": "Current",
-    "image": ""
+    "image": "/players/andre-onana.png"
   },
   {
     "id": 93,
@@ -1595,7 +1595,7 @@
     "nation": "Cameroon",
     "club": "Legacy",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/carlos-kameni.png"
   },
   {
     "id": 95,
@@ -1612,7 +1612,7 @@
     "nation": "Egypt",
     "club": "Legacy",
     "season": "Icon",
-    "image": ""
+    "image": "/players/essam-el-hadary.png"
   },
   {
     "id": 96,
@@ -1629,7 +1629,7 @@
     "nation": "Egypt",
     "club": "Egypt",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/mohamed-el-shenawy.png"
   },
   {
     "id": 97,
@@ -1646,7 +1646,7 @@
     "nation": "Cameroon",
     "club": "England",
     "season": "Current",
-    "image": ""
+    "image": "/players/andre-onana.png"
   },
   {
     "id": 98,
@@ -1663,7 +1663,7 @@
     "nation": "South Korea",
     "club": "Saudi Pro League",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/kim-seung-gyu.png"
   },
   {
     "id": 99,
@@ -1680,7 +1680,7 @@
     "nation": "Australia",
     "club": "Italy",
     "season": "Veteran",
-    "image": ""
+    "image": "/players/mathew-ryan.png"
   },
   {
     "id": 100,
