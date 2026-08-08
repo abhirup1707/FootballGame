@@ -67,6 +67,7 @@ function migrateSqlite() {
 
 function migrate() { if (usingPostgres) return migratePostgres(); migrateSqlite(); }
 migrate();
+console.log(`[db] using ${usingPostgres ? `PostgreSQL (${new URL(DATABASE_URL).host})` : "SQLite"}`);
 
 function upgrade() {
   if (usingPostgres) return;
