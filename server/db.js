@@ -1,5 +1,5 @@
 const path = require("path");
-const { Worker } = require("worker_threads");
+const { spawnSync } = require("child_process");
 const { DatabaseSync } = require("node:sqlite");
 const { tierForRating, applyTier, computeOVR } = require("./ovr");
 
@@ -17,12 +17,10 @@ function pgSql(sql, params, returning) {
 }
 
 function executePg(sql, params = [], returning = false) {
-  const buffer = new SharedArrayBuffer(16 * 1024 * 1024);
-  const header = new Int32Array(buffer, 0, 2);
-  new Worker(path.join(__dirname, "postgres-worker.js"), { workerData: { databaseUrl: DATABASE_URL, sql: pgSql(sql, params, returning), params, buffer } });
-  Atomics.wait(header, 0, 0);
-  const length = Atomics.load(header, 1);
-  const result = JSON.parse(Buffer.from(new Uint8Array(buffer, 8, length)).toString("utf8"));
+  const query = JSON.stringify({ sql: pgSql(sql, params, returning), params });
+  const child = spawnSync(process.execPath, [path.join(__dirname, "postgres-query.js"), query], { env:process.env, encoding:"utf8", timeout:20000 });
+  if (child.error) throw child.error;
+  const result = JSON.parse(child.stdout || '{"error":"The database did not return a response."}');
   if (result.error) throw new Error(result.error);
   return result;
 }
