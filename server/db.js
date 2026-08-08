@@ -1,5 +1,5 @@
 const path = require("path");
-const { spawnSync } = require("child_process");
+const { Worker } = require("worker_threads");
 const { DatabaseSync } = require("node:sqlite");
 const { tierForRating, applyTier, computeOVR } = require("./ovr");
 
@@ -16,12 +16,49 @@ function pgSql(sql, params, returning) {
   return converted;
 }
 
+// Synchronous Postgres bridge over a single worker thread. The worker holds
+// one persistent pg Pool; the main thread parks on Atomics.wait while it runs.
+// This keeps the whole codebase's synchronous db.prepare(...) API intact
+// without spawning a new child process (and new pool + SSL handshake) per query.
+const PG_BUFFER_BYTES = 8 * 1024 * 1024;
+const PG_DATA_OFFSET = 16; // header[0]=status, [1]=reqId, [2]=queryLen, [3]=resultLen
+let pgStatus = null;
+let pgHeader = null;
+let pgBytes = null;
+let pgWorker = null;
+let pgRequestId = 0;
+
+function ensurePgWorker() {
+  if (pgWorker) return;
+  const sab = new SharedArrayBuffer(PG_BUFFER_BYTES);
+  pgStatus = new Int32Array(sab);
+  pgHeader = new Int32Array(sab, 0, 4);
+  pgBytes = new Uint8Array(sab);
+  pgWorker = new Worker(path.join(__dirname, "pg-worker.js"), { workerData: { sab }, env: process.env });
+  pgWorker.unref();
+}
+
 function executePg(sql, params = [], returning = false) {
+  ensurePgWorker();
   const query = JSON.stringify({ sql: pgSql(sql, params, returning), params });
-  const child = spawnSync(process.execPath, [path.join(__dirname, "postgres-query.js"), query], { env:process.env, encoding:"utf8", timeout:20000 });
-  if (child.error) throw child.error;
-  const result = JSON.parse(child.stdout || '{"error":"The database did not return a response."}');
-  if (result.error) throw new Error(result.error);
+  const qBuf = Buffer.from(query, "utf8");
+  if (qBuf.length > PG_BUFFER_BYTES - PG_DATA_OFFSET) throw new Error("Query exceeds buffer size");
+  pgBytes.set(qBuf, PG_DATA_OFFSET);
+  pgHeader[1] = ++pgRequestId;
+  pgHeader[2] = qBuf.length;
+  pgHeader[3] = 0;
+  Atomics.store(pgStatus, 0, 1); // BUSY
+  Atomics.notify(pgStatus, 0);
+  Atomics.wait(pgStatus, 0, 1, 30000); // wait until not BUSY
+  const code = Atomics.load(pgStatus, 0);
+  const rlen = pgHeader[3];
+  // Hand control back to the worker's idle loop before reading the result, so
+  // it parks instead of re-executing the same request.
+  Atomics.store(pgStatus, 0, 0);
+  Atomics.notify(pgStatus, 0);
+  const resultBuf = Buffer.from(pgBytes.subarray(PG_DATA_OFFSET + qBuf.length, PG_DATA_OFFSET + qBuf.length + rlen)).toString("utf8");
+  const result = JSON.parse(resultBuf || '{"error":"The database did not return a response."}');
+  if (code !== 2) throw new Error(result.error || "Database query failed");
   return result;
 }
 
