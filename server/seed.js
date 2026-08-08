@@ -38,6 +38,7 @@ function loadCatalog() {
 function seed(catalog) {
   if (catalog.length === 0) return { seeded: false, cards: 0 };
   const existing = Number(db.prepare("SELECT COUNT(*) AS count FROM cards").get().count);
+  console.log(`seed: database has ${existing}/${catalog.length} cards`);
   // The club JSON is the single source of truth. Whenever the catalog size
   // differs from what the DB holds (stale legacy pool, partial seed, old
   // season), wipe and reseed so the game always plays off the club rosters.
@@ -71,6 +72,7 @@ function seed(catalog) {
   // the first cloud deployment responsive while the catalog is created.
   for (let start = 0; start < seededRows.length; start += 100) {
     const batch = seededRows.slice(start, start + 100);
+    console.log(`seed: writing cards ${start + 1}-${start + batch.length}`);
     const insert = db.prepare(`
       INSERT INTO cards (name, season, club, nation, position, category, pace, shooting, passing, dribbling, defending, physicality, base_rating, tier, image)
       VALUES ${batch.map(() => "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)").join(",")}

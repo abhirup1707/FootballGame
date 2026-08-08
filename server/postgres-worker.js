@@ -15,12 +15,14 @@ function finish(result) {
 
 (async () => {
   const pool = new Pool({ connectionString: workerData.databaseUrl, ssl: { rejectUnauthorized: false } });
+  let response;
   try {
     const result = await pool.query(workerData.sql, workerData.params);
-    finish({ rows: result.rows || [], rowCount: result.rowCount || 0 });
+    response = { rows: result.rows || [], rowCount: result.rowCount || 0 };
   } catch (error) {
-    finish({ error: error.message });
+    response = { error: error.message };
   } finally {
     await pool.end();
   }
+  finish(response);
 })();
