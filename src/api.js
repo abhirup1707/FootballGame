@@ -23,6 +23,7 @@ const api = {
   leaderboard: (token, type) => request(`/api/leaderboard?type=${type}`, { token }),
   inventory: (token) => request("/api/inventory", { token }),
   team: (token) => request("/api/team", { token }),
+  teamPublic: (token, userId) => request(`/api/team/${userId}`, { token }),
   saveTeam: (token, slots) => request("/api/team", { method: "POST", token, body: { slots } }),
   packs: (token) => request("/api/packs", { token }),
   openPack: (token, packKey) => request("/api/packs/open", { method: "POST", token, body: { packKey } }),

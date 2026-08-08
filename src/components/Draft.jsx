@@ -7,6 +7,7 @@ import socket from "../socket";
 import api from "../api";
 import { useAuth } from "../auth";
 import { slotCategory, effectiveRating } from "../lib/position";
+import LoadingOverlay from "./LoadingOverlay";
 
 const emptyPositions = () => ({ GK:null, LB:null, CB1:null, CB2:null, RB:null, CM1:null, CM2:null, CAM:null, LW:null, ST:null, RW:null });
 const EMPTY_PLAYERS = [];
@@ -56,6 +57,8 @@ export default function Draft({ room, onLeaveRoom }) {
   const [myPositions, setMyPositions] = useState(emptyPositions);
   const [clubData, setClubData] = useState(null);
   const [clubError, setClubError] = useState("");
+  const [opponentClub, setOpponentClub] = useState(null);
+  const [opponentClubError, setOpponentClubError] = useState("");
   const [rematchRequested, setRematchRequested] = useState(false);
   const [rematchCount, setRematchCount] = useState(0);
   const [opponentLeft, setOpponentLeft] = useState(false);
@@ -121,6 +124,18 @@ export default function Draft({ room, onLeaveRoom }) {
   }, [token, room.mode]);
 
   useEffect(() => {
+    if (room.mode !== "club") return;
+    if (!opponent?.userId) return;
+    let active = true;
+    setOpponentClub(null);
+    setOpponentClubError("");
+    api.teamPublic(token, opponent.userId)
+      .then((team) => { if (active) setOpponentClub(team); })
+      .catch((err) => { if (active) setOpponentClubError(err.message); });
+    return () => { active = false; };
+  }, [token, room.mode, opponent?.userId]);
+
+  useEffect(() => {
     if (rulesAccepted && draft.turnId === socket.id && !draft.complete) socket.emit("requestDraftPack", { roomCode: room.roomCode });
   }, [draft.turnId, draft.round, draft.complete, room.roomCode, rulesAccepted]);
 
@@ -155,13 +170,22 @@ export default function Draft({ room, onLeaveRoom }) {
     const clubPositions = clubData.positions;
     const clubXi = Object.values(clubPositions).filter(Boolean);
     const clubOverall = clubXi.length === 11 ? Number((clubXi.reduce((sum, player) => sum + effectiveRating(player.rating, player.category, slotCategory[player.slot]), 0) / 11).toFixed(1)) : 0;
+    const oppPositions = emptyPositions();
+    (opponentClub?.squad || []).forEach((row) => { if (row.slot && oppPositions[row.slot] !== undefined) oppPositions[row.slot] = row; });
+    const oppXi = Object.values(oppPositions).filter(Boolean);
+    const oppOverall = oppXi.length === 11 ? Number((oppXi.reduce((sum, player) => sum + effectiveRating(player.rating, player.category, slotCategory[player.slot]), 0) / 11).toFixed(1)) : 0;
     const readyClub = () => { setWaiting(true); socket.emit("playerReady", { roomCode: room.roomCode }); };
     return <main className="draft-page">
       <header className="draft-header"><div><span className="eyebrow">MY TEAM MATCH</span><h1>{room.players[0]?.name} <b>vs</b> {room.players[1]?.name}</h1></div><div className="draft-progress"><strong>CLUB</strong><span>own squad battle</span></div></header>
       <section className="team-ready"><div className="team-review-head"><span className="eyebrow">OWN SQUADS</span><h2>Your XI is set</h2><p>You both play with the squad saved in your club. Tweak it anytime from My Team on the hub — press Ready when you're set.</p></div>
         <div className="team-review-squads">
           <div className="team-review-team"><h3>{me?.name}<small>Your team</small></h3><SquadBoard positions={clubPositions} overall={clubOverall} readOnly /></div>
-          <div className="team-review-team"><h3>{opponent?.name}<small>Opponent team</small></h3><div className="opponent-waiting"><i>🛡️</i><p>Their squad lines up at kick-off.</p></div></div>
+          <div className="team-review-team"><h3>{opponent?.name}<small>Opponent team</small></h3>
+            {opponentClubError ? <div className="opponent-waiting"><i>🛡️</i><p>Couldn't load their squad.</p></div>
+              : !opponentClub ? <div className="opponent-waiting"><i>🛡️</i><p>Loading their squad…</p></div>
+                : oppXi.length === 0 ? <div className="opponent-waiting"><i>🛡️</i><p>They haven't saved a starting XI yet.</p></div>
+                  : <><SquadBoard positions={oppPositions} overall={oppOverall} readOnly />{oppXi.length < 11 && <p className="opponent-incomplete">Only {oppXi.length}/11 set — they'll need a full XI to kick off.</p>}</>}
+          </div>
         </div>
         {clubError && <p className="auth-error">{clubError}</p>}
         {waiting ? <button className="primary-btn" disabled>Waiting for opponent · {readyCount}/2</button> : <button className="primary-btn" onClick={readyClub} disabled={Boolean(clubError)}>Ready for match</button>}
@@ -187,7 +211,7 @@ export default function Draft({ room, onLeaveRoom }) {
         <div><strong>{draft.turnId === socket.id ? "Your turn to choose" : `${turnPlayer?.name || "Opponent"} is choosing`}</strong><small>{label[draft.category]} • one legend leaves the pool forever</small></div>
       </section>
       <div className="draft-workspace"><section className="pick-stage">
-        {opening && !pack.length && <div className="pack-loading">Opening {label[draft.category]} pack…</div>}
+        {opening && !pack.length && <LoadingOverlay message={`Opening ${label[draft.category]} pack…`} />}
         {pack.length > 0 && <AnimatedPack players={pack} onPick={(player) => socket.emit("draftPick", { roomCode:room.roomCode, player })} />}
         {draft.turnId !== socket.id && <div className="waiting-turn"><div className="spinner" /><h2>Watch the draft unfold</h2><p>{turnPlayer?.name} is selecting from {label[draft.category]?.toLowerCase()}.</p></div>}
       </section><aside className="draft-team"><h2>Your XI</h2><SquadBoard positions={positions} overall={overall} onReposition={repositionPlayer} /></aside></div>

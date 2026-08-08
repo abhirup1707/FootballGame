@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import socket from "../socket";
 import { useAuth } from "../auth";
+import LoadingOverlay from "./LoadingOverlay";
 
 const sessionKey = (code) => `footyverse-room-${code}`;
 const newToken = () =>
@@ -62,6 +63,7 @@ export default function Lobby({ setRoom, onBack }) {
   );
   const [roomCode, setRoomCode] = useState(initialCode);
   const [status, setStatus] = useState("");
+  const [creating, setCreating] = useState(false);
   const [players, setPlayers] = useState([]);
   const [matchMode, setMatchMode] = useState("goals");
   const [mode, setMode] = useState("draft");
@@ -89,6 +91,8 @@ export default function Lobby({ setRoom, onBack }) {
 
   const createRoom = () => {
     if (!playerName.trim()) return alert("Enter your manager name first");
+    setCreating(true);
+    setStatus("Creating your room…");
     sessionRef.current = {
       playerName: playerName.trim(),
       resumeToken: newToken(),
@@ -105,6 +109,8 @@ export default function Lobby({ setRoom, onBack }) {
   const joinRoom = () => {
     if (!playerName.trim() || !roomCode.trim())
       return alert("Enter your manager name and room code");
+    setCreating(true);
+    setStatus("Joining room…");
     if (!sessionRef.current)
       sessionRef.current = {
         playerName: playerName.trim(),
@@ -117,6 +123,7 @@ export default function Lobby({ setRoom, onBack }) {
     });
   };
   const startAiMatch = () => {
+    setCreating(true);
     setStatus("Preparing your CPU opponent…");
     socket.emit("createAiMatch", {
       playerName: user?.username || "You",
@@ -146,12 +153,14 @@ export default function Lobby({ setRoom, onBack }) {
 
   useEffect(() => {
     const created = (code) => {
+      setCreating(false);
       setRoomCode(code);
       setIsRoomOwner(true);
       saveSession(code, playerName.trim());
       setStatus("Room created — share the match link with your opponent.");
     };
     const ready = (room) => {
+      setCreating(false);
       saveSession(room.roomCode, playerName.trim());
       setPlayers(room.players);
       setStatus(
@@ -161,13 +170,17 @@ export default function Lobby({ setRoom, onBack }) {
       );
       setTimeout(() => setRoom(room), 750);
     };
+    const onError = (message) => {
+      setCreating(false);
+      alert(message);
+    };
     socket.on("roomCreated", created);
     socket.on("roomReady", ready);
-    socket.on("errorMessage", alert);
+    socket.on("errorMessage", onError);
     return () => {
       socket.off("roomCreated", created);
       socket.off("roomReady", ready);
-      socket.off("errorMessage", alert);
+      socket.off("errorMessage", onError);
     };
   }, [playerName, setRoom]);
 
@@ -365,9 +378,9 @@ export default function Lobby({ setRoom, onBack }) {
                 You were invited to a private match. Ready to step on the
                 pitch?
               </p>
-              <button className="g-cta" onClick={joinRoom}>
-                <span>JOIN ROOM</span>
-                <em>Enter the match</em>
+              <button className="g-cta" onClick={joinRoom} disabled={creating}>
+                <span>{creating && <i className="mini-spinner" />}{creating ? "JOINING…" : "JOIN ROOM"}</span>
+                <em>{creating ? "Entering the arena…" : "Enter the match"}</em>
               </button>
             </>
           ) : (
@@ -453,9 +466,9 @@ export default function Lobby({ setRoom, onBack }) {
                     🛡️ You play with the 11 players saved in your My Team
                     squad.
                   </p>
-                  <button className="g-cta" onClick={startAiMatch}>
-                    <span>KICK OFF</span>
-                    <em>vs {opponent?.name}</em>
+                  <button className="g-cta" onClick={startAiMatch} disabled={creating}>
+                    <span>{creating && <i className="mini-spinner" />}{creating ? "PREPARING…" : "KICK OFF"}</span>
+                    <em>{creating ? "Building your opponent…" : `vs ${opponent?.name}`}</em>
                   </button>
                 </div>
               ) : (
@@ -490,9 +503,9 @@ export default function Lobby({ setRoom, onBack }) {
                     </button>
                   </div>
                   {formatBlock()}
-                  <button className="g-cta" onClick={createRoom}>
-                    <span>CREATE ROOM</span>
-                    <em>+ share the code</em>
+                  <button className="g-cta" onClick={createRoom} disabled={creating}>
+                    <span>{creating && <i className="mini-spinner" />}{creating ? "CREATING…" : "CREATE ROOM"}</span>
+                    <em>{creating ? "Setting up your arena…" : "+ share the code"}</em>
                   </button>
                   <div className="g-or">
                     <span>OR JOIN A FRIEND</span>
@@ -507,8 +520,8 @@ export default function Lobby({ setRoom, onBack }) {
                         setRoomCode(event.target.value.toUpperCase())
                       }
                     />
-                    <button className="g-join-btn" onClick={joinRoom}>
-                      JOIN ARENA <span>→</span>
+                    <button className="g-join-btn" onClick={joinRoom} disabled={creating}>
+                      {creating && <i className="mini-spinner" />}JOIN ARENA{creating ? "" : <span>→</span>}
                     </button>
                   </div>
                 </div>
@@ -525,6 +538,7 @@ export default function Lobby({ setRoom, onBack }) {
           )}
         </div>
       </section>
+      {creating && <LoadingOverlay message={status || "Loading…"} />}
     </main>
   );
 }

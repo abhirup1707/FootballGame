@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import api from "../api";
 import { useAuth } from "../auth";
 import FcCard from "./FcCard";
+import LoadingOverlay from "./LoadingOverlay";
 
 export default function PackScreen({ onBack }) {
   const { token, user, refreshUser } = useAuth();
@@ -64,11 +65,11 @@ export default function PackScreen({ onBack }) {
       {packs.map((pack, index) => {
         const disabled = pack.key === "daily" ? daily.claimed : !canAfford(pack);
         return <motion.button key={pack.key} initial={{ opacity:0, y:18 }} animate={{ opacity:1, y:0 }} transition={{ delay:.08 + index * .07 }} className={`pack-card ${pack.key === "daily" ? "pack-daily" : ""} ${disabled ? "pack-disabled" : ""}`} disabled={disabled || Boolean(opening)} onClick={() => open(pack)}>
-          <div className="pack-art"><i>{pack.image}</i><em>{pack.cardCount} CARDS</em></div>
+          <div className="pack-art">{opening === pack.key ? <i className="pack-art-spin">⚽</i> : <i>{pack.image}</i>}<em>{pack.cardCount} CARDS</em></div>
           <b>{pack.name}</b>
           <span>{pack.description}</span>
           {pack.key === "daily" && !daily.claimed && <em className="pack-daily-streak">{daily.streak > 0 ? `🔥 ${daily.streak}-day streak` : "New player pack"}</em>}
-          <strong>{pack.key === "daily" ? (daily.claimed ? "CLAIMED ✓" : opening === "daily" ? "Opening…" : "FREE") : pack.cost.type === "coins" ? `${pack.cost.amount} 🪙` : `${pack.cost.amount} 💎`}</strong>
+          <strong>{pack.key === "daily" ? (daily.claimed ? "CLAIMED ✓" : opening === "daily" ? "⏳ Opening…" : "FREE") : pack.cost.type === "coins" ? `${pack.cost.amount} 🪙` : `${pack.cost.amount} 💎`}</strong>
         </motion.button>;
       })}
     </div>
@@ -97,5 +98,7 @@ export default function PackScreen({ onBack }) {
         </div>
       </motion.div>}
     </AnimatePresence>
+
+    {opening && <LoadingOverlay message="Opening pack…" />}
   </div></main>;
 }

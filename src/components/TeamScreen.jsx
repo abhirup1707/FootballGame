@@ -6,6 +6,7 @@ import SquadBoard from "./SquadBoard";
 import FcCard from "./FcCard";
 import { slotCategory, effectiveRating } from "../lib/position";
 import { countryFlagPath } from "../lib/countries";
+import LoadingOverlay from "./LoadingOverlay";
 
 const emptyPositions = () => ({ GK:null, LB:null, CB1:null, CB2:null, RB:null, CM1:null, CM2:null, CAM:null, LW:null, ST:null, RW:null });
 const slotLabels = { GK:"Goalkeeper", LB:"Left back", CB1:"Centre back", CB2:"Centre back", RB:"Right back", CM1:"Centre midfield", CM2:"Centre midfield", CAM:"Attacking midfield", LW:"Left wing", ST:"Striker", RW:"Right wing" };
@@ -301,7 +302,7 @@ export default function TeamScreen({ onBack }) {
         )}
         <div className="squad-savebar">
           <span>{filledCount}/11 filled</span>
-          <button className="primary-btn" onClick={save} disabled={saving}>{saving ? "Saving…" : "Save squad"}</button>
+          <button className="primary-btn" onClick={save} disabled={saving}>{saving ? <><i className="mini-spinner" />Saving…</> : "Save squad"}</button>
         </div>
       </div>
     </motion.section>
@@ -332,5 +333,8 @@ export default function TeamScreen({ onBack }) {
         </motion.div>
       )}
     </AnimatePresence>
-  </div></main>;
+  </div>
+
+  {saving && <LoadingOverlay message="Saving your squad…" />}
+</main>;
 }

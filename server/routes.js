@@ -122,6 +122,21 @@ router.get("/team", requireAuth, (req, res) => {
   res.json({ squad: rows, overall: squadOverall(rows) });
 });
 
+// Another manager's saved XI, so the pre-match screen can show both sides'
+// clubs before kick-off. Same shape as /team so the client reuses its
+// squad rendering.
+router.get("/team/:userId", requireAuth, (req, res) => {
+  const userId = Number(req.params.userId);
+  if (!Number.isInteger(userId) || userId <= 0) return res.status(400).json({ error: "Invalid user id." });
+  const rows = db.prepare(`
+    SELECT oc.*, c.name, c.season, c.club, c.nation, c.position, c.category, c.base_rating, c.tier, c.image
+    FROM owned_cards oc JOIN cards c ON c.id = oc.card_id
+    WHERE oc.user_id = ? AND oc.is_in_xi = 1
+  `).all(userId);
+  rows.sort((a, b) => SLOT_ORDER.indexOf(a.slot) - SLOT_ORDER.indexOf(b.slot));
+  res.json({ squad: rows, overall: squadOverall(rows) });
+});
+
 // Save the starting XI: a map of slot -> owned_cards id. Players must be owned
 // by the user, and any player can fill any slot (playing out of position costs
 // OVR: -3 for one step off, -5 for two or more). Saving partial squads is
