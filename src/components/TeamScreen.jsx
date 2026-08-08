@@ -17,6 +17,7 @@ export default function TeamScreen({ onBack }) {
   const [inventory, setInventory] = useState([]);
   const [limits, setLimits] = useState({ limit: 50, warnAt: 35 });
   const [selectedSlot, setSelectedSlot] = useState(null);
+  const [pickedCard, setPickedCard] = useState(null);
   const [filter, setFilter] = useState("ALL");
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
@@ -62,7 +63,33 @@ export default function TeamScreen({ onBack }) {
     return [...list].sort((a, b) => b.rating - a.rating || a.name.localeCompare(b.name));
   }, [inventory, filter]);
 
-  const openPicker = (slot) => { setNotice(""); setSelectedSlot(slot); };
+  const openPicker = (slot) => { setNotice(""); setPickedCard(null); setSelectedSlot(slot); };
+
+  const pickCard = (card) => {
+    setNotice("");
+    setSelectedSlot(null);
+    setPickedCard((current) => (current?.id === card.id ? null : card));
+  };
+
+  const placeCard = (slot) => {
+    if (!pickedCard) return;
+    const alreadyHere = positions[slot]?.id === pickedCard.id;
+    const elsewhere = Object.keys(positions).some(
+      (key) => key !== slot && positions[key]?.id === pickedCard.id,
+    );
+    if (alreadyHere && !elsewhere) {
+      setPickedCard(null);
+      return;
+    }
+    setPositions((current) => {
+      const next = { ...current };
+      Object.keys(next).forEach((key) => { if (next[key]?.id === pickedCard.id) next[key] = null; });
+      next[slot] = pickedCard;
+      return next;
+    });
+    setPickedCard(null);
+    setDirty(true);
+  };
 
   const assign = (card) => {
     setPositions((current) => {
@@ -211,6 +238,7 @@ export default function TeamScreen({ onBack }) {
       <h3>YOUR PLAYERS <small>{inventory.length}/{limits.limit}</small></h3>
       {notice && <p className="team-notice">{notice}</p>}
       {error && <p className="auth-error">{error}</p>}
+      {pickedCard && <p className="inventory-hint swap-active">Swapping <b>{pickedCard.name}</b> — now tap a slot on the XI board to place them.</p>}
       {tabs}
       {!error && visibleCards.length === 0 && <div className="inventory-empty"><i>⚽</i><p>No {filter === "ALL" ? "" : `${filter} `}players yet. Open packs to build your squad.</p></div>}
       <div className="inventory-scroll">
@@ -218,9 +246,9 @@ export default function TeamScreen({ onBack }) {
           const slot = Object.keys(positions).find((key) => positions[key]?.id === card.id);
           const inXI = Boolean(slot);
           return (
-            <div key={card.id} className={`owned-card ${inXI ? "in-xi" : ""}`}>
+            <button key={card.id} className={`owned-card pickable ${inXI ? "in-xi" : ""} ${pickedCard?.id === card.id ? "selected" : ""}`} onClick={() => pickCard(card)}>
               {cardBody(card, inXI ? <em className="xi-badge">{slot}</em> : null)}
-            </div>
+            </button>
           );
         })}
       </div>
@@ -239,7 +267,7 @@ export default function TeamScreen({ onBack }) {
           <button className="autobuild-btn" onClick={autobuild} disabled={inventory.length === 0} aria-label="Auto-build squad" title="Auto-build squad from highest-rated players">
             <span className="autobuild-arrows">&gt;&gt;</span><span className="autobuild-label">Auto-build</span>
           </button>
-          <SquadBoard positions={positions} overall={overall} onPickForSlot={openPicker} />
+          <SquadBoard positions={positions} overall={overall} onPickForSlot={openPicker} pickedPlayer={pickedCard} onPlaceCard={placeCard} />
         </div>
       </div>
 

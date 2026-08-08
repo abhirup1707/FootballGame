@@ -78,6 +78,30 @@ router.get("/cards", (req, res) => {
   res.json({ cards: rows });
 });
 
+const LEADERBOARD_TYPES = ["wins", "goals", "saves"];
+
+router.get("/leaderboard", (req, res) => {
+  const type = LEADERBOARD_TYPES.includes(req.query.type) ? req.query.type : "wins";
+  const limit = Math.max(1, Math.min(100, Number(req.query.limit) || 20));
+  const entries = db.prepare(`
+    SELECT u.username, s.wins, s.goals, s.saves
+    FROM user_stats s JOIN users u ON u.id = s.user_id
+    WHERE s.${type} > 0
+    ORDER BY s.${type} DESC, u.username ASC
+    LIMIT ?
+  `).all(limit);
+  let me = null;
+  const user = userByToken(tokenFrom(req));
+  if (user) {
+    const mine = db.prepare("SELECT * FROM user_stats WHERE user_id = ?").get(user.id);
+    if (mine) {
+      const ahead = db.prepare(`SELECT COUNT(*) AS c FROM user_stats WHERE ${type} > ?`).get(Number(mine[type]) || 0).c;
+      me = { username: user.username, rank: Number(ahead) + 1, wins: Number(mine.wins), goals: Number(mine.goals), saves: Number(mine.saves) };
+    }
+  }
+  res.json({ type, entries, me });
+});
+
 router.get("/inventory", requireAuth, (req, res) => {
   const rows = db.prepare(`
     SELECT oc.*, c.name, c.season, c.club, c.nation, c.position, c.category, c.base_rating, c.tier, c.image

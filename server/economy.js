@@ -304,6 +304,18 @@ function claimQuest(userId, questId) {
 
 const OUTCOME_RATES = { win: { coins: 300, xp: 40 }, loss: { coins: 120, xp: 20 }, draw: { coins: 200, xp: 30 } };
 
+function recordMatchStats(userId, outcome, goals, saves) {
+  if (!userId) return;
+  db.prepare(`
+    INSERT INTO user_stats (user_id, wins, goals, saves)
+    VALUES (?, ?, ?, ?)
+    ON CONFLICT(user_id) DO UPDATE SET
+      wins = user_stats.wins + excluded.wins,
+      goals = user_stats.goals + excluded.goals,
+      saves = user_stats.saves + excluded.saves
+  `).run(userId, outcome === "win" ? 1 : 0, goals, saves);
+}
+
 function resolveMatchRewards(room) {
   const [a, b] = room.players;
   const sa = room.scoreA, sb = room.scoreB;
@@ -327,7 +339,9 @@ function resolveMatchRewards(room) {
     if (outcome === "win") bumpQuest(player.userId, "matches_won", 1);
     const goals = room.stats?.[player.id]?.goals?.length || 0;
     if (goals) bumpQuest(player.userId, "goals_scored", goals);
-    rewards[player.userId] = { outcome, coins: rate.coins, xp: rate.xp, goals, leveledUp: xp.leveledUp, bonusCoins: xp.bonusCoins };
+    const saves = room.stats?.[player.id]?.saves || 0;
+    recordMatchStats(player.userId, outcome, goals, saves);
+    rewards[player.userId] = { outcome, coins: rate.coins, xp: rate.xp, goals, saves, leveledUp: xp.leveledUp, bonusCoins: xp.bonusCoins };
   };
   grant(a, aOutcome);
   grant(b, bOutcome);

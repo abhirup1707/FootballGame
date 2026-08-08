@@ -20,6 +20,7 @@ const api = {
   logout: (token) => request("/api/auth/logout", { method: "POST", token }),
   me: (token) => request("/api/me", { token }),
   cards: () => request("/api/cards"),
+  leaderboard: (token, type) => request(`/api/leaderboard?type=${type}`, { token }),
   inventory: (token) => request("/api/inventory", { token }),
   team: (token) => request("/api/team", { token }),
   saveTeam: (token, slots) => request("/api/team", { method: "POST", token, body: { slots } }),

@@ -10,6 +10,11 @@ const { resolveMatchRewards } = require("./economy");
 const { userByToken } = require("./auth");
 const { computeOVR, effectiveStats, positionPenalty } = require("./ovr");
 const { DRAFT_POOL } = require("./draftPool");
+const { buildAiTeam, AI_DIFFICULTIES, AI_NAMES, AI_READ_RATE, AI_ATTACK_SMART } = require("./ai");
+
+// How many pass options each side sees in Vs AI matches: [user, cpu].
+// Vs Friends always uses 3 for both.
+const AI_PASS_OPTIONS = { easy:{ user:5, ai:3 }, medium:{ user:3, ai:3 }, hard:{ user:5, ai:5 }, extreme:{ user:3, ai:5 } };
 
 const app = express();
 const allowedOrigins = process.env.CLIENT_ORIGIN
@@ -86,8 +91,11 @@ function passOptions(room) {
   const team = room.teams[room.possession];
   const carrierPosition = playerPosition(team, room.match.carrier.id);
   const [carrierX, carrierY] = PITCH_COORDINATES[carrierPosition] || [50, 50];
-  // Every pass presents exactly the three closest teammates. This keeps the
-  // choice competitive and adapts naturally to whichever player has the ball.
+  // Vs AI matches use an asymmetric option count per difficulty (how many passes
+  // the human sees vs how many the CPU sees). Vs Friends keeps the classic three
+  // for both sides.
+  const preset = room.ai ? AI_PASS_OPTIONS[room.ai.difficulty] : null;
+  const optionCount = preset ? (room.possession === room.ai.id ? preset.ai : preset.user) : 3;
   return Object.entries(team.positions)
     .filter(([position, player]) => player && position !== carrierPosition)
     .map(([position, player]) => {
@@ -95,7 +103,7 @@ function passOptions(room) {
       return { player, distance:(x - carrierX) ** 2 + (y - carrierY) ** 2 };
     })
     .sort((a, b) => a.distance - b.distance)
-    .slice(0, 3)
+    .slice(0, optionCount)
     .map(({ player }) => player);
 }
 function matchPayload(room) {
@@ -123,6 +131,7 @@ function startShootout(room) {
   room.match = { phase:"PENALTY", passCount:0, carrier:null, choices:{} };
   addStory(room, `Penalty shootout! ${room.players.find((p) => p.id === order[0]).name} start because of their higher OVR.`);
   sendMatch(room, "penaltyStarted");
+  aiShootoutTick(room);
 }
 function advanceShootout(room) {
   const shootout = room.shootout, [first, second] = shootout.order;
@@ -136,6 +145,7 @@ function advanceShootout(room) {
   shootout.currentTeam = shootout.order[(currentIndex + 1) % 2];
   shootout.phase = "SELECT"; shootout.selectedShooter = null; shootout.choices = {}; shootout.result = null;
   sendMatch(room);
+  aiShootoutTick(room);
 }
 function resolvePenalty(room) {
   const shootout = room.shootout, attackId = shootout.currentTeam, defendId = room.players.find((p) => p.id !== attackId).id;
@@ -148,6 +158,7 @@ function resolvePenalty(room) {
   let goal;
   if (shot === dive) goal = false;
   else goal = Math.random() * 100 < clamp(70 + (shooterSHO - keeperREF) * 2, 40, 94);
+  if (!goal) room.stats[defendId].saves += 1;
   shootout.kicks[attackId].push(goal); shootout.result = { attackId, shooter, keeper, shot, dive, goal };
   shootout.phase = "RESULT";
   addStory(room, goal ? `GOAL! ${shooter.name} sends ${keeper.name} the wrong way.` : `SAVED! ${keeper.name} reads the penalty.`);
@@ -178,6 +189,7 @@ function startPossession(room, teamId, story, carrier) {
   delete room.nextKickoffCarrier;
   room.match = { phase:"PASS", passCount:0, carrier:openingCarrier, choices:{}, deadline:Date.now() + MOVE_TIMEOUT };
   if (story) addStory(room, story);
+  ensureAiChoice(room);
 }
 function closestDefender(room, defendId, receiver) {
   const receiverPosition = playerPosition(room.teams[room.possession], receiver.id);
@@ -242,6 +254,7 @@ function resolvePass(room) {
     room.match.phase = "GOAL";
     addStory(room, `⚡ FIVE PASSES COMPLETE — ${receiver.name} has the final chance!`);
   }
+  if (room.ai && room.possession === room.ai.id) ensureAiChoice(room);
 }
 function resolveShot(room) {
   const attackId = room.possession;
@@ -270,7 +283,10 @@ function resolveShot(room) {
     io.to(room.roomCode).emit("goalScored", { scorer:shooter.name, shot, scoreA:room.scoreA, scoreB:room.scoreB, stats:room.stats });
     setTimeout(() => { startPossession(room, defendId, `🔄 ${room.players.find((p) => p.id === defendId).name} restart after the goal.`); sendMatch(room); }, 2800);
     return true;
-  } else addStory(room, `🧱 SAVE! ${keeper.name} reads ${shooter.name}'s ${shot.toLowerCase()} finish.`);
+  } else {
+    room.stats[defendId].saves += 1;
+    addStory(room, `🧱 SAVE! ${keeper.name} reads ${shooter.name}'s ${shot.toLowerCase()} finish.`);
+  }
   startPossession(room, defendId, `🔄 ${room.players.find((p) => p.id === defendId).name} build again from defence.`);
   io.to(room.roomCode).emit("saveMade", { keeper:keeper.name, shooter:shooter.name, shot });
   return false;
@@ -281,6 +297,7 @@ function autoPickMoves(room) {
   const isGoal = room.match.phase === "GOAL";
   const randomPass = () => randomItem(passOptions(room))?.id;
   if (!room.match.choices[attackId]) room.match.choices[attackId] = isGoal ? randomItem(["LEFT", "CENTER", "RIGHT"]) : randomPass();
+  ensureAiChoice(room);
   if (!room.match.choices[defendId]) room.match.choices[defendId] = isGoal ? randomItem(["LEFT", "CENTER", "RIGHT"]) : randomPass();
   addStory(room, "⏰ Time up — a move was chosen automatically.");
   if (isGoal) { if (resolveShot(room)) return; }
@@ -288,6 +305,110 @@ function autoPickMoves(room) {
   if (room.match?.phase === "INTERCEPTION") return;
   sendMatch(room);
 }
+
+// ----- AI opponent -----
+// The CPU shares the normal match engine. When the CPU holds the ball it locks
+// in its move instantly at the start of the phase; when defending it waits for
+// the human's move and "reads" it with a difficulty-based chance before
+// answering, so the resolution still happens the moment the human submits.
+function aiAttackerChoice(room, difficulty) {
+  const isGoal = room.match.phase === "GOAL";
+  if (isGoal) return randomItem(["LEFT", "CENTER", "RIGHT"]);
+  const options = passOptions(room);
+  if (!options.length) return undefined;
+  const smart = AI_ATTACK_SMART[difficulty] || 0;
+  return smart >= 1 || Math.random() < smart ? options[0].id : randomItem(options).id;
+}
+function aiDefendChoice(room, difficulty) {
+  const botId = room.ai.id;
+  const user = room.players.find((player) => player.id !== botId);
+  const userChoice = room.match.choices[user.id];
+  const read = AI_READ_RATE[difficulty] || 0;
+  const isGoal = room.match.phase === "GOAL";
+  if (isGoal) {
+    const dirs = ["LEFT", "CENTER", "RIGHT"];
+    if (userChoice && (read >= 1 || Math.random() < read)) return userChoice;
+    return userChoice ? randomItem(dirs.filter((direction) => direction !== userChoice)) : randomItem(dirs);
+  }
+  const options = passOptions(room);
+  if (!options.length) return undefined;
+  if (userChoice && (read >= 1 || Math.random() < read)) return userChoice;
+  const others = options.filter((option) => option.id !== userChoice);
+  return (userChoice && others.length ? randomItem(others) : randomItem(options)).id;
+}
+function ensureAiChoice(room) {
+  const bot = room.ai;
+  if (!bot || !room.match || !["PASS", "GOAL"].includes(room.match.phase)) return;
+  if (room.match.choices[bot.id] !== undefined) return;
+  room.match.choices[bot.id] = room.possession === bot.id ? aiAttackerChoice(room, bot.difficulty) : aiDefendChoice(room, bot.difficulty);
+}
+function aiShootoutTick(room) {
+  const shootout = room.shootout;
+  if (!shootout || shootout.phase !== "SELECT" || shootout.currentTeam !== room.ai.id) return;
+  const team = room.teams[room.ai.id].positions;
+  const candidates = Object.values(team).filter((player) => player && player.position !== "GK" && !shootout.usedShooters[room.ai.id].includes(player.id));
+  if (!candidates.length) return;
+  candidates.sort((a, b) => b.rating - a.rating);
+  const shooter = candidates[0];
+  shootout.usedShooters[room.ai.id].push(shooter.id);
+  shootout.selectedShooter = shooter;
+  shootout.phase = "DUEL";
+  shootout.choices = {};
+  sendMatch(room);
+}
+function aiPenaltyDirection(room) {
+  const shootout = room.shootout;
+  const botId = room.ai.id;
+  const user = room.players.find((player) => player.id !== botId);
+  const dirs = ["LEFT", "CENTER", "RIGHT"];
+  if (shootout.currentTeam === botId) return randomItem(dirs);
+  const read = AI_READ_RATE[room.ai.difficulty] || 0;
+  const userChoice = shootout.choices[user.id];
+  if (userChoice && (read >= 1 || Math.random() < read)) return userChoice;
+  return userChoice ? randomItem(dirs.filter((direction) => direction !== userChoice)) : randomItem(dirs);
+}
+function resetAiRoom(room) {
+  if (room.timer) clearInterval(room.timer);
+  room.readyPlayers = 2;
+  room.scoreA = 0;
+  room.scoreB = 0;
+  room.possession = null;
+  room.commentary = [];
+  room.match = null;
+  room.finished = false;
+  room.shootout = null;
+  room.rematchVotes = [];
+  io.to(room.roomCode).emit("rematchConfirmed", { room });
+  beginMatch(room);
+}
+function beginMatch(room) {
+  const [first, second] = room.players.map((player) => player.id);
+  room.stats = { [first]:{ passes:0, interceptions:0, goals:[], saves:0 }, [second]:{ passes:0, interceptions:0, goals:[], saves:0 } };
+  const kickoffId = pickKickoff(room);
+  room.nextKickoffCarrier = highestRatedPlayer(room.teams[kickoffId]);
+  startPossession(room, kickoffId, "🏟️ Kick-off! The stronger side starts from the back — for now.");
+  startMatchClock(room);
+  sendMatch(room, "enterMatch");
+}
+function loadOwnTeam(userId) {
+  const ownedRows = db.prepare(`
+    SELECT oc.*, c.name, c.season, c.club, c.position, c.category, c.base_rating, c.tier, c.image, c.pace, c.shooting, c.passing, c.dribbling, c.defending, c.physicality
+    FROM owned_cards oc JOIN cards c ON c.id = oc.card_id
+    WHERE oc.user_id = ?
+  `).all(userId);
+  const inXI = ownedRows.filter((row) => row.is_in_xi === 1);
+  if (inXI.length !== 11) return { error: "Set your starting XI (11 players) in My Team before playing." };
+  const xiPositions = {};
+  for (const row of inXI) {
+    if (!row.slot || !FORMATION_CATEGORY[row.slot]) return { error: "Your saved squad is invalid." };
+    if (xiPositions[row.slot]) return { error: "Your saved squad has duplicate players." };
+    const penalty = positionPenalty(row.category, FORMATION_CATEGORY[row.slot]);
+    xiPositions[row.slot] = { ...ownedPlayer(row), rating: row.rating + penalty };
+  }
+  const verifiedOverall = Number((Object.values(xiPositions).reduce((sum, player) => sum + player.rating, 0) / STARTER_COUNT).toFixed(1));
+  return { team: { positions: buildTeam(xiPositions), overall: verifiedOverall } };
+}
+
 
 io.on("connection", (socket) => {
   socket.on("authSocket", ({ token }) => {
@@ -298,6 +419,22 @@ io.on("connection", (socket) => {
     const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
     rooms[roomCode] = { roomCode, mode: mode === "club" ? "club" : "draft", goalLimit:[1,3,5].includes(Number(goalLimit)) ? Number(goalLimit) : 3, matchMode:matchMode === "time" ? "time" : "goals", timeLimit:[90,120,150,180].includes(Number(timeLimit)) ? Number(timeLimit) : 90, players:[{ id:socket.id, name:playerName, resumeToken, userId:socket.data.userId }], readyPlayers:0, teams:{}, scoreA:0, scoreB:0, possession:null, commentary:[], stats:{}, draft:{ round:0, turnId:socket.id, picks:{}, takenIds:[] }, match:null, timer:null, finished:false, shootout:null, reconnectTimers:{}, rematchVotes:[] };
     socket.join(roomCode); socket.emit("roomCreated", roomCode);
+  });
+  socket.on("createAiMatch", ({ playerName, difficulty, matchMode, goalLimit, timeLimit }) => {
+    const userId = socket.data.userId;
+    if (!userId) return socket.emit("errorMessage", "Log in to play against the CPU.");
+    const aiDiff = AI_DIFFICULTIES.includes(difficulty) ? difficulty : "easy";
+    const own = loadOwnTeam(userId);
+    if (own.error) return socket.emit("errorMessage", own.error);
+    const aiTeam = buildAiTeam(aiDiff, own.team.overall);
+    if (!aiTeam) return socket.emit("errorMessage", "No players available to build the CPU squad yet.");
+    const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const botId = `ai-${socket.id}`;
+    const room = { roomCode, mode: "club", ai:{ id: botId, difficulty: aiDiff }, goalLimit:[1,3,5].includes(Number(goalLimit)) ? Number(goalLimit) : 3, matchMode:matchMode === "time" ? "time" : "goals", timeLimit:[90,120,150,180].includes(Number(timeLimit)) ? Number(timeLimit) : 90, players:[{ id:socket.id, name:String(playerName || "").slice(0, 20) || "You", userId }, { id:botId, name:AI_NAMES[aiDiff], isBot:true }], readyPlayers:2, teams:{ [socket.id]: own.team, [botId]: aiTeam }, scoreA:0, scoreB:0, possession:null, commentary:[], stats:{}, draft:{ round:0, turnId:socket.id, picks:{}, takenIds:[] }, match:null, timer:null, finished:false, shootout:null, reconnectTimers:{}, rematchVotes:[] };
+    rooms[roomCode] = room;
+    socket.join(roomCode);
+    socket.emit("roomReady", room);
+    beginMatch(room);
   });
   socket.on("joinRoom", ({ roomCode, playerName, resumeToken }) => {
     const room = rooms[roomCode];
@@ -344,24 +481,9 @@ io.on("connection", (socket) => {
       // Own-team mode: the server builds the XI from the manager's saved squad,
       // so the draft is skipped entirely and the lineup can't be tampered with.
       if (!socket.data.userId) return socket.emit("errorMessage", "Log in to play with your own team.");
-      const ownedRows = db.prepare(`
-        SELECT oc.*, c.name, c.season, c.club, c.position, c.category, c.base_rating, c.tier, c.image, c.pace, c.shooting, c.passing, c.dribbling, c.defending, c.physicality
-        FROM owned_cards oc JOIN cards c ON c.id = oc.card_id
-        WHERE oc.user_id = ?
-      `).all(socket.data.userId);
-      const inXI = ownedRows.filter((row) => row.is_in_xi === 1);
-      if (inXI.length !== 11) return socket.emit("errorMessage", "Set your starting XI (11 players) in My Team before playing.");
-      const xiPositions = {};
-      for (const row of inXI) {
-        if (!row.slot || !FORMATION_CATEGORY[row.slot]) return socket.emit("errorMessage", "Your saved squad is invalid.");
-        if (xiPositions[row.slot]) return socket.emit("errorMessage", "Your saved squad has duplicate players.");
-        // Any player can play any slot; out-of-position players lose OVR here so
-        // the match sees the same rating penalty the team screen shows.
-        const penalty = positionPenalty(row.category, FORMATION_CATEGORY[row.slot]);
-        xiPositions[row.slot] = { ...ownedPlayer(row), rating: row.rating + penalty };
-      }
-      const verifiedOverall = Number((Object.values(xiPositions).reduce((sum, player) => sum + player.rating, 0) / STARTER_COUNT).toFixed(1));
-      team = { positions: buildTeam(xiPositions), overall: verifiedOverall };
+      const own = loadOwnTeam(socket.data.userId);
+      if (own.error) return socket.emit("errorMessage", own.error);
+      team = own.team;
     } else {
       if (!validLineup(room, socket.id, positions)) return socket.emit("errorMessage", "Your lineup must keep each player in their own category.");
       const verifiedOverall = Number((Object.keys(FORMATION_CATEGORY).reduce((sum, slot) => sum + positions[slot].rating, 0) / STARTER_COUNT).toFixed(1));
@@ -369,13 +491,7 @@ io.on("connection", (socket) => {
     }
     room.teams[socket.id] = team; room.readyPlayers += 1; io.to(roomCode).emit("readyCount", room.readyPlayers);
     if (room.readyPlayers === 2) {
-      const [first, second] = room.players.map((player) => player.id);
-      room.stats = { [first]:{ passes:0, interceptions:0, goals:[] }, [second]:{ passes:0, interceptions:0, goals:[] } };
-      const kickoffId = pickKickoff(room);
-      room.nextKickoffCarrier = highestRatedPlayer(room.teams[kickoffId]);
-      startPossession(room, kickoffId, "🏟️ Kick-off! The stronger side starts from the back — for now.");
-      startMatchClock(room);
-      sendMatch(room, "enterMatch");
+      beginMatch(room);
     }
   });
   socket.on("submitMove", ({ roomCode, move }) => {
@@ -384,6 +500,7 @@ io.on("connection", (socket) => {
     if (isGoal && !["LEFT","CENTER","RIGHT"].includes(move)) return;
     if (!isGoal && !passOptions(room).some((player) => player.id === move)) return;
     room.match.choices[socket.id] = move;
+    ensureAiChoice(room);
     if (Object.keys(room.match.choices).length < 2) return sendMatch(room);
     if (isGoal && resolveShot(room)) return;
     if (!isGoal) resolvePass(room);
@@ -404,10 +521,12 @@ io.on("connection", (socket) => {
     const defendId = room.players.find((p) => p.id !== shootout.currentTeam).id;
     if (socket.id !== shootout.currentTeam && socket.id !== defendId) return;
     shootout.choices[socket.id] = direction;
+    if (room.ai && shootout.choices[room.ai.id] === undefined) shootout.choices[room.ai.id] = aiPenaltyDirection(room);
     if (Object.keys(shootout.choices).length === 2) resolvePenalty(room); else sendMatch(room);
   });
   socket.on("requestRematch", ({ roomCode }) => {
     const room = rooms[roomCode]; if (!room || !room.players.some((player) => player.id === socket.id)) return;
+    if (room.ai) { resetAiRoom(room); return; }
     if (room.rematchVotes.includes(socket.id)) return;
     room.rematchVotes.push(socket.id);
     io.to(roomCode).emit("rematchRequested", { count:room.rematchVotes.length, total:room.players.length });
@@ -427,10 +546,10 @@ io.on("connection", (socket) => {
     if (room.timer) clearInterval(room.timer);
     room.players = room.players.filter((player) => player.id !== socket.id);
     delete room.reconnectTimers?.[socket.id];
-    if (!room.players.length) { delete rooms[roomCode]; return; }
+    if (room.ai || !room.players.length) { delete rooms[roomCode]; return; }
     io.to(roomCode).emit("opponentLeft", { name:room.players.find((player) => player.id !== socket.id)?.name });
   });
-  socket.on("disconnect", () => { Object.keys(rooms).forEach((code) => { const room = rooms[code]; const player = room.players.find((participant) => participant.id === socket.id); if (!player) return; room.rematchVotes = room.rematchVotes.filter((id) => id !== socket.id); room.reconnectTimers ||= {}; room.reconnectTimers[socket.id] = setTimeout(() => { const currentRoom = rooms[code]; if (!currentRoom) return; currentRoom.players = currentRoom.players.filter((participant) => participant.id !== socket.id); delete currentRoom.reconnectTimers[socket.id]; if (!currentRoom.players.length) { if (currentRoom.timer) clearInterval(currentRoom.timer); delete rooms[code]; } }, 60000); }); });
+  socket.on("disconnect", () => { Object.keys(rooms).forEach((code) => { const room = rooms[code]; const player = room.players.find((participant) => participant.id === socket.id); if (!player) return; room.rematchVotes = room.rematchVotes.filter((id) => id !== socket.id); room.reconnectTimers ||= {}; room.reconnectTimers[socket.id] = setTimeout(() => { const currentRoom = rooms[code]; if (!currentRoom) return; currentRoom.players = currentRoom.players.filter((participant) => participant.id !== socket.id); delete currentRoom.reconnectTimers[socket.id]; if (currentRoom.ai || !currentRoom.players.length) { if (currentRoom.timer) clearInterval(currentRoom.timer); delete rooms[code]; } }, 60000); }); });
 });
 const port = Number(process.env.PORT) || 5000;
 server.listen(port, () => {
