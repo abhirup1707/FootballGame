@@ -79,7 +79,7 @@ function exchangeForGuaranteed(userId, ids) {
 // must be filled for the exchange to unlock.
 const PURPLE_REQUIREMENTS = [
   { label: "5 × 60-69 rated", min: 60, max: 69, count: 5 },
-  { label: "5 × 70-74 rated", min: 70, max: 74, count: 5 },
+  { label: "5 × 70-75 rated", min: 70, max: 75, count: 5 },
 ];
 const PURPLE_REWARD_RANGE = { min: 77, max: 80 };
 

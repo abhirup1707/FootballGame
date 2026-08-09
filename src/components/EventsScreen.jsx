@@ -18,6 +18,7 @@ export default function EventsScreen({ onBack }) {
   const [error, setError] = useState("");
   const [flash, setFlash] = useState("");
   const [view, setView] = useState("preview");
+  const [showAllPurple, setShowAllPurple] = useState(false);
   const [selected, setSelected] = useState([]);
   const [exchanging, setExchanging] = useState(false);
   const [result, setResult] = useState(null);
@@ -146,7 +147,10 @@ export default function EventsScreen({ onBack }) {
     <div className="purple-preview">
       <div className="purple-preview-head">
         <span className="event-tag">PURPLE · {exchange?.reward.min}-{exchange?.reward.max}</span>
-        <h3>Guaranteed purple card</h3>
+        <div className="purple-preview-title">
+          <h3>Guaranteed purple card</h3>
+          <button className="view-all-btn" onClick={() => setShowAllPurple(true)}>View all <span>▾</span></button>
+        </div>
         <p>All the event cards on rotation below. Trade in a mix of your players for a guaranteed purple signing. Fill every requirement to unlock the exchange.</p>
       </div>
       <div
@@ -297,6 +301,34 @@ export default function EventsScreen({ onBack }) {
             <div className="exchange-result-card"><FcCard player={{ ...result, version: "purple" }} /></div>
             <p className="exchange-result-note">Added to your club. Tap a squad slot to play them.</p>
             <button className="hero-btn primary-btn" onClick={() => setResult(null)}>Nice! <span>✓</span></button>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+
+    <AnimatePresence>
+      {showAllPurple && (
+        <motion.div className="pack-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          <motion.div className="purple-all-modal" initial={{ scale: .9, y: 30 }} animate={{ scale: 1, y: 0 }} exit={{ scale: .95, opacity: 0 }} transition={{ type: "spring", stiffness: 180, damping: 18 }}>
+            <div className="purple-all-head">
+              <div>
+                <span className="event-tag">PURPLE · {exchange?.reward.min}-{exchange?.reward.max}</span>
+                <h2>All purple players <small>{previews.length} on rotation</small></h2>
+              </div>
+              <button className="icon-btn" onClick={() => setShowAllPurple(false)} aria-label="Close">✕</button>
+            </div>
+            <div className="purple-all-list">
+              {previews.map((card) => (
+                <div key={card.id} className="purple-all-row">
+                  <FcCard player={{ ...card, version: "purple" }} size="sm" />
+                  <div className="purple-all-info">
+                    <b>{card.name}</b>
+                    <small>{card.category} · {card.club || "Free agent"} · {card.nation}</small>
+                  </div>
+                  <strong>{card.base_rating ?? card.rating}</strong>
+                </div>
+              ))}
+            </div>
           </motion.div>
         </motion.div>
       )}
