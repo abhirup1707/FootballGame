@@ -1,7 +1,7 @@
 const express = require("express");
 const { db } = require("./db");
 const { hashPassword, verifyPassword, publicUser, createSession, userByToken, deleteSession } = require("./auth");
-const { PACK_TYPES, openPack, confirmPackPick, questsFor, claimQuest, grantWelcomeGift, todayBucket, exchangeForGuaranteed, exchangeForPurple, PURPLE_REQUIREMENTS, PURPLE_REWARD_RANGE, eventQuestsFor, claimEventQuest, INVENTORY_LIMIT, INVENTORY_WARN_AT } = require("./economy");
+const { PACK_TYPES, openPack, confirmPackPick, questsFor, claimQuest, grantWelcomeGift, todayBucket, exchangeForGuaranteed, exchangeForPurple, PURPLE_REQUIREMENTS, PURPLE_REWARD_RANGE, eventQuestsFor, claimEventQuest, INVENTORY_LIMIT, INVENTORY_WARN_AT, loginRewardStatus, claimLoginReward, packPurchasesInWindow } = require("./economy");
 const { effectiveRating } = require("./ovr");
 
 const router = express.Router();
@@ -46,7 +46,7 @@ router.post("/auth/register", async (req, res) => {
     const token = createSession(user.id);
     const gift = grantWelcomeGift(user.id);
     const fresh = db.prepare("SELECT * FROM users WHERE id = ?").get(user.id);
-    res.json({ token, user: publicUser(fresh), gift });
+    res.json({ token, user: publicUser(fresh), gift, loginReward: loginRewardStatus(fresh.id) });
   } catch (error) {
     res.status(500).json({ error: "Could not create account." });
   }
@@ -60,7 +60,7 @@ router.post("/auth/login", async (req, res) => {
       return res.status(401).json({ error: "Incorrect username or password." });
     }
     const token = createSession(user.id);
-    res.json({ token, user: publicUser(user) });
+    res.json({ token, user: publicUser(user), loginReward: loginRewardStatus(user.id) });
   } catch (error) {
     res.status(500).json({ error: "Could not sign in." });
   }
@@ -71,7 +71,15 @@ router.post("/auth/logout", (req, res) => {
   res.json({ ok: true });
 });
 
-router.get("/me", requireAuth, (req, res) => res.json({ user: publicUser(req.user) }));
+router.get("/me", requireAuth, (req, res) => res.json({ user: publicUser(req.user), loginReward: loginRewardStatus(req.user.id) }));
+
+router.get("/login-reward", requireAuth, (req, res) => res.json({ loginReward: loginRewardStatus(req.user.id) }));
+
+router.post("/login-reward/claim", requireAuth, (req, res) => {
+  const result = claimLoginReward(req.user.id);
+  if (result.error) return res.status(400).json({ error: result.error });
+  res.json(result);
+});
 
 router.get("/cards", (req, res) => {
   const rows = db.prepare("SELECT * FROM cards ORDER BY category, base_rating DESC").all();
@@ -185,8 +193,10 @@ router.get("/packs", requireAuth, (req, res) => {
   res.json({
     packs: PACK_TYPES.map((p) => ({
       key: p.key, name: p.name, cost: p.cost, cardCount: p.cardCount || null, image: p.image, description: p.description,
-      odds: p.odds ? toPercent(p.odds) : (p.pick ? null : poolOdds),
+      odds: p.ratings ? toPercent(p.ratings) : (p.odds ? toPercent(p.odds) : (p.pick ? null : poolOdds)),
       pick: p.pick ? { rounds: p.pick.rounds, optionsPerPick: p.pick.optionsPerPick, minRating: p.pick.minRating, maxRating: p.pick.maxRating } : null,
+      limit: p.limit ? { max: p.limit.max, days: p.limit.days, used: packPurchasesInWindow(req.user.id, p.key, p.limit.days) } : null,
+      reveal: p.reveal || null,
     })),
     daily: { claimed: req.user.last_claimed_daily === todayBucket(), streak: req.user.streak || 0 },
   });

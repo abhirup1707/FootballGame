@@ -100,6 +100,30 @@ export default function EventsScreen({ onBack }) {
   const totalNeeded = exchange?.requirements.reduce((sum, g) => sum + g.count, 0) || 0;
   const allMet = useMemo(() => Boolean(exchange && exchange.requirements.every((g) => selected.filter((c) => c.rating >= g.min && c.rating <= g.max).length >= g.count)), [exchange, selected]);
 
+  const autoAdd = () => {
+    if (!exchange) return;
+    setSelected((current) => {
+      const next = [...current];
+      const taken = new Set(next.map((c) => c.id));
+      for (const group of exchange.requirements) {
+        const filled = next.filter((c) => c.rating >= group.min && c.rating <= group.max).length;
+        const need = group.count - filled;
+        if (need <= 0) continue;
+        const candidates = inventory
+          .filter((card) => {
+            const r = cardRating(card);
+            return r >= group.min && r <= group.max && !inXI.has(card.id) && !taken.has(card.id);
+          })
+          .sort((a, b) => cardRating(a) - cardRating(b) || a.name.localeCompare(b.name));
+        candidates.slice(0, need).forEach((card) => {
+          next.push({ id: card.id, rating: cardRating(card) });
+          taken.add(card.id);
+        });
+      }
+      return next;
+    });
+  };
+
   const doExchange = async () => {
     if (!allMet || exchanging) return;
     setExchanging(true);
@@ -195,7 +219,10 @@ export default function EventsScreen({ onBack }) {
       </div>
       <div className="exchange-footer">
         <span>{allMet ? "Requirements met!" : `${selected.length}/${totalNeeded} selected`}</span>
-        <button className="primary-btn" disabled={!allMet || exchanging} onClick={doExchange}>{exchanging ? "Exchanging…" : `Exchange for purple ${exchange?.reward.min}-${exchange?.reward.max}`}</button>
+        <div className="exchange-footer-actions">
+          <button className="auto-add-btn" onClick={autoAdd} disabled={allMet || exchanging}>Auto add lowest rated</button>
+          <button className="primary-btn" disabled={!allMet || exchanging} onClick={doExchange}>{exchanging ? "Exchanging…" : `Exchange for purple ${exchange?.reward.min}-${exchange?.reward.max}`}</button>
+        </div>
       </div>
     </div>
   );

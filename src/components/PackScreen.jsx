@@ -4,6 +4,7 @@ import api from "../api";
 import { useAuth } from "../auth";
 import FcCard from "./FcCard";
 import LoadingOverlay from "./LoadingOverlay";
+import WalkoutReveal from "./WalkoutReveal";
 
 const TIER_LABEL = { bronze: "Bronze (60-69)", silver: "Silver (70-79)", gold: "Gold (80+)" };
 
@@ -103,14 +104,16 @@ export default function PackScreen({ onBack }) {
     {error && <p className="auth-error pack-error">{error}</p>}
     <div className="packs-grid">
       {packs.map((pack, index) => {
-        const disabled = pack.key === "daily" ? daily.claimed : !canAfford(pack);
+        const limitUsed = pack.limit ? pack.limit.used >= pack.limit.max : false;
+        const disabled = pack.key === "daily" ? daily.claimed : limitUsed || !canAfford(pack);
         return <div key={pack.key} className="pack-tile">
           <motion.button initial={{ opacity:0, y:18 }} animate={{ opacity:1, y:0 }} transition={{ delay:.08 + index * .07 }} className={`pack-card ${pack.key === "daily" ? "pack-daily" : ""} ${disabled ? "pack-disabled" : ""}`} disabled={disabled || Boolean(opening)} onClick={() => open(pack)}>
-            <div className="pack-art">{opening === pack.key ? <i className="pack-art-spin">⚽</i> : <i>{pack.image}</i>}<em>{pack.pick ? `PICK ${pack.pick.rounds}` : `${pack.cardCount} CARDS`}</em></div>
+            <div className="pack-art">{opening === pack.key ? <i className="pack-art-spin">⚽</i> : <i>{pack.image}</i>}<em>{pack.pick ? `PICK ${pack.pick.rounds}` : pack.cardCount === 1 ? "1 PLAYER" : `${pack.cardCount} CARDS`}</em></div>
             <b>{pack.name}</b>
             <span>{pack.description}</span>
             {pack.key === "daily" && !daily.claimed && <em className="pack-daily-streak">{daily.streak > 0 ? `🔥 ${daily.streak}-day streak` : "New player pack"}</em>}
-            <strong>{pack.key === "daily" ? (daily.claimed ? "CLAIMED ✓" : opening === "daily" ? "⏳ Opening…" : "FREE") : pack.cost.type === "coins" ? `${pack.cost.amount} 🪙` : `${pack.cost.amount} 💎`}</strong>
+            {pack.limit && <em className={`pack-limit-streak ${limitUsed ? "pack-limit-done" : ""}`}>{limitUsed ? "LIMIT REACHED" : `${pack.limit.used}/${pack.limit.max} bought · resets in ${pack.limit.days}d`}</em>}
+            <strong>{pack.key === "daily" ? (daily.claimed ? "CLAIMED ✓" : opening === "daily" ? "⏳ Opening…" : "FREE") : limitUsed ? "SOLD OUT" : pack.cost.type === "coins" ? `${pack.cost.amount} 🪙` : `${pack.cost.amount} 💎`}</strong>
           </motion.button>
           <span className="pack-info-btn" onClick={() => setInfoPack(pack)} aria-label="Pack info">ⓘ</span>
         </div>;
@@ -148,12 +151,13 @@ export default function PackScreen({ onBack }) {
               <div className="pack-info-odds">
                 {infoPack.odds && Object.entries(infoPack.odds).map(([tier, pct]) => (
                   <div className="pack-info-line" key={tier}>
-                    <span>{TIER_LABEL[tier] || tier}</span>
+                    <span>{TIER_LABEL[tier] || (infoPack.limit ? `${tier} rated` : tier)}</span>
                     <strong>{pct}%</strong>
                   </div>
                 ))}
               </div>
-              <p className="pack-info-note">Contains {infoPack.cardCount} cards, each drawn independently.</p>
+              {infoPack.limit && <p className="pack-info-note">Buy limit: {infoPack.limit.max} pack{infoPack.limit.max > 1 ? "s" : ""} every {infoPack.limit.days} days ({infoPack.limit.used}/{infoPack.limit.max} used).</p>}
+              <p className="pack-info-note">Contains {infoPack.cardCount} card{infoPack.cardCount > 1 ? "s" : ""}, drawn independently.</p>
             </>
           )}
           <button className="hero-btn primary-btn pack-info-close" onClick={() => setInfoPack(null)}>Got it <span>✓</span></button>
@@ -190,7 +194,13 @@ export default function PackScreen({ onBack }) {
     </AnimatePresence>
 
     <AnimatePresence>
-      {result && <motion.div className="pack-overlay" initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}>
+      {result && result.pack.reveal === "walkout" && result.cards?.[0] && (
+        <WalkoutReveal card={result.cards[0]} packName={result.pack.name} onDone={() => setResult(null)} />
+      )}
+    </AnimatePresence>
+
+    <AnimatePresence>
+      {result && result.pack.reveal !== "walkout" && <motion.div className="pack-overlay" initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}>
         <div className="pack-reveal">
           <div className="pack-reveal-head"><small>YOU OPENED</small><h2>{result.pack.name}</h2>{result.bonus && <p className="pack-streak-bonus">🔥 {result.bonus.streak}-day streak! +{result.bonus.coins} coins</p>}</div>
           <div className="pack-reveal-grid">

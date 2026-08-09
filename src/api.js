@@ -34,6 +34,8 @@ const api = {
   claimEventQuest: (token, questId) => request("/api/events/quests/claim", { method: "POST", token, body: { questId } }),
   exchangePurple: (token, ids) => request("/api/events/exchange", { method: "POST", token, body: { ids } }),
   exchange: (token, ids) => request("/api/exchange", { method: "POST", token, body: { ids } }),
+  loginReward: (token) => request("/api/login-reward", { token }),
+  claimLoginReward: (token) => request("/api/login-reward/claim", { method: "POST", token }),
 };
 
 export default api;

@@ -16,13 +16,18 @@ export function AuthProvider({ children }) {
   const [session, setSession] = useState(loadSession);
   const [checking, setChecking] = useState(Boolean(loadSession()));
   const [welcomeGift, setWelcomeGift] = useState(null);
+  const [loginReward, setLoginReward] = useState(null);
 
   useEffect(() => {
     const stored = loadSession();
     if (!stored?.token) { setChecking(false); return; }
     let active = true;
     api.me(stored.token)
-      .then(({ user }) => { if (active) setSession((current) => (current ? { ...current, user } : current)); })
+      .then(({ user, loginReward }) => {
+        if (!active) return;
+        setSession((current) => (current ? { ...current, user } : current));
+        if (loginReward?.available) setLoginReward(loginReward);
+      })
       .catch(() => { if (active) { localStorage.removeItem(KEY); setSession(null); } })
       .finally(() => { if (active) setChecking(false); });
     return () => { active = false; };
@@ -33,13 +38,27 @@ export function AuthProvider({ children }) {
     setSession({ token: next.token, user: next.user });
   }, []);
 
-  const login = useCallback(async (username, password) => store(await api.login(username, password)), [store]);
+  const login = useCallback(async (username, password) => {
+    const data = await api.login(username, password);
+    if (data.loginReward?.available) setLoginReward(data.loginReward);
+    store(data);
+  }, [store]);
   const register = useCallback(async (username, password) => {
     const data = await api.register(username, password);
     setWelcomeGift(data.gift || null);
+    if (data.loginReward?.available) setLoginReward(data.loginReward);
     store(data);
   }, [store]);
   const dismissWelcomeGift = useCallback(() => setWelcomeGift(null), []);
+  const dismissLoginReward = useCallback(() => setLoginReward(null), []);
+  const claimLoginReward = useCallback(async () => {
+    const stored = loadSession();
+    if (!stored?.token) return null;
+    const data = await api.claimLoginReward(stored.token);
+    if (data.user) setSession((current) => (current ? { ...current, user: data.user } : current));
+    setLoginReward((current) => (current && !data.loginReward?.available ? null : (data.loginReward || null)));
+    return data;
+  }, []);
   const refreshUser = useCallback(async () => {
     const stored = loadSession();
     if (!stored?.token) return;
@@ -54,7 +73,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user: session?.user || null, token: session?.token || null, checking, login, register, logout, refreshUser, welcomeGift, dismissWelcomeGift }}>
+    <AuthContext.Provider value={{ user: session?.user || null, token: session?.token || null, checking, login, register, logout, refreshUser, welcomeGift, dismissWelcomeGift, loginReward, dismissLoginReward, claimLoginReward }}>
       {children}
     </AuthContext.Provider>
   );

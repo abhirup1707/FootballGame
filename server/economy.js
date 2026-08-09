@@ -131,6 +131,7 @@ const PACK_TYPES = [
   { key: "gem50", name: "50 Gems Pick", cost: { type: "gems", amount: 50 }, image: "🎯", description: "Choose 1 of 3 players rated 70-75.", pick: { rounds: 1, optionsPerPick: 3, minRating: 70, maxRating: 75 } },
   { key: "gem100", name: "100 Gems Pick", cost: { type: "gems", amount: 100 }, image: "💎", description: "Choose 1 of 3 star players rated 73-75.", pick: { rounds: 1, optionsPerPick: 3, minRating: 73, maxRating: 75 } },
   { key: "gem1000", name: "1000 Coins Pick", cost: { type: "coins", amount: 1000 }, image: "👑", description: "Three picks — choose 1 of 3 players rated 70-75 each.", pick: { rounds: 3, optionsPerPick: 3, minRating: 70, maxRating: 75 } },
+  { key: "star5000", name: "5000 Coins Star Pack", cost: { type: "coins", amount: 5000 }, cardCount: 1, image: "🌟", description: "One 77-80 rated star. Limited to 2 buys every 7 days.", ratings: { 77: 0.4, 78: 0.3, 79: 0.2, 80: 0.1 }, limit: { max: 2, days: 7 }, reveal: "walkout" },
 ];
 
 const QUEST_SEEDS = [
@@ -219,10 +220,20 @@ function addXp(userId, amount) {
 function drawCards(pack, cardCount) {
   const pool = db.prepare("SELECT * FROM cards").all();
   const odds = pack.odds;
+  const ratings = pack.ratings;
   const selected = [];
   for (let i = 0; i < cardCount; i++) {
     let candidates = pool.filter((c) => !selected.includes(c.id));
-    if (odds) {
+    if (ratings) {
+      let roll = Math.random();
+      let rating = Object.keys(ratings)[0];
+      for (const key of Object.keys(ratings)) {
+        if (roll < ratings[key]) { rating = key; break; }
+        roll -= ratings[key];
+      }
+      const rated = candidates.filter((c) => c.base_rating === Number(rating));
+      if (rated.length) candidates = rated;
+    } else if (odds) {
       let roll = Math.random();
       let tier = Object.keys(odds)[0];
       for (const key of Object.keys(odds)) {
@@ -240,6 +251,11 @@ function drawCards(pack, cardCount) {
 }
 
 const pendingPicks = new Map();
+
+function packPurchasesInWindow(userId, packKey, days) {
+  const cutoff = new Date(Date.now() - days * 86400000).toISOString();
+  return Number(db.prepare("SELECT COUNT(*) AS c FROM pack_purchases WHERE user_id = ? AND pack_key = ? AND created_at >= ?").get(userId, packKey, cutoff).c);
+}
 
 function buildPickRounds(pool, pick) {
   const used = new Set();
@@ -325,12 +341,71 @@ function grantWelcomeGift(userId) {
   return { cards, coins: WELCOME_COINS, gems: WELCOME_GEMS };
 }
 
+// 7-day login reward promo. Every account can claim 4000 coins + 500 gems
+// once per day while the promo runs. The 7-day window is fixed from the first
+// day it is enabled (stored in meta so server restarts don't extend it), the
+// disclaimer counts down daily, and once the window closes the reward is gone
+// for everyone.
+const LOGIN_REWARD_DAYS = 7;
+const LOGIN_REWARD_COINS = 4000;
+const LOGIN_REWARD_GEMS = 500;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function loginPromoInfo() {
+  let start = db.prepare("SELECT value FROM meta WHERE key = 'login_reward_start'").get()?.value;
+  if (!start) {
+    start = todayBucket();
+    db.prepare("INSERT INTO meta (key, value) VALUES ('login_reward_start', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").run(start);
+  }
+  const startMs = Date.parse(`${start}T00:00:00Z`);
+  const endMs = startMs + LOGIN_REWARD_DAYS * DAY_MS;
+  const now = Date.now();
+  if (now >= endMs) return { active: false, daysLeft: 0, endsAt: endMs };
+  return { active: true, daysLeft: Math.ceil((endMs - now) / DAY_MS), endsAt: endMs };
+}
+
+function loginRewardStatus(userId) {
+  const promo = loginPromoInfo();
+  if (!promo.active) {
+    return { available: false, claimedToday: false, daysLeft: 0, coins: LOGIN_REWARD_COINS, gems: LOGIN_REWARD_GEMS };
+  }
+  const user = db.prepare("SELECT last_login_reward FROM users WHERE id = ?").get(userId);
+  const claimedToday = Boolean(user && user.last_login_reward === todayBucket());
+  return { ...promo, available: !claimedToday, claimedToday, coins: LOGIN_REWARD_COINS, gems: LOGIN_REWARD_GEMS };
+}
+
+function claimLoginReward(userId) {
+  const status = loginRewardStatus(userId);
+  if (!status.available) {
+    return { error: status.claimedToday ? "You already claimed today's login reward. Come back tomorrow." : "This login reward has ended." };
+  }
+  db.exec("BEGIN");
+  try {
+    addCoins(userId, LOGIN_REWARD_COINS);
+    addGems(userId, LOGIN_REWARD_GEMS);
+    db.prepare("UPDATE users SET last_login_reward = ? WHERE id = ?").run(todayBucket(), userId);
+    db.exec("COMMIT");
+  } catch (error) {
+    db.exec("ROLLBACK");
+    return { error: "Could not claim your reward." };
+  }
+  const updated = db.prepare("SELECT * FROM users WHERE id = ?").get(userId);
+  return { reward: { coins: LOGIN_REWARD_COINS, gems: LOGIN_REWARD_GEMS }, user: publicUser(updated), loginReward: loginRewardStatus(userId) };
+}
+
 function openPack(userId, packKey, options = {}) {
   const free = Boolean(options.free);
   const pack = PACK_TYPES.find((p) => p.key === packKey);
   if (!pack) return { error: "Unknown pack." };
   const user = db.prepare("SELECT * FROM users WHERE id = ?").get(userId);
   if (!user) return { error: "Account not found." };
+
+  if (pack.limit && !free) {
+    const count = packPurchasesInWindow(userId, pack.key, pack.limit.days);
+    if (count >= pack.limit.max) {
+      return { error: `This pack can only be bought ${pack.limit.max} times every ${pack.limit.days} days.` };
+    }
+  }
 
   const owned = ownedCount(userId);
   const needed = pack.pick ? pack.pick.rounds : pack.cardCount;
@@ -352,6 +427,10 @@ function openPack(userId, packKey, options = {}) {
   } else if (!free && pack.cost.type === "gems") {
     if (user.gems < pack.cost.amount) return { error: "Not enough gems." };
     db.prepare("UPDATE users SET gems = gems - ? WHERE id = ?").run(pack.cost.amount, userId);
+  }
+
+  if (pack.limit && !free) {
+    db.prepare("INSERT INTO pack_purchases (user_id, pack_key) VALUES (?, ?)").run(userId, pack.key);
   }
 
   let cards = [];
@@ -376,7 +455,7 @@ function openPack(userId, packKey, options = {}) {
   bumpQuest(userId, "packs_opened", 1);
 
   const updated = db.prepare("SELECT * FROM users WHERE id = ?").get(userId);
-  return { pack: { key: pack.key, name: pack.name }, cards, pick, bonus, user: publicUser(updated) };
+  return { pack: { key: pack.key, name: pack.name, reveal: pack.reveal || null }, cards, pick, bonus, user: publicUser(updated) };
 }
 
 function confirmPackPick(userId, pickId, selections) {
@@ -547,4 +626,4 @@ function resolveMatchRewards(room) {
   return rewards;
 }
 
-module.exports = { PACK_TYPES, openPack, confirmPackPick, questsFor, claimQuest, bumpQuest, resolveMatchRewards, grantWelcomeGift, todayBucket, ownedCount, exchangeForGuaranteed, exchangeForPurple, PURPLE_REQUIREMENTS, PURPLE_REWARD_RANGE, eventQuestsFor, claimEventQuest, INVENTORY_LIMIT, INVENTORY_WARN_AT };
+module.exports = { PACK_TYPES, openPack, confirmPackPick, questsFor, claimQuest, bumpQuest, resolveMatchRewards, grantWelcomeGift, todayBucket, ownedCount, exchangeForGuaranteed, exchangeForPurple, PURPLE_REQUIREMENTS, PURPLE_REWARD_RANGE, eventQuestsFor, claimEventQuest, INVENTORY_LIMIT, INVENTORY_WARN_AT, loginRewardStatus, claimLoginReward, LOGIN_REWARD_DAYS, LOGIN_REWARD_COINS, LOGIN_REWARD_GEMS, packPurchasesInWindow };

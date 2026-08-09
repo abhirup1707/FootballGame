@@ -11,9 +11,10 @@ import EventsScreen from "./components/EventsScreen";
 import Lobby from "./components/Lobby";
 import Draft from "./components/Draft";
 import WelcomePopup from "./components/WelcomePopup";
+import LoginRewardPopup from "./components/LoginRewardPopup";
 
 function Shell() {
-  const { user, checking, token, welcomeGift, dismissWelcomeGift, refreshUser } = useAuth();
+  const { user, checking, token, welcomeGift, dismissWelcomeGift, refreshUser, loginReward, dismissLoginReward, claimLoginReward } = useAuth();
   const [screen, setScreen] = useState("hub");
   const [room, setRoom] = useState(null);
 
@@ -73,6 +74,9 @@ function Shell() {
     <>
       <Hub onNavigate={(next) => setScreen(next)} />
       {welcomeGift && <WelcomePopup gift={welcomeGift} onAccept={() => { dismissWelcomeGift(); refreshUser(); }} />}
+      {!welcomeGift && loginReward?.available && (
+        <LoginRewardPopup reward={loginReward} onClaim={claimLoginReward} onDone={dismissLoginReward} />
+      )}
     </>
   );
 }

@@ -173,6 +173,17 @@ export default function TeamScreen({ onBack }) {
     });
   };
 
+  const autoAddExchange = () => {
+    setExchangeIds((current) => {
+      const remaining = 10 - current.length;
+      if (remaining <= 0) return current;
+      const candidates = inventory
+        .filter((card) => isExchangable(card) && !inXIIs.has(card.id) && !current.includes(card.id))
+        .sort((a, b) => cardRating(a) - cardRating(b) || a.name.localeCompare(b.name));
+      return [...current, ...candidates.slice(0, remaining).map((card) => card.id)];
+    });
+  };
+
   const doExchange = async () => {
     if (exchangeIds.length !== 10 || exchanging) return;
     setExchanging(true);
@@ -229,7 +240,10 @@ export default function TeamScreen({ onBack }) {
       </div>
       <div className="exchange-footer">
         <span>{exchangeIds.length}/10 selected</span>
-        <button className="primary-btn" disabled={exchangeIds.length !== 10 || exchanging} onClick={doExchange}>{exchanging ? "Exchanging…" : "Exchange for 72+ card"}</button>
+        <div className="exchange-footer-actions">
+          <button className="auto-add-btn" onClick={autoAddExchange} disabled={exchangeIds.length >= 10 || exchanging}>Auto add lowest rated</button>
+          <button className="primary-btn" disabled={exchangeIds.length !== 10 || exchanging} onClick={doExchange}>{exchanging ? "Exchanging…" : "Exchange for 72+ card"}</button>
+        </div>
       </div>
     </>
   );
