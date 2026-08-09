@@ -165,14 +165,8 @@ function resolvePenalty(room) {
   const shootout = room.shootout, attackId = shootout.currentTeam, defendId = room.players.find((p) => p.id !== attackId).id;
   const shot = shootout.choices[attackId], dive = shootout.choices[defendId];
   const shooter = shootout.selectedShooter, keeper = room.teams[defendId].positions.GK;
-  const shooterSHO = effectiveStat(shooter, "shooting");
-  const keeperREF = effectiveStat(keeper, "defending");
   const shooterName = shooter?.name || "Unknown", keeperName = keeper?.name || "the keeper";
-  // Diving the right way always saves the penalty — the mind-game is the core.
-  // Stats only move the odds when the keeper guesses wrong.
-  let goal;
-  if (shot === dive) goal = false;
-  else goal = Math.random() * 100 < clamp(70 + (shooterSHO - keeperREF) * 2, 40, 94);
+  const goal = shot !== dive;
   if (!goal) room.stats[defendId].saves += 1;
   shootout.kicks[attackId].push(goal); shootout.result = { attackId, shooter, keeper, shot, dive, goal };
   shootout.phase = "RESULT";
