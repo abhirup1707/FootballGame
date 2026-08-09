@@ -1,6 +1,9 @@
 // Season reset scale: cards run 60-75. Tiers add a small premium so the
 // boosted stats (still capped at 75) never push a displayed OVR past 75.
+// Ultimate Icons event cards break the catalog cap and ship authored stats
+// up to 80, so the displayed rating clamp is lifted to 80 for those rows.
 const STAT_CAP = 75;
+const CATALOG_RATING_CAP = 80;
 const TIER_MULTIPLIERS = { base: 1, inform: 1.01, prime: 1.03, icon: 1.05 };
 
 function tierForRating(rating) {
@@ -107,7 +110,7 @@ function hasProvidedStats(card) {
 function providedStats(card) {
   const r = card.rating;
   const d = (salt, min, max) => hashRange(`${card.name}:${card.id}`, salt, min, max);
-  const c = (v) => clamp(v, 1, 99);
+  const c = (v) => clamp(v, 1, 100);
   if (card.category === "GK") {
     // GK rows ship all six keeper stats, so just translate them across.
     const pick = (key) => (typeof card[key] === "number" && card[key] >= 1 ? card[key] : r - d(GK_TO_ENGINE[key], 0, 10));
@@ -130,7 +133,7 @@ function providedStats(card) {
 function buildCardStats(card) {
   const tier = tierForRating(card.rating);
   const stats = hasProvidedStats(card) ? providedStats(card) : applyTier(deriveStats(card), tier);
-  return { ...stats, tier, rating: clamp(card.rating, 1, STAT_CAP) };
+  return { ...stats, tier, rating: clamp(card.rating, 1, CATALOG_RATING_CAP) };
 }
 
 // Draft-mode cards come from src/data/*.json, a curated legend pool rated

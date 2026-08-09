@@ -5,6 +5,8 @@ import { useAuth } from "../auth";
 import FcCard from "./FcCard";
 import LoadingOverlay from "./LoadingOverlay";
 
+const TIER_LABEL = { bronze: "Bronze (60-69)", silver: "Silver (70-79)", gold: "Gold (80+)" };
+
 export default function PackScreen({ onBack }) {
   const { token, user, refreshUser } = useAuth();
   const [packs, setPacks] = useState([]);
@@ -15,6 +17,9 @@ export default function PackScreen({ onBack }) {
   const [inventoryCount, setInventoryCount] = useState(0);
   const [limits, setLimits] = useState({ limit: 50, warnAt: 35 });
   const [warnDismissed, setWarnDismissed] = useState(false);
+  const [infoPack, setInfoPack] = useState(null);
+  const [pickSession, setPickSession] = useState(null);
+  const [picking, setPicking] = useState(false);
 
   const load = async () => {
     try {
@@ -35,7 +40,19 @@ export default function PackScreen({ onBack }) {
     setOpening(pack.key);
     try {
       const data = await api.openPack(token, pack.key);
-      setResult(data);
+      if (data.pick) {
+        setPickSession({
+          pickId: data.pick.pickId,
+          total: data.pick.total,
+          name: data.pack.name,
+          minRating: pack.pick.minRating,
+          maxRating: pack.pick.maxRating,
+          rounds: data.pick.rounds,
+          selections: [],
+        });
+      } else {
+        setResult(data);
+      }
       setOpening(null);
       await refreshUser();
       load();
@@ -43,6 +60,27 @@ export default function PackScreen({ onBack }) {
       setError(err.message);
       setOpening(null);
     }
+  };
+
+  const choosePick = async (card) => {
+    if (picking) return;
+    const selections = [...pickSession.selections, card];
+    if (selections.length < pickSession.total) {
+      setPickSession({ ...pickSession, selections });
+      return;
+    }
+    setPicking(true);
+    try {
+      const data = await api.pickPack(token, pickSession.pickId, selections.map((s) => s.id));
+      setResult(data);
+      setPickSession(null);
+      await refreshUser();
+      load();
+    } catch (err) {
+      setError(err.message);
+      setPickSession(null);
+    }
+    setPicking(false);
   };
 
   const canAfford = (pack) => {
@@ -54,6 +92,8 @@ export default function PackScreen({ onBack }) {
 
   const showWarn = !warnDismissed && inventoryCount > limits.warnAt;
 
+  const currentRound = pickSession ? pickSession.rounds[pickSession.selections.length] : null;
+
   return <main className="lobby-bg"><div className="lobby-orb orb-one" /><div className="lobby-orb orb-two" /><div className="lobby-noise" /><div className="hub-wrap packs-screen">
     <motion.header initial={{ opacity:0, y:-14 }} animate={{ opacity:1, y:0 }} className="team-head">
       <button className="icon-btn" onClick={onBack} aria-label="Back">←</button>
@@ -64,13 +104,16 @@ export default function PackScreen({ onBack }) {
     <div className="packs-grid">
       {packs.map((pack, index) => {
         const disabled = pack.key === "daily" ? daily.claimed : !canAfford(pack);
-        return <motion.button key={pack.key} initial={{ opacity:0, y:18 }} animate={{ opacity:1, y:0 }} transition={{ delay:.08 + index * .07 }} className={`pack-card ${pack.key === "daily" ? "pack-daily" : ""} ${disabled ? "pack-disabled" : ""}`} disabled={disabled || Boolean(opening)} onClick={() => open(pack)}>
-          <div className="pack-art">{opening === pack.key ? <i className="pack-art-spin">⚽</i> : <i>{pack.image}</i>}<em>{pack.cardCount} CARDS</em></div>
-          <b>{pack.name}</b>
-          <span>{pack.description}</span>
-          {pack.key === "daily" && !daily.claimed && <em className="pack-daily-streak">{daily.streak > 0 ? `🔥 ${daily.streak}-day streak` : "New player pack"}</em>}
-          <strong>{pack.key === "daily" ? (daily.claimed ? "CLAIMED ✓" : opening === "daily" ? "⏳ Opening…" : "FREE") : pack.cost.type === "coins" ? `${pack.cost.amount} 🪙` : `${pack.cost.amount} 💎`}</strong>
-        </motion.button>;
+        return <div key={pack.key} className="pack-tile">
+          <motion.button initial={{ opacity:0, y:18 }} animate={{ opacity:1, y:0 }} transition={{ delay:.08 + index * .07 }} className={`pack-card ${pack.key === "daily" ? "pack-daily" : ""} ${disabled ? "pack-disabled" : ""}`} disabled={disabled || Boolean(opening)} onClick={() => open(pack)}>
+            <div className="pack-art">{opening === pack.key ? <i className="pack-art-spin">⚽</i> : <i>{pack.image}</i>}<em>{pack.pick ? `PICK ${pack.pick.rounds}` : `${pack.cardCount} CARDS`}</em></div>
+            <b>{pack.name}</b>
+            <span>{pack.description}</span>
+            {pack.key === "daily" && !daily.claimed && <em className="pack-daily-streak">{daily.streak > 0 ? `🔥 ${daily.streak}-day streak` : "New player pack"}</em>}
+            <strong>{pack.key === "daily" ? (daily.claimed ? "CLAIMED ✓" : opening === "daily" ? "⏳ Opening…" : "FREE") : pack.cost.type === "coins" ? `${pack.cost.amount} 🪙` : `${pack.cost.amount} 💎`}</strong>
+          </motion.button>
+          <span className="pack-info-btn" onClick={() => setInfoPack(pack)} aria-label="Pack info">ⓘ</span>
+        </div>;
       })}
     </div>
 
@@ -83,6 +126,67 @@ export default function PackScreen({ onBack }) {
           <button className="primary-btn" onClick={() => setWarnDismissed(true)}>Got it</button>
         </motion.div>
       </motion.div>}
+    </AnimatePresence>
+
+    <AnimatePresence>
+      {infoPack && <motion.div className="pack-overlay" initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }} onClick={() => setInfoPack(null)}>
+        <motion.div className="pack-info-pop" initial={{ scale: .85, y: 24 }} animate={{ scale: 1, y: 0 }} exit={{ scale: .9, opacity: 0 }} onClick={(e) => e.stopPropagation()}>
+          <small>DROP RATES</small>
+          <h2>{infoPack.image} {infoPack.name}</h2>
+          <p>{infoPack.description}</p>
+          {infoPack.pick ? (
+            <>
+              <div className="pack-info-odds">
+                <div className="pack-info-line"><span>Guaranteed pick</span><strong>{infoPack.pick.minRating}-{infoPack.pick.maxRating} rated</strong></div>
+                <div className="pack-info-line"><span>Total picks</span><strong>{infoPack.pick.rounds}</strong></div>
+                <div className="pack-info-line"><span>Options per pick</span><strong>{infoPack.pick.optionsPerPick}</strong></div>
+              </div>
+              <p className="pack-info-note">Each pick shows {infoPack.pick.optionsPerPick} players to choose from. Pick 1, then the next pick opens automatically.</p>
+            </>
+          ) : (
+            <>
+              <div className="pack-info-odds">
+                {infoPack.odds && Object.entries(infoPack.odds).map(([tier, pct]) => (
+                  <div className="pack-info-line" key={tier}>
+                    <span>{TIER_LABEL[tier] || tier}</span>
+                    <strong>{pct}%</strong>
+                  </div>
+                ))}
+              </div>
+              <p className="pack-info-note">Contains {infoPack.cardCount} cards, each drawn independently.</p>
+            </>
+          )}
+          <button className="hero-btn primary-btn pack-info-close" onClick={() => setInfoPack(null)}>Got it <span>✓</span></button>
+        </motion.div>
+      </motion.div>}
+    </AnimatePresence>
+
+    <AnimatePresence>
+      {pickSession && !picking && currentRound && (
+        <motion.div className="pack-overlay" initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}>
+          <div className="pack-pick">
+            <div className="pack-reveal-head">
+              <small>PICK {pickSession.selections.length + 1} OF {pickSession.total}</small>
+              <h2>{pickSession.name}</h2>
+              <p>Choose 1 player rated {pickSession.minRating}-{pickSession.maxRating}. Tap a card to select.</p>
+            </div>
+            {pickSession.selections.length > 0 && (
+              <div className="pack-pick-chosen">
+                {pickSession.selections.map((sel, index) => (
+                  <span key={index}>Round {index + 1}: {sel.name}</span>
+                ))}
+              </div>
+            )}
+            <div className="pack-pick-options">
+              {currentRound.options.map((card, index) => (
+                <motion.div key={card.id} initial={{ opacity:0, y:22, scale:.92 }} animate={{ opacity:1, y:0, scale:1 }} transition={{ delay: index * .09 }}>
+                  <FcCard player={card} clickable onClick={() => choosePick(card)} />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      )}
     </AnimatePresence>
 
     <AnimatePresence>
@@ -100,5 +204,6 @@ export default function PackScreen({ onBack }) {
     </AnimatePresence>
 
     {opening && <LoadingOverlay message="Opening pack…" />}
+    {picking && <LoadingOverlay message="Adding your pick…" />}
   </div></main>;
 }

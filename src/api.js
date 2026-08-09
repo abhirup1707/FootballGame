@@ -27,8 +27,12 @@ const api = {
   saveTeam: (token, slots) => request("/api/team", { method: "POST", token, body: { slots } }),
   packs: (token) => request("/api/packs", { token }),
   openPack: (token, packKey) => request("/api/packs/open", { method: "POST", token, body: { packKey } }),
+  pickPack: (token, pickId, selections) => request("/api/packs/pick", { method: "POST", token, body: { pickId, selections } }),
   quests: (token) => request("/api/quests", { token }),
   claimQuest: (token, questId) => request("/api/quests/claim", { method: "POST", token, body: { questId } }),
+  events: (token) => request("/api/events", { token }),
+  claimEventQuest: (token, questId) => request("/api/events/quests/claim", { method: "POST", token, body: { questId } }),
+  exchangePurple: (token, ids) => request("/api/events/exchange", { method: "POST", token, body: { ids } }),
   exchange: (token, ids) => request("/api/exchange", { method: "POST", token, body: { ids } }),
 };
 

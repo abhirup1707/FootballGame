@@ -44,6 +44,14 @@ const NAV = [
     color: "#ff8a3c",
     tag: "RANKED",
   },
+  {
+    key: "events",
+    icon: "🎪",
+    title: "Events",
+    desc: "Live events feed — cups, promos & limited-time rewards.",
+    color: "#c77dff",
+    tag: "LIVE",
+  },
 ];
 
 export default function Hub({ onNavigate }) {

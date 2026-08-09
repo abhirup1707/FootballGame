@@ -43,29 +43,45 @@ export default function SquadBoard({
     const effective = player
       ? effectiveRating(player.rating, category, slotCategory[positionKey])
       : null;
+    const rating = player ? (player.base_rating ?? player.rating) : null;
+    const tier = player
+      ? player.version === "purple"
+        ? "purple"
+        : rating >= 80
+          ? "gold"
+          : rating >= 70
+            ? "silver"
+            : "bronze"
+      : "";
     return (
       <button
         type="button"
         disabled={readOnly}
         className={`squad-slot ${player ? "filled" : ""} ${
           selectedSlot === positionKey ? "selected" : ""
-        } ${canReceive ? "eligible" : ""} ${readOnly ? "locked" : ""}`}
+        } ${canReceive ? "eligible" : ""} ${readOnly ? "locked" : ""} ${
+          player ? `squad-tier-${tier}` : ""
+        }`}
         onClick={() => selectPosition(positionKey)}
         aria-label={`${label} position`}
       >
         <span className="squad-role">{label}</span>
         {player ? (
           <>
-            <span className="squad-avatar">
-              {player.image ? (
-                <img src={player.image} alt="" />
-              ) : (
-                player.name
-                  .split(" ")
-                  .map((word) => word[0])
-                  .join("")
-                  .slice(0, 2)
-              )}
+            <span className="squad-card">
+              <span className="squad-avatar">
+                {player.image ? (
+                  <img src={player.image} alt="" />
+                ) : (
+                  player.name
+                    .split(" ")
+                    .map((word) => word[0])
+                    .join("")
+                    .slice(0, 2)
+                )}
+              </span>
+              <span className="squad-name">{player.name.split(/\s+/).filter(Boolean).pop()}</span>
+              <span className="squad-pos">{player.position || player.category}</span>
             </span>
             <span className="squad-rating">{effective}</span>
           </>

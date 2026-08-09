@@ -3,6 +3,9 @@ const { publicUser } = require("./auth");
 const { buildCardStats } = require("./ovr");
 const fs = require("fs");
 const path = require("path");
+const { randomUUID } = require("crypto");
+
+const TIER_RANGE = { bronze: [60, 69], silver: [70, 79], gold: [80, 99] };
 
 const CLUB_DIR = path.join(__dirname, "..", "src", "data", "club");
 const CLUB_FILES = { ATT: "attackers.json", MID: "midfielders.json", DEF: "defenders.json", GK: "goalkeepers.json" };
@@ -71,11 +74,63 @@ function exchangeForGuaranteed(userId, ids) {
   return { card: reward, count: ownedCount(userId) };
 }
 
+// Purple (event) exchange: trade a specific mix of owned players for one
+// guaranteed purple Ultimate Icons card (rated 77-80). Each requirement group
+// must be filled for the exchange to unlock.
+const PURPLE_REQUIREMENTS = [
+  { label: "5 × 60-69 rated", min: 60, max: 69, count: 5 },
+  { label: "5 × 70-74 rated", min: 70, max: 74, count: 5 },
+];
+const PURPLE_REWARD_RANGE = { min: 77, max: 80 };
+
+function exchangeForPurple(userId, ids) {
+  const totalNeeded = PURPLE_REQUIREMENTS.reduce((sum, g) => sum + g.count, 0);
+  if (!Array.isArray(ids) || ids.length !== totalNeeded) {
+    return { error: `Select exactly ${totalNeeded} players to exchange.` };
+  }
+  const numericIds = [...new Set(ids.map(Number))];
+  if (numericIds.length !== totalNeeded) return { error: "Duplicate players selected." };
+  if (numericIds.some((id) => !Number.isInteger(id) || id <= 0)) return { error: "Invalid player selection." };
+
+  const placeholders = numericIds.map(() => "?").join(",");
+  const owned = db.prepare(`
+    SELECT oc.*, c.base_rating, c.name
+    FROM owned_cards oc JOIN cards c ON c.id = oc.card_id
+    WHERE oc.user_id = ? AND oc.id IN (${placeholders})
+  `).all(userId, ...numericIds);
+  if (owned.length !== totalNeeded) return { error: "You don't own all the selected players." };
+  const inXI = owned.find((row) => row.is_in_xi === 1);
+  if (inXI) return { error: `Remove ${inXI.name} from your starting XI before exchanging.` };
+
+  for (const group of PURPLE_REQUIREMENTS) {
+    const count = owned.filter((row) => row.base_rating >= group.min && row.base_rating <= group.max).length;
+    if (count < group.count) {
+      return { error: `Need ${group.count} ${group.label.replace("×", "×")} — selected ${count}.` };
+    }
+  }
+
+  const pool = db.prepare("SELECT * FROM cards WHERE base_rating BETWEEN ? AND ?").all(PURPLE_REWARD_RANGE.min, PURPLE_REWARD_RANGE.max);
+  if (!pool.length) return { error: "No purple rewards available right now." };
+  const reward = pool[Math.floor(Math.random() * pool.length)];
+
+  db.exec("BEGIN");
+  try {
+    db.prepare(`DELETE FROM owned_cards WHERE user_id = ? AND id IN (${placeholders})`).run(userId, ...numericIds);
+    db.prepare("INSERT INTO owned_cards (user_id, card_id, rating, xp, is_in_xi, slot, acquired_from, version) VALUES (?, ?, ?, 0, 0, NULL, 'purple_exchange', 'purple')").run(userId, reward.id, reward.base_rating);
+    db.exec("COMMIT");
+  } catch (error) {
+    db.exec("ROLLBACK");
+    return { error: "Could not complete the exchange." };
+  }
+  return { card: { ...reward, version: "purple" }, count: ownedCount(userId) };
+}
+
 const PACK_TYPES = [
-  { key: "daily", name: "Daily Free Pack", cost: { type: "free" }, cardCount: 3, image: "🎁", description: "Free every day. Streak bonus inside." },
-  { key: "basic", name: "Basic Pack", cost: { type: "coins", amount: 100 }, cardCount: 3, image: "📦", description: "Three players from the pool." },
-  { key: "gold", name: "Gold Pack", cost: { type: "coins", amount: 1000 }, cardCount: 5, image: "🌟", description: "Five players with a higher chance of a 70+ rated star." },
-  { key: "gem", name: "Gem Pack", cost: { type: "gems", amount: 50 }, cardCount: 5, image: "💎", description: "Guaranteed one 72+ rated player." },
+  { key: "daily", name: "Daily Free Pack", cost: { type: "free" }, cardCount: 3, image: "🎁", description: "Free every day. Streak bonus inside.", odds: { bronze: 0.8, silver: 0.2 } },
+  { key: "basic", name: "100 Coins Pack", cost: { type: "coins", amount: 100 }, cardCount: 3, image: "📦", description: "Three players from the pool.", odds: { bronze: 0.67, silver: 0.33 } },
+  { key: "gem50", name: "50 Gems Pick", cost: { type: "gems", amount: 50 }, image: "🎯", description: "Choose 1 of 3 players rated 70-75.", pick: { rounds: 1, optionsPerPick: 3, minRating: 70, maxRating: 75 } },
+  { key: "gem100", name: "100 Gems Pick", cost: { type: "gems", amount: 100 }, image: "💎", description: "Choose 1 of 3 star players rated 73-75.", pick: { rounds: 1, optionsPerPick: 3, minRating: 73, maxRating: 75 } },
+  { key: "gem1000", name: "1000 Coins Pick", cost: { type: "coins", amount: 1000 }, image: "👑", description: "Three picks — choose 1 of 3 players rated 70-75 each.", pick: { rounds: 3, optionsPerPick: 3, minRating: 70, maxRating: 75 } },
 ];
 
 const QUEST_SEEDS = [
@@ -85,6 +140,22 @@ const QUEST_SEEDS = [
   { key: "GOALS_5", title: "Score 5 goals", description: "Score five goals across matches.", type: "goals_scored", requirement: 5, reward_coins: 600, reward_gems: 0, reward_pack: null, reset_daily: 1 },
   { key: "WIN_5", title: "Win 5 matches", description: "Win five matches this week.", type: "matches_won", requirement: 5, reward_coins: 1500, reward_gems: 100, reward_pack: "gold", reset_daily: 0 },
   { key: "GOALS_15", title: "Score 15 goals", description: "Score fifteen goals this week.", type: "goals_scored", requirement: 15, reward_coins: 2000, reward_gems: 0, reward_pack: null, reset_daily: 0 },
+];
+
+// Event quests are claim-once per event season. Difficulty maps to a fixed
+// reward so harder objectives pay more: easy 300 coins, medium 500 coins,
+// hard 30 gems, epic 50 gems.
+const EVENT_QUEST_SEEDS = [
+  { key: "EV_WIN_1", title: "Win an event match", description: "Win any match during the event.", type: "matches_won", requirement: 1, reward_coins: 300, reward_gems: 0, difficulty: "easy" },
+  { key: "EV_SCORE_3", title: "Score 3 goals", description: "Score three goals in event matches.", type: "goals_scored", requirement: 3, reward_coins: 300, reward_gems: 0, difficulty: "easy" },
+  { key: "EV_PLAY_5", title: "Play 5 matches", description: "Finish five matches during the event.", type: "matches_played", requirement: 5, reward_coins: 300, reward_gems: 0, difficulty: "easy" },
+  { key: "EV_WIN_3", title: "Win 3 matches", description: "Win three matches in the event window.", type: "matches_won", requirement: 3, reward_coins: 500, reward_gems: 0, difficulty: "medium" },
+  { key: "EV_SCORE_10", title: "Score 10 goals", description: "Score ten goals during the event.", type: "goals_scored", requirement: 10, reward_coins: 500, reward_gems: 0, difficulty: "medium" },
+  { key: "EV_OPEN_3", title: "Open 3 packs", description: "Open any three packs during the event.", type: "packs_opened", requirement: 3, reward_coins: 500, reward_gems: 0, difficulty: "medium" },
+  { key: "EV_WIN_8", title: "Win 8 matches", description: "Win eight matches — a serious run.", type: "matches_won", requirement: 8, reward_coins: 0, reward_gems: 30, difficulty: "hard" },
+  { key: "EV_SCORE_20", title: "Score 20 goals", description: "Score twenty goals in event matches.", type: "goals_scored", requirement: 20, reward_coins: 0, reward_gems: 30, difficulty: "hard" },
+  { key: "EV_WIN_15", title: "Win 15 matches", description: "Win fifteen matches — an elite run.", type: "matches_won", requirement: 15, reward_coins: 0, reward_gems: 50, difficulty: "epic" },
+  { key: "EV_SCORE_40", title: "Score 40 goals", description: "Score forty goals across the event.", type: "goals_scored", requirement: 40, reward_coins: 0, reward_gems: 50, difficulty: "epic" },
 ];
 
 function todayBucket() { return new Date().toISOString().slice(0, 10); }
@@ -111,6 +182,21 @@ function seedQuests() {
   }
 }
 seedQuests();
+db.prepare("UPDATE quests SET reward_pack = 'gem100' WHERE key = 'WIN_5' AND reward_pack = 'gold'").run();
+
+const EVENT_BUCKET = "event-s1";
+
+function seedEventQuests() {
+  if (db.prepare("SELECT COUNT(*) AS c FROM event_quests").get().c > 0) return;
+  const insert = db.prepare(`
+    INSERT INTO event_quests (key, title, description, type, requirement, reward_coins, reward_gems, difficulty)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+  for (const q of EVENT_QUEST_SEEDS) {
+    insert.run(q.key, q.title, q.description, q.type, q.requirement, q.reward_coins, q.reward_gems, q.difficulty);
+  }
+}
+seedEventQuests();
 
 function addCoins(userId, amount) { db.prepare("UPDATE users SET coins = coins + ? WHERE id = ?").run(amount, userId); }
 function addGems(userId, amount) { db.prepare("UPDATE users SET gems = gems + ? WHERE id = ?").run(amount, userId); }
@@ -130,23 +216,52 @@ function addXp(userId, amount) {
   return { xp, level, leveledUp: bonusCoins > 0, bonusCoins };
 }
 
-function drawCards(packKey, cardCount) {
+function drawCards(pack, cardCount) {
   const pool = db.prepare("SELECT * FROM cards").all();
+  const odds = pack.odds;
   const selected = [];
   for (let i = 0; i < cardCount; i++) {
     let candidates = pool.filter((c) => !selected.includes(c.id));
-    if (packKey === "gold" && Math.random() < 0.4) {
-      const high = candidates.filter((c) => c.base_rating >= 70);
-      if (high.length) candidates = high;
-    }
-    if (packKey === "gem" && i === cardCount - 1) {
-      const top = candidates.filter((c) => c.base_rating >= 72);
-      if (top.length) candidates = top;
+    if (odds) {
+      let roll = Math.random();
+      let tier = Object.keys(odds)[0];
+      for (const key of Object.keys(odds)) {
+        if (roll < odds[key]) { tier = key; break; }
+        roll -= odds[key];
+      }
+      const [lo, hi] = TIER_RANGE[tier] || [0, 99];
+      const tiered = candidates.filter((c) => c.base_rating >= lo && c.base_rating <= hi);
+      if (tiered.length) candidates = tiered;
     }
     if (!candidates.length) break;
     selected.push(candidates[Math.floor(Math.random() * candidates.length)].id);
   }
   return pool.filter((c) => selected.includes(c.id));
+}
+
+const pendingPicks = new Map();
+
+function buildPickRounds(pool, pick) {
+  const used = new Set();
+  const rounds = [];
+  for (let r = 0; r < pick.rounds; r++) {
+    const candidates = pool.filter((c) => !used.has(c.id) && c.base_rating >= pick.minRating && c.base_rating <= pick.maxRating);
+    const options = [];
+    for (let i = 0; i < pick.optionsPerPick && candidates.length; i++) {
+      options.push(candidates.splice(Math.floor(Math.random() * candidates.length), 1)[0].id);
+    }
+    for (const id of options) used.add(id);
+    rounds.push({ round: r + 1, options });
+  }
+  return rounds;
+}
+
+function prunePendingPicks() {
+  if (pendingPicks.size <= 500) return;
+  for (const key of pendingPicks.keys()) {
+    pendingPicks.delete(key);
+    if (pendingPicks.size <= 250) break;
+  }
 }
 
 const WELCOME_CARDS = 15;
@@ -218,7 +333,8 @@ function openPack(userId, packKey, options = {}) {
   if (!user) return { error: "Account not found." };
 
   const owned = ownedCount(userId);
-  if (owned + pack.cardCount > INVENTORY_LIMIT) {
+  const needed = pack.pick ? pack.pick.rounds : pack.cardCount;
+  if (owned + needed > INVENTORY_LIMIT) {
     return { error: `Inventory full (${owned}/${INVENTORY_LIMIT}). Exchange players to make room.` };
   }
 
@@ -238,18 +354,60 @@ function openPack(userId, packKey, options = {}) {
     db.prepare("UPDATE users SET gems = gems - ? WHERE id = ?").run(pack.cost.amount, userId);
   }
 
-  const cards = drawCards(pack.key, pack.cardCount);
+  let cards = [];
+  let pick = null;
+  if (pack.pick) {
+    const pool = db.prepare("SELECT * FROM cards").all();
+    const rounds = buildPickRounds(pool, pack.pick);
+    const pickId = randomUUID();
+    pendingPicks.set(pickId, { userId, packKey, rounds });
+    const byId = new Map(pool.map((c) => [c.id, c]));
+    pick = { pickId, total: rounds.length, rounds: rounds.map((r) => ({ round: r.round, options: r.options.map((id) => byId.get(id)) })) };
+  } else {
+    cards = drawCards(pack, pack.cardCount);
+    const insert = db.prepare("INSERT INTO owned_cards (user_id, card_id, rating, xp, is_in_xi, slot, acquired_from) VALUES (?, ?, ?, 0, 0, NULL, ?)");
+    const drawnIds = [];
+    for (const card of cards) {
+      insert.run(userId, card.id, card.base_rating, pack.key);
+      drawnIds.push(card.id);
+    }
+    db.prepare("INSERT INTO pack_logs (user_id, pack_key, card_ids) VALUES (?, ?, ?)").run(userId, pack.key, JSON.stringify(drawnIds));
+  }
+  bumpQuest(userId, "packs_opened", 1);
+
+  const updated = db.prepare("SELECT * FROM users WHERE id = ?").get(userId);
+  return { pack: { key: pack.key, name: pack.name }, cards, pick, bonus, user: publicUser(updated) };
+}
+
+function confirmPackPick(userId, pickId, selections) {
+  const entry = pendingPicks.get(pickId);
+  if (!entry || entry.userId !== userId) return { error: "Pick session not found or expired." };
+  const pack = PACK_TYPES.find((p) => p.key === entry.packKey);
+  if (!pack || !pack.pick) return { error: "Unknown pack." };
+  if (!Array.isArray(selections) || selections.length !== entry.rounds.length) {
+    return { error: `Pick exactly ${entry.rounds.length} player${entry.rounds.length > 1 ? "s" : ""}.` };
+  }
+  const pool = db.prepare("SELECT * FROM cards").all();
+  const byId = new Map(pool.map((c) => [c.id, c]));
+  const picked = [];
+  for (let i = 0; i < entry.rounds.length; i++) {
+    const cardId = Number(selections[i]);
+    if (!entry.rounds[i].options.includes(cardId)) return { error: `Pick ${i + 1} is invalid.` };
+    const card = byId.get(cardId);
+    if (!card) return { error: "Invalid player." };
+    picked.push(card);
+  }
   const insert = db.prepare("INSERT INTO owned_cards (user_id, card_id, rating, xp, is_in_xi, slot, acquired_from) VALUES (?, ?, ?, 0, 0, NULL, ?)");
   const drawnIds = [];
-  for (const card of cards) {
+  for (const card of picked) {
     insert.run(userId, card.id, card.base_rating, pack.key);
     drawnIds.push(card.id);
   }
   db.prepare("INSERT INTO pack_logs (user_id, pack_key, card_ids) VALUES (?, ?, ?)").run(userId, pack.key, JSON.stringify(drawnIds));
-  bumpQuest(userId, "packs_opened", 1);
-
+  pendingPicks.delete(pickId);
+  prunePendingPicks();
   const updated = db.prepare("SELECT * FROM users WHERE id = ?").get(userId);
-  return { pack: { key: pack.key, name: pack.name }, cards, bonus, user: publicUser(updated) };
+  return { pack: { key: pack.key, name: pack.name }, cards: picked, user: publicUser(updated) };
 }
 
 function bumpQuest(userId, type, amount) {
@@ -263,6 +421,18 @@ function bumpQuest(userId, type, amount) {
       db.prepare("UPDATE quest_progress SET progress = ?, claimed_at = NULL, bucket = ? WHERE id = ?").run(Math.min(amount, q.requirement), bucket, row.id);
     } else if (!row.claimed_at) {
       db.prepare("UPDATE quest_progress SET progress = ? WHERE id = ?").run(Math.min(row.progress + amount, q.requirement), row.id);
+    }
+  }
+
+  const eventQuests = db.prepare("SELECT * FROM event_quests WHERE type = ?").all(type);
+  for (const q of eventQuests) {
+    const row = db.prepare("SELECT * FROM event_quest_progress WHERE user_id = ? AND quest_id = ?").get(userId, q.id);
+    if (!row) {
+      db.prepare("INSERT INTO event_quest_progress (user_id, quest_id, progress, claimed_at, bucket) VALUES (?, ?, ?, NULL, ?)").run(userId, q.id, Math.min(amount, q.requirement), EVENT_BUCKET);
+    } else if (row.bucket !== EVENT_BUCKET) {
+      db.prepare("UPDATE event_quest_progress SET progress = ?, claimed_at = NULL, bucket = ? WHERE id = ?").run(Math.min(amount, q.requirement), EVENT_BUCKET, row.id);
+    } else if (!row.claimed_at) {
+      db.prepare("UPDATE event_quest_progress SET progress = ? WHERE id = ?").run(Math.min(row.progress + amount, q.requirement), row.id);
     }
   }
 }
@@ -300,6 +470,35 @@ function claimQuest(userId, questId) {
 
   const updated = db.prepare("SELECT * FROM users WHERE id = ?").get(userId);
   return { questId, reward: { coins: q.reward_coins, gems: q.reward_gems, pack: q.reward_pack }, user: publicUser(updated) };
+}
+
+function eventQuestsFor(userId) {
+  return db.prepare("SELECT * FROM event_quests ORDER BY id ASC").all().map((q) => {
+    const row = db.prepare("SELECT * FROM event_quest_progress WHERE user_id = ? AND quest_id = ?").get(userId, q.id);
+    const stale = Boolean(row && row.bucket !== EVENT_BUCKET);
+    const progress = stale ? 0 : (row?.progress || 0);
+    const claimed = Boolean(row && !stale && row.claimed_at);
+    return { ...q, progress, claimable: !claimed && progress >= q.requirement, claimed };
+  });
+}
+
+function claimEventQuest(userId, questId) {
+  const q = db.prepare("SELECT * FROM event_quests WHERE id = ?").get(questId);
+  if (!q) return { error: "Event quest not found." };
+  const row = db.prepare("SELECT * FROM event_quest_progress WHERE user_id = ? AND quest_id = ?").get(userId, questId);
+  const fresh = Boolean(row && row.bucket === EVENT_BUCKET);
+  const progress = fresh ? row.progress : 0;
+  if (progress < q.requirement) return { error: "Event quest not complete yet." };
+  if (fresh && row.claimed_at) return { error: "Reward already claimed." };
+
+  if (q.reward_coins) addCoins(userId, q.reward_coins);
+  if (q.reward_gems) addGems(userId, q.reward_gems);
+
+  if (fresh) db.prepare("UPDATE event_quest_progress SET claimed_at = datetime('now') WHERE id = ?").run(row.id);
+  else db.prepare("INSERT INTO event_quest_progress (user_id, quest_id, progress, claimed_at, bucket) VALUES (?, ?, ?, datetime('now'), ?)").run(userId, questId, q.requirement, EVENT_BUCKET);
+
+  const updated = db.prepare("SELECT * FROM users WHERE id = ?").get(userId);
+  return { questId, reward: { coins: q.reward_coins, gems: q.reward_gems }, user: publicUser(updated) };
 }
 
 const OUTCOME_RATES = { win: { coins: 300, xp: 40 }, loss: { coins: 120, xp: 20 }, draw: { coins: 200, xp: 30 } };
@@ -348,4 +547,4 @@ function resolveMatchRewards(room) {
   return rewards;
 }
 
-module.exports = { PACK_TYPES, openPack, questsFor, claimQuest, bumpQuest, resolveMatchRewards, grantWelcomeGift, todayBucket, ownedCount, exchangeForGuaranteed, INVENTORY_LIMIT, INVENTORY_WARN_AT };
+module.exports = { PACK_TYPES, openPack, confirmPackPick, questsFor, claimQuest, bumpQuest, resolveMatchRewards, grantWelcomeGift, todayBucket, ownedCount, exchangeForGuaranteed, exchangeForPurple, PURPLE_REQUIREMENTS, PURPLE_REWARD_RANGE, eventQuestsFor, claimEventQuest, INVENTORY_LIMIT, INVENTORY_WARN_AT };

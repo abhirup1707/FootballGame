@@ -1,7 +1,7 @@
 const express = require("express");
 const { db } = require("./db");
 const { hashPassword, verifyPassword, publicUser, createSession, userByToken, deleteSession } = require("./auth");
-const { PACK_TYPES, openPack, questsFor, claimQuest, grantWelcomeGift, todayBucket, exchangeForGuaranteed, INVENTORY_LIMIT, INVENTORY_WARN_AT } = require("./economy");
+const { PACK_TYPES, openPack, confirmPackPick, questsFor, claimQuest, grantWelcomeGift, todayBucket, exchangeForGuaranteed, exchangeForPurple, PURPLE_REQUIREMENTS, PURPLE_REWARD_RANGE, eventQuestsFor, claimEventQuest, INVENTORY_LIMIT, INVENTORY_WARN_AT } = require("./economy");
 const { effectiveRating } = require("./ovr");
 
 const router = express.Router();
@@ -176,8 +176,18 @@ router.post("/team", requireAuth, (req, res) => {
 });
 
 router.get("/packs", requireAuth, (req, res) => {
+  const pool = db.prepare("SELECT * FROM cards").all();
+  const bronze = pool.filter((c) => c.base_rating < 70).length;
+  const silver = pool.filter((c) => c.base_rating >= 70 && c.base_rating < 80).length;
+  const total = bronze + silver || 1;
+  const poolOdds = { bronze: Math.round((bronze / total) * 100), silver: Math.round((silver / total) * 100) };
+  const toPercent = (odds) => Object.fromEntries(Object.entries(odds).map(([k, v]) => [k, Math.round(v * 100)]));
   res.json({
-    packs: PACK_TYPES.map((p) => ({ key: p.key, name: p.name, cost: p.cost, cardCount: p.cardCount, image: p.image, description: p.description })),
+    packs: PACK_TYPES.map((p) => ({
+      key: p.key, name: p.name, cost: p.cost, cardCount: p.cardCount || null, image: p.image, description: p.description,
+      odds: p.odds ? toPercent(p.odds) : (p.pick ? null : poolOdds),
+      pick: p.pick ? { rounds: p.pick.rounds, optionsPerPick: p.pick.optionsPerPick, minRating: p.pick.minRating, maxRating: p.pick.maxRating } : null,
+    })),
     daily: { claimed: req.user.last_claimed_daily === todayBucket(), streak: req.user.streak || 0 },
   });
 });
@@ -188,10 +198,84 @@ router.post("/packs/open", requireAuth, (req, res) => {
   res.json(result);
 });
 
+router.post("/packs/pick", requireAuth, (req, res) => {
+  const result = confirmPackPick(req.user.id, req.body?.pickId, req.body?.selections);
+  if (result.error) return res.status(400).json({ error: result.error });
+  res.json(result);
+});
+
 router.get("/quests", requireAuth, (req, res) => res.json({ quests: questsFor(req.user.id) }));
 
 router.post("/quests/claim", requireAuth, (req, res) => {
   const result = claimQuest(req.user.id, Number(req.body?.questId));
+  if (result.error) return res.status(400).json({ error: result.error });
+  res.json(result);
+});
+
+// Curated events feed. Statuses are computed from timestamps so the feed
+// genuinely shifts between upcoming / live / ending soon over time.
+const HOUR = 60 * 60 * 1000;
+const DAY = 24 * HOUR;
+const EVENT_CATALOG = [
+  {
+    id: "new-beginnings",
+    icon: "🌅",
+    title: "New Beginnings",
+    desc: "Season 1 is here — trade in your players for a guaranteed Ultimate Icons purple card rated 77-80.",
+    tag: "SEASON 1",
+    reward: "guaranteed 77-80 purple card",
+    startAt: Date.now() - 1 * DAY,
+    endAt: Date.now() + 30 * DAY,
+  },
+];
+
+function eventStatus(ev) {
+  const now = Date.now();
+  if (now < ev.startAt) return "upcoming";
+  if (now > ev.endAt) return "ended";
+  return ev.endAt - now < 24 * HOUR ? "ending" : "ongoing";
+}
+
+const EVENT_TAGS = { ongoing: "LIVE", ending: "ENDING SOON" };
+
+router.get("/events", requireAuth, (req, res) => {
+  const now = Date.now();
+  const events = EVENT_CATALOG
+    .filter((ev) => {
+      const status = eventStatus(ev);
+      return status === "ongoing" || status === "ending";
+    })
+    .map((ev) => {
+      const status = eventStatus(ev);
+      let label;
+      let tag;
+      if (status === "ongoing") { label = `Live · ends in ${Math.ceil((ev.endAt - now) / DAY)}d`; tag = EVENT_TAGS.ongoing; }
+      else { label = `Ends in ${Math.ceil((ev.endAt - now) / HOUR)}h`; tag = EVENT_TAGS.ending; }
+      return { ...ev, status, tag, label };
+    });
+  const previewPool = db.prepare("SELECT * FROM cards WHERE base_rating BETWEEN ? AND ?").all(PURPLE_REWARD_RANGE.min, PURPLE_REWARD_RANGE.max);
+  const previews = previewPool
+    .map((c) => ({ ...c, version: "purple" }))
+    .sort(() => Math.random() - 0.5);
+  res.json({
+    events,
+    quests: eventQuestsFor(req.user.id),
+    exchange: {
+      requirements: PURPLE_REQUIREMENTS,
+      reward: { min: PURPLE_REWARD_RANGE.min, max: PURPLE_REWARD_RANGE.max },
+      previews,
+    },
+  });
+});
+
+router.post("/events/quests/claim", requireAuth, (req, res) => {
+  const result = claimEventQuest(req.user.id, Number(req.body?.questId));
+  if (result.error) return res.status(400).json({ error: result.error });
+  res.json(result);
+});
+
+router.post("/events/exchange", requireAuth, (req, res) => {
+  const result = exchangeForPurple(req.user.id, req.body?.ids);
   if (result.error) return res.status(400).json({ error: result.error });
   res.json(result);
 });
