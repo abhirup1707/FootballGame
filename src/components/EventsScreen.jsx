@@ -80,6 +80,7 @@ export default function EventsScreen({ onBack }) {
   };
 
   const cardRating = (card) => card.base_rating ?? card.rating;
+  const isPurple = (card) => card.version === "purple" || (cardRating(card) >= 77 && cardRating(card) <= 80);
 
   const toggle = (card) => {
     const rating = cardRating(card);
@@ -212,8 +213,8 @@ export default function EventsScreen({ onBack }) {
           const eligible = !inXI.has(card.id) && Boolean(exchange?.requirements.some((g) => rating >= g.min && rating <= g.max));
           const isSelected = selected.some((c) => c.id === card.id);
           return (
-            <button key={card.id} className={`owned-card exchg ${card.version === "purple" ? "owned-card-purple" : ""} ${isSelected ? "exchg-selected" : ""} ${!eligible ? "exchg-disabled" : ""}`} disabled={!eligible} onClick={() => toggle(card)}>
-              <div className={`owned-card-art ${card.version === "purple" ? "owned-card-art-purple" : ""}`}>{card.image ? <img src={card.image} alt="" /> : <span>{card.name.split(/\s+/).slice(0, 2).map((p) => p[0]).join("").slice(0, 3) || card.name.slice(0, 3)}</span>}</div>
+            <button key={card.id} className={`owned-card exchg ${isPurple(card) ? "owned-card-purple" : ""} ${isSelected ? "exchg-selected" : ""} ${!eligible ? "exchg-disabled" : ""}`} disabled={!eligible} onClick={() => toggle(card)}>
+              <div className={`owned-card-art ${isPurple(card) ? "owned-card-art-purple" : ""}`}>{card.image ? <img src={card.image} alt="" /> : <span>{card.name.split(/\s+/).slice(0, 2).map((p) => p[0]).join("").slice(0, 3) || card.name.slice(0, 3)}</span>}</div>
               <div className="owned-card-info"><small>{card.category}</small><b>{card.name}</b></div>
               <strong>{rating}</strong>
               {card.version === "purple" && <em className="xi-badge">P</em>}

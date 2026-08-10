@@ -45,7 +45,7 @@ export default function SquadBoard({
       : null;
     const rating = player ? (player.base_rating ?? player.rating) : null;
     const tier = player
-      ? player.version === "purple"
+      ? player.version === "purple" || (rating >= 77 && rating <= 80)
         ? "purple"
         : rating >= 80
           ? "gold"

@@ -40,7 +40,7 @@ function PlayerShadow() {
 export default function FcCard({ player, size = "md", className = "", onClick }) {
   const rating = player.rating ?? player.base_rating ?? 0;
   const position = player.position || player.category || "?";
-  const tier = player.version === "purple" ? "purple" : rating >= 70 ? "silver" : "bronze";
+  const tier = player.version === "purple" || (rating >= 77 && rating <= 80) ? "purple" : rating >= 70 ? "silver" : "bronze";
   const clickable = Boolean(onClick);
   return (
     <div className={`fcc fcc-${tier} fcc-${size} ${clickable ? "fcc-clickable" : ""} ${className}`} onClick={onClick}>

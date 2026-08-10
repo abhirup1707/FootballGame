@@ -164,6 +164,7 @@ export default function TeamScreen({ onBack }) {
 
   const cardRating = (card) => card.base_rating ?? card.rating;
   const isExchangable = (card) => cardRating(card) >= 60 && cardRating(card) <= 69;
+  const isPurple = (card) => card.version === "purple" || (cardRating(card) >= 77 && cardRating(card) <= 80);
 
   const toggleExchange = (card) => {
     setExchangeIds((current) => {
@@ -205,7 +206,7 @@ export default function TeamScreen({ onBack }) {
 
   const cardBody = (card, badge) => (
     <>
-      <div className={`owned-card-art ${card.version === "purple" ? "owned-card-art-purple" : ""}`}>{card.image ? <img src={card.image} alt="" /> : <span>{shortName(card.name)}</span>}</div>
+      <div className={`owned-card-art ${isPurple(card) ? "owned-card-art-purple" : ""}`}>{card.image ? <img src={card.image} alt="" /> : <span>{shortName(card.name)}</span>}</div>
       <div className="owned-card-info"><small>{countryFlagPath(card.nation) ? <img className="owned-card-nation" src={countryFlagPath(card.nation)} alt={card.nation} /> : null}{card.category}</small><b>{shortName(card.name)}</b></div>
       <strong>{cardRating(card)}</strong>
       {badge}
@@ -232,7 +233,7 @@ export default function TeamScreen({ onBack }) {
           const eligible = isExchangable(card) && !inXI;
           const selected = exchangeIds.includes(card.id);
           return (
-            <button key={card.id} className={`owned-card exchg ${card.version === "purple" ? "owned-card-purple" : ""} ${selected ? "exchg-selected" : ""} ${!eligible ? "exchg-disabled" : ""}`} disabled={!eligible} onClick={() => toggleExchange(card)}>
+            <button key={card.id} className={`owned-card exchg ${isPurple(card) ? "owned-card-purple" : ""} ${selected ? "exchg-selected" : ""} ${!eligible ? "exchg-disabled" : ""}`} disabled={!eligible} onClick={() => toggleExchange(card)}>
               {cardBody(card, inXI ? <em className="xi-badge exchg-xi">XI</em> : null)}
             </button>
           );
@@ -261,7 +262,7 @@ export default function TeamScreen({ onBack }) {
           const slot = Object.keys(positions).find((key) => positions[key]?.id === card.id);
           const inXI = Boolean(slot);
           return (
-            <button key={card.id} className={`owned-card pickable ${card.version === "purple" ? "owned-card-purple" : ""} ${inXI ? "in-xi" : ""} ${pickedCard?.id === card.id ? "selected" : ""}`} onClick={() => pickCard(card)}>
+            <button key={card.id} className={`owned-card pickable ${isPurple(card) ? "owned-card-purple" : ""} ${inXI ? "in-xi" : ""} ${pickedCard?.id === card.id ? "selected" : ""}`} onClick={() => pickCard(card)}>
               {cardBody(card, inXI ? <em className="xi-badge">{slot}</em> : null)}
             </button>
           );
