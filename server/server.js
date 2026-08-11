@@ -133,7 +133,8 @@ function finishMatch(room) {
   if (room.finished) return;
   room.finished = true;
   if (room.timer) clearInterval(room.timer);
-  const rewards = resolveMatchRewards(room);
+  let rewards = {};
+  try { rewards = resolveMatchRewards(room); } catch (error) { console.error(`[match] reward grant failed for room ${room.roomCode}:`, error.message); }
   io.to(room.roomCode).emit("matchFinished", { scoreA:room.scoreA, scoreB:room.scoreB, stats:room.stats, shootout:room.shootout || null, rewards });
 }
 function shootoutScore(room, id) { return room.shootout.kicks[id].filter(Boolean).length; }
@@ -184,7 +185,7 @@ function startMatchClock(room) {
       return;
     }
     const elapsed = Date.now() - room.matchStartedAt;
-    if (room.matchMode === "time" && elapsed >= room.timeLimit * 1000) {
+    if (room.matchMode === "time" && elapsed >= (room.timeLimit || 90) * 1000) {
       if (room.scoreA === room.scoreB) startShootout(room); else finishMatch(room);
     } else {
       if ((room.match?.phase === "PASS" || room.match?.phase === "GOAL") && room.match.deadline && Date.now() >= room.match.deadline && Object.keys(room.match.choices).length < 2) {
@@ -225,6 +226,7 @@ function resolveShootoutTick(room) {
 }
 function addStory(room, line) { room.commentary.unshift(line); room.commentary = room.commentary.slice(0, 5); }
 function startPossession(room, teamId, story, carrier) {
+  if (room.finished) return;
   room.possession = teamId;
   const team = room.teams[teamId];
   const openingCarrier = carrier || room.nextKickoffCarrier || randomItem([team.positions.CB1, team.positions.CB2].filter(Boolean));
@@ -266,6 +268,7 @@ function beginInterception(room, defendId, receiver, interceptor, story) {
   sendMatch(room);
   io.to(room.roomCode).emit("interceptionMade", { interceptor:interceptor.name, receiver:receiver.name });
   setTimeout(() => {
+    if (room.finished) return;
     if (room.match?.phase !== "INTERCEPTION") return;
     startPossession(room, defendId, `${room.players.find((p) => p.id === defendId).name} begin a new five-pass move with ${interceptor.name}.`, interceptor);
     sendMatch(room);
@@ -350,7 +353,7 @@ function resolveLongShot(room) {
     room.nextKickoffCarrier = midfieldKickoffPlayer(room.teams[defendId]);
     sendMatch(room);
     io.to(room.roomCode).emit("goalScored", { scorer:shooter.name, shot:"LONG", scoreA:room.scoreA, scoreB:room.scoreB, stats:room.stats });
-    setTimeout(() => { startPossession(room, defendId, `🔄 ${room.players.find((p) => p.id === defendId).name} restart after the goal.`); sendMatch(room); }, 2800);
+    setTimeout(() => { if (room.finished) return; startPossession(room, defendId, `🔄 ${room.players.find((p) => p.id === defendId).name} restart after the goal.`); sendMatch(room); }, 2800);
     return;
   }
   // Miss: most are straight at the keeper, some fly wide.
@@ -394,7 +397,7 @@ function resolveShot(room) {
     room.nextKickoffCarrier = midfieldKickoffPlayer(room.teams[defendId]);
     sendMatch(room);
     io.to(room.roomCode).emit("goalScored", { scorer:shooter.name, shot, scoreA:room.scoreA, scoreB:room.scoreB, stats:room.stats });
-    setTimeout(() => { startPossession(room, defendId, `🔄 ${room.players.find((p) => p.id === defendId).name} restart after the goal.`); sendMatch(room); }, 2800);
+    setTimeout(() => { if (room.finished) return; startPossession(room, defendId, `🔄 ${room.players.find((p) => p.id === defendId).name} restart after the goal.`); sendMatch(room); }, 2800);
     return true;
   } else {
     room.stats[defendId].saves += 1;

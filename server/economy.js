@@ -127,7 +127,7 @@ function exchangeForPurple(userId, ids) {
 
 const PACK_TYPES = [
   { key: "daily", name: "Daily Free Pack", cost: { type: "free" }, cardCount: 3, image: "🎁", description: "Free every day. Streak bonus inside.", odds: { bronze: 0.8, silver: 0.2 } },
-  { key: "basic", name: "100 Coins Pack", cost: { type: "coins", amount: 100 }, cardCount: 3, image: "📦", description: "Three players from the pool.", odds: { bronze: 0.67, silver: 0.33 } },
+  { key: "basic", name: "100 Coins Pack", cost: { type: "coins", amount: 100 }, cardCount: 3, image: "📦", description: "Three players rated 60-69.", odds: { bronze: 1 } },
   { key: "gem50", name: "50 Gems Pick", cost: { type: "gems", amount: 50 }, image: "🎯", description: "Choose 1 of 3 players rated 70-75.", pick: { rounds: 1, optionsPerPick: 3, minRating: 70, maxRating: 75 } },
   { key: "gem100", name: "100 Gems Pick", cost: { type: "gems", amount: 100 }, image: "💎", description: "Choose 1 of 3 star players rated 73-75.", pick: { rounds: 1, optionsPerPick: 3, minRating: 73, maxRating: 75 } },
   { key: "gem1000", name: "1000 Coins Pick", cost: { type: "coins", amount: 1000 }, image: "👑", description: "Three picks — choose 1 of 3 players rated 70-75 each.", pick: { rounds: 3, optionsPerPick: 3, minRating: 70, maxRating: 75 } },
