@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import socket from "../socket";
+import EmoteBar from "./EmoteBar";
 
 const directions = ["LEFT", "CENTER", "RIGHT"];
 const initials = (player) => player?.name?.split(" ").map((part) => part[0]).join("").slice(0, 2);
@@ -31,6 +32,7 @@ export default function PenaltyShootout({ room, data }) {
 
   return <main className="penalty-page">
     <header className="penalty-scorecard"><div><b>{room.players[0].name}</b><span>{markers(teamA)}</span></div><strong><small>SHOOTOUT</small>{shootoutScore(teamA)} – {shootoutScore(teamB)}</strong><div><span>{markers(teamB)}</span><b>{room.players[1].name}</b></div></header>
+    <EmoteBar roomCode={room.roomCode} />
     <section className="penalty-stage"><div className="shootout-kicker">PENALTY SHOOTOUT <small>{room.players.find((p) => p.id === attackingId)?.name} to take</small></div>
       {shootout.phase === "SELECT" ? <div className="shooter-select"><h1>Choose your penalty taker</h1><p>{isShooter ? "Pick any outfield player from your XI." : "Your opponent is selecting their taker."}</p><div>{candidates.map((player) => <button key={player.id} disabled={!isShooter} onClick={() => select(player.id)}>{player.image && <img src={player.image} alt="" />}<span>{player.name}</span><small>{player.rating} OVR</small></button>)}</div></div> : <><div className="goal-frame"><div className="goal-net" /><Portrait player={defendingTeam.positions.GK} side="keeper" label="GOALKEEPER" dive={keeperDive} /></div><div className="penalty-duel"><Portrait player={shootout.selectedShooter} side="shooter" label="PENALTY TAKER" />{result && <motion.div className={`penalty-ball ${result.goal ? "goal" : "save"}`} initial={{ y:110, x:0, scale:.5 }} animate={{ y:-210, x:result.shot === "LEFT" ? -125 : result.shot === "RIGHT" ? 125 : 0, scale:1.15 }}><span>⚽</span><b>{result.goal ? "GOAL!" : "SAVED!"}</b></motion.div>}</div>{shootout.phase === "DUEL" && <div className="penalty-controls"><div><small>{isShooter ? (choiceLocked ? "Direction locked — waiting" : "Choose where to shoot") : "Striker is choosing"}</small>{isShooter && <DirectionButtons onChoose={choose} disabled={choiceLocked} />}</div><div><small>{isKeeper ? (choiceLocked ? "Dive locked — waiting" : "Choose your goalkeeper dive") : "Goalkeeper is choosing"}</small>{isKeeper && <DirectionButtons onChoose={choose} disabled={choiceLocked} />}</div></div>}{shootout.phase === "RESULT" && <div className="penalty-result">{result.goal ? `${result.shooter.name} scores!` : `${result.keeper.name} makes the save!`}</div>}</>}</section>
   </main>;

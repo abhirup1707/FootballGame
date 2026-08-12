@@ -540,6 +540,15 @@ function claimQuest(userId, questId) {
   if (q.reward_pack) {
     const packResult = openPack(userId, q.reward_pack, { free: true });
     if (packResult.error) return { error: packResult.error };
+    if (packResult.pick) {
+      const best = packResult.pick.rounds.map((round) => {
+        const options = round.options || [];
+        return [...options].sort((a, b) => b.base_rating - a.base_rating || a.name.localeCompare(b.name))[0];
+      });
+      if (best.some((card) => !card)) return { error: "Could not grant the quest pack." };
+      const confirm = confirmPackPick(userId, packResult.pick.pickId, best.map((card) => card.id));
+      if (confirm.error) return { error: confirm.error };
+    }
   }
   if (q.reward_coins) addCoins(userId, q.reward_coins);
   if (q.reward_gems) addGems(userId, q.reward_gems);

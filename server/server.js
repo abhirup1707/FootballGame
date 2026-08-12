@@ -691,6 +691,13 @@ io.on("connection", (socket) => {
     rooms[roomCode] = reset;
     io.to(roomCode).emit("rematchConfirmed", { room });
   });
+  socket.on("sendEmote", ({ roomCode, emote }) => {
+    const room = rooms[roomCode];
+    if (!room || (!room.match && !room.shootout)) return;
+    const player = room.players.find((participant) => participant.id === socket.id);
+    if (!player || !["GG", "LAUGH", "CRY", "ANGRY", "SHUSH"].includes(emote)) return;
+    socket.to(roomCode).emit("opponentEmote", { emote, name: player.name });
+  });
   socket.on("leaveRoom", ({ roomCode }) => {
     const room = rooms[roomCode]; if (!room || !room.players.some((player) => player.id === socket.id)) return;
     if (room.timer) clearInterval(room.timer);

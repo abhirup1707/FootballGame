@@ -1569,3 +1569,20 @@ box-shadow:
 .opponent-incomplete{margin:10px 0 0;padding:8px 12px;border:1px dashed #ffd24a55;border-radius:11px;background:#2a250733;color:#ffe9b3;font-size:12px;font-weight:800;text-align:center}
 
 @media (max-width:520px){.events-cols{grid-template-columns:1fr}.events-live{grid-template-columns:1fr}.eq-top{align-items:flex-start}.eq-title b{white-space:normal}}
+
+/* ===== Background music toggle ===== */
+.music-toggle{position:fixed;right:16px;bottom:16px;z-index:90;display:flex;align-items:center;gap:8px}
+.music-btn{display:grid;place-items:center;width:46px;height:46px;border:1px solid #69dff444;border-radius:50%;background:#0a1b2bb8;font-size:20px;cursor:pointer;box-shadow:0 8px 22px #000a;transition:transform .15s ease,border-color .15s ease}
+.music-btn:hover{transform:translateY(-2px);border-color:#8aeaff}
+.music-btn.music-on{border-color:#8aeaff;box-shadow:0 0 20px #3ad8ff44}
+.music-vol{width:90px;accent-color:#3ad8ff;cursor:pointer}
+
+/* ===== In-match quick emotes ===== */
+.emote-bar{display:flex;gap:8px;justify-content:center;margin:0 auto 14px;flex-wrap:wrap;max-width:520px}
+.emote-btn{display:flex;align-items:center;gap:7px;padding:8px 14px;border:1px solid #33475c;border-radius:999px;background:#182433;color:#d7e1ec;font-size:13px;font-weight:800;cursor:pointer;transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease}
+.emote-btn span{font-size:17px}
+.emote-btn:hover{transform:translateY(-2px);border-color:#f9c846;box-shadow:0 0 14px #f9c84622}
+.emote-btn.cooling{opacity:.45;pointer-events:none}
+.emote-pop{position:fixed;bottom:118px;left:50%;z-index:70;display:flex;flex-direction:column;align-items:center;gap:4px;pointer-events:none}
+.emote-pop span{font-size:64px;filter:drop-shadow(0 6px 14px #000a)}
+.emote-pop small{padding:5px 12px;border-radius:999px;background:#0a1622e6;border:1px solid #f9c84655;color:#ffe9b3;font-size:12px;font-weight:900;letter-spacing:1px;white-space:nowrap}

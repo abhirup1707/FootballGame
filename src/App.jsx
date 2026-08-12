@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { AuthProvider, useAuth } from "./auth";
 import socket from "./socket";
+import { MusicProvider, useMusic } from "./music";
 import AuthGate from "./components/AuthGate";
 import Hub from "./components/Hub";
 import TeamScreen from "./components/TeamScreen";
@@ -12,11 +13,18 @@ import Lobby from "./components/Lobby";
 import Draft from "./components/Draft";
 import WelcomePopup from "./components/WelcomePopup";
 import LoginRewardPopup from "./components/LoginRewardPopup";
+import MusicToggle from "./components/MusicToggle";
 
 function Shell() {
   const { user, checking, token, welcomeGift, dismissWelcomeGift, refreshUser, loginReward, dismissLoginReward, claimLoginReward } = useAuth();
   const [screen, setScreen] = useState("hub");
   const [room, setRoom] = useState(null);
+  const { setMatch } = useMusic();
+
+  // Menu music ducks out while a match is running so it doesn't clash.
+  useEffect(() => {
+    setMatch(Boolean(room));
+  }, [room, setMatch]);
 
   useEffect(() => {
     if (token) socket.emit("authSocket", { token });
@@ -72,6 +80,7 @@ function Shell() {
   if (screen === "play") return <Lobby setRoom={setRoom} onBack={() => setScreen("hub")} />;
   return (
     <>
+      <MusicToggle />
       <Hub onNavigate={(next) => setScreen(next)} />
       {welcomeGift && <WelcomePopup gift={welcomeGift} onAccept={() => { dismissWelcomeGift(); refreshUser(); }} />}
       {!welcomeGift && loginReward?.available && (
@@ -82,5 +91,11 @@ function Shell() {
 }
 
 export default function App() {
-  return <AuthProvider><Shell /></AuthProvider>;
+  return (
+    <AuthProvider>
+      <MusicProvider>
+        <Shell />
+      </MusicProvider>
+    </AuthProvider>
+  );
 }
