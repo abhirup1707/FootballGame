@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "../auth";
 import api from "../api";
+import RewardedAd from "./RewardedAd";
 
 const NAV = [
   {
@@ -209,6 +210,8 @@ export default function Hub({ onNavigate }) {
             </motion.button>
           ))}
         </div>
+
+        <RewardedAd onReward={() => {}} />
 
         <button className="g-signout" onClick={logout}>
           Sign out

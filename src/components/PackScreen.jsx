@@ -5,6 +5,7 @@ import { useAuth } from "../auth";
 import FcCard from "./FcCard";
 import LoadingOverlay from "./LoadingOverlay";
 import WalkoutReveal from "./WalkoutReveal";
+import RewardedAd from "./RewardedAd";
 
 const TIER_LABEL = { bronze: "Bronze (60-69)", silver: "Silver (70-79)", gold: "Gold (80+)" };
 
@@ -118,6 +119,10 @@ export default function PackScreen({ onBack }) {
           <span className="pack-info-btn" onClick={() => setInfoPack(pack)} aria-label="Pack info">ⓘ</span>
         </div>;
       })}
+    </div>
+
+    <div style={{ margin: "18px 0" }}>
+      <RewardedAd onReward={load} />
     </div>
 
     <AnimatePresence>

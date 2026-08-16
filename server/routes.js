@@ -419,4 +419,32 @@ router.delete("/friends/:friendId", requireAuth, (req, res) => {
   res.json({ ok: true, list: friendsList(req.user.id) });
 });
 
+const AD_REWARD_COINS = 250;
+const AD_REWARD_COOLDOWN_MS = 60 * 60 * 1000;
+
+router.get("/reward/ad", requireAuth, (req, res) => {
+  const row = db.prepare("SELECT claimed_at FROM ad_rewards WHERE user_id = ? ORDER BY id DESC LIMIT 1").get(req.user.id);
+  if (row) {
+    const elapsed = Date.now() - new Date(row.claimed_at).getTime();
+    if (elapsed < AD_REWARD_COOLDOWN_MS) {
+      return res.json({ ok: true, cooldownMs: AD_REWARD_COOLDOWN_MS - elapsed, coins: AD_REWARD_COINS });
+    }
+  }
+  res.json({ ok: true, cooldownMs: 0, coins: AD_REWARD_COINS });
+});
+
+router.post("/reward/ad/claim", requireAuth, (req, res) => {
+  const row = db.prepare("SELECT claimed_at FROM ad_rewards WHERE user_id = ? ORDER BY id DESC LIMIT 1").get(req.user.id);
+  if (row) {
+    const elapsed = Date.now() - new Date(row.claimed_at).getTime();
+    if (elapsed < AD_REWARD_COOLDOWN_MS) {
+      return res.status(400).json({ error: "Reward not ready yet. Try again later.", cooldownMs: AD_REWARD_COOLDOWN_MS - elapsed });
+    }
+  }
+  db.prepare("INSERT INTO ad_rewards (user_id) VALUES (?)").run(req.user.id);
+  db.prepare("UPDATE users SET coins = coins + ? WHERE id = ?").run(AD_REWARD_COINS, req.user.id);
+  const user = publicUser(db.prepare("SELECT * FROM users WHERE id = ?").get(req.user.id));
+  res.json({ ok: true, coins: AD_REWARD_COINS, user });
+});
+
 module.exports = router;
