@@ -52,6 +52,22 @@ const NAV = [
     color: "#c77dff",
     tag: "LIVE",
   },
+  {
+    key: "players",
+    icon: "📊",
+    title: "Players list",
+    desc: "Search the full player database by name, position, nation, OVR & event.",
+    color: "#4fe3a0",
+    tag: "DATABASE",
+  },
+  {
+    key: "exchange",
+    icon: "🪙",
+    title: "Exchange",
+    desc: "Trade up your players and earn Footyverse tokens for 83-85 signings.",
+    color: "#ffd24a",
+    tag: "TRADES",
+  },
 ];
 
 export default function Hub({ onNavigate }) {

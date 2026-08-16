@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { countryFlagPath } from "../lib/countries";
+import { clubLogoPath, isLaligaCard, lastName } from "../lib/card";
 
 const STAT_ITEMS = [
   ["PAC", "pace"],
@@ -45,6 +46,8 @@ export default function WalkoutReveal({ card, packName, onDone }) {
 
   const rating = card.rating ?? card.base_rating ?? 0;
   const position = card.position || card.category || "?";
+  const laliga = isLaligaCard(card);
+  const clubLogo = laliga ? clubLogoPath(card.club) : null;
   const showFlag = stage >= 1;
   const showPos = stage >= 2;
   const showOvr = stage >= 3;
@@ -54,9 +57,11 @@ export default function WalkoutReveal({ card, packName, onDone }) {
 
   return (
     <motion.div className="pack-overlay walkout-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-      <div className="walkout-card walkout-purple">
+      <div className={`walkout-card walkout-${laliga ? "laliga" : "purple"}`}>
         <StageGlow />
         <div className="walkout-sheen" />
+        {clubLogo && <img className="walkout-club" src={clubLogo} alt="" aria-hidden="true" />}
+        {laliga && <span className="walkout-league">LALIGA</span>}
         <div className="walkout-head">
           <AnimatePresence>{showFlag && <motion.div key="flag" initial={{ opacity: 0, scale: .2, rotate: -30 }} animate={{ opacity: 1, scale: 1, rotate: 0 }} transition={{ type: "spring", stiffness: 240, damping: 14 }}><FlagReveal card={card} /></motion.div>}</AnimatePresence>
           <AnimatePresence>{showOvr && <motion.div key="ovr" className="walkout-ovr" initial={{ opacity: 0, y: -34, scale: .4 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ type: "spring", stiffness: 260, damping: 15 }}><b>{rating}</b><small>OVR</small></motion.div>}</AnimatePresence>
@@ -72,7 +77,7 @@ export default function WalkoutReveal({ card, packName, onDone }) {
                   ? <img src={card.image} alt={card.name} className="walkout-img" />
                   : <span className="walkout-silhouette">⚽</span>}
               </div>
-              <motion.h2 className="walkout-name" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: .25 }}>{card.name}</motion.h2>
+              <motion.h2 className="walkout-name" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: .25 }}>{lastName(card.name)}</motion.h2>
               <motion.div className="walkout-stats" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .45 }}>
                 {STAT_ITEMS.map(([label, key]) => <span className="walkout-stat" key={key}><em>{label}</em><b>{card[key] ?? "-"}</b></span>)}
               </motion.div>

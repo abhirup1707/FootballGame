@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
-import { slotCategory, effectiveRating } from "../lib/position";
+import { effectiveRating } from "../lib/position";
+import { clubLogoPath, isLaligaCard } from "../lib/card";
+import FORMATIONS from "../data/formations.json";
+
+const slotLabel = (slot) => slot.replace(/[0-9]+$/, "");
 
 export default function SquadBoard({
   positions,
@@ -9,7 +13,10 @@ export default function SquadBoard({
   onPickForSlot,
   pickedPlayer,
   onPlaceCard,
+  formation,
 }) {
+  const shape = formation ? FORMATIONS[formation] || FORMATIONS["4-3-3"] : FORMATIONS["4-3-3"];
+  const slotCategory = shape.slotCategory;
   const [selectedSlot, setSelectedSlot] = useState(null);
   const selectedPlayer = selectedSlot ? positions[selectedSlot] : null;
 
@@ -36,7 +43,7 @@ export default function SquadBoard({
     setSelectedSlot(null);
   };
 
-  function Position({ label, positionKey }) {
+  function Position({ positionKey }) {
     const player = positions[positionKey];
     const canReceive = Boolean(!readOnly && pickedPlayer);
     const category = player ? player.category || player.position : null;
@@ -45,14 +52,17 @@ export default function SquadBoard({
       : null;
     const rating = player ? (player.base_rating ?? player.rating) : null;
     const tier = player
-      ? player.version === "purple" || (rating >= 77 && rating <= 80)
-        ? "purple"
-        : rating >= 80
-          ? "gold"
-          : rating >= 70
-            ? "silver"
-            : "bronze"
+      ? isLaligaCard(player)
+        ? "laliga"
+        : player.version === "purple" || (rating >= 77 && rating <= 80)
+          ? "purple"
+          : rating >= 80
+            ? "gold"
+            : rating >= 70
+              ? "silver"
+              : "bronze"
       : "";
+    const laligaClub = isLaligaCard(player) ? clubLogoPath(player.club) : null;
     return (
       <button
         type="button"
@@ -63,12 +73,13 @@ export default function SquadBoard({
           player ? `squad-tier-${tier}` : ""
         }`}
         onClick={() => selectPosition(positionKey)}
-        aria-label={`${label} position`}
+        aria-label={`${slotLabel(positionKey)} position`}
       >
-        <span className="squad-role">{label}</span>
+        <span className="squad-role">{slotLabel(positionKey)}</span>
         {player ? (
           <>
             <span className="squad-card">
+              {laligaClub && <img className="squad-club-bg" src={laligaClub} alt="" aria-hidden="true" />}
               <span className="squad-avatar">
                 {player.image ? (
                   <img src={player.image} alt="" />
@@ -112,33 +123,19 @@ export default function SquadBoard({
     <div className="squad-panel">
       <div className="squad-panel-head">
         <h3>PLAYING XI</h3>
-        <span>4–3–3</span>
+        <span>{shape.name}</span>
       </div>
       {!readOnly && hint && <p className="squad-swap-hint">{hint}</p>}
-      <div className="pitch squad-pitch">
+      <div className="pitch squad-pitch" style={{ gridTemplateRows: `repeat(${shape.rows.length}, 1fr)` }}>
         <div className="penalty-box-top" />
         <div className="penalty-box-bottom" />
-        <div className="pitch-row forward-row">
-          <Position label="ST" positionKey="ST" />
-        </div>
-        <div className="pitch-row wing-row">
-          <Position label="LW" positionKey="LW" />
-          <Position label="CAM" positionKey="CAM" />
-          <Position label="RW" positionKey="RW" />
-        </div>
-        <div className="pitch-row midfield-row">
-          <Position label="CM" positionKey="CM1" />
-          <Position label="CM" positionKey="CM2" />
-        </div>
-        <div className="pitch-row defence-row">
-          <Position label="LB" positionKey="LB" />
-          <Position label="CB" positionKey="CB1" />
-          <Position label="CB" positionKey="CB2" />
-          <Position label="RB" positionKey="RB" />
-        </div>
-        <div className="pitch-row keeper-row">
-          <Position label="GK" positionKey="GK" />
-        </div>
+        {shape.rows.slice().reverse().map((row, rowIndex) => (
+          <div className="pitch-row" key={rowIndex} style={{ gridTemplateColumns: `repeat(${row.length}, minmax(0, 1fr))` }}>
+            {row.map((slot) => (
+              <Position key={slot} positionKey={slot} />
+            ))}
+          </div>
+        ))}
       </div>
       <div className="overall">
         <span>TEAM OVR</span>

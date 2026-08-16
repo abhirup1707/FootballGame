@@ -1,0 +1,50 @@
+{
+  "4-3-3": {
+    "name": "4-3-3",
+    "def": 4, "mid": 3, "att": 3,
+    "slots": ["GK", "LB", "CB1", "CB2", "RB", "CM1", "CM2", "CAM", "LW", "ST", "RW"],
+    "slotCategory": { "GK": "GK", "LB": "DEF", "CB1": "DEF", "CB2": "DEF", "RB": "DEF", "CM1": "MID", "CM2": "MID", "CAM": "MID", "LW": "ATT", "ST": "ATT", "RW": "ATT" },
+    "coords": { "GK": [50, 88], "LB": [17, 70], "CB1": [38, 74], "CB2": [62, 74], "RB": [83, 70], "CM1": [32, 53], "CM2": [68, 53], "CAM": [50, 43], "LW": [19, 25], "ST": [50, 18], "RW": [81, 25] },
+    "rows": [["GK"], ["LB", "CB1", "CB2", "RB"], ["CM1", "CM2"], ["CAM"], ["LW", "ST", "RW"]]
+  },
+  "4-4-2": {
+    "name": "4-4-2",
+    "def": 4, "mid": 4, "att": 2,
+    "slots": ["GK", "LB", "CB1", "CB2", "RB", "LM", "CM1", "CM2", "RM", "ST1", "ST2"],
+    "slotCategory": { "GK": "GK", "LB": "DEF", "CB1": "DEF", "CB2": "DEF", "RB": "DEF", "LM": "MID", "CM1": "MID", "CM2": "MID", "RM": "MID", "ST1": "ATT", "ST2": "ATT" },
+    "coords": { "GK": [50, 88], "LB": [17, 70], "CB1": [38, 74], "CB2": [62, 74], "RB": [83, 70], "LM": [17, 50], "CM1": [32, 53], "CM2": [68, 53], "RM": [83, 50], "ST1": [37, 16], "ST2": [63, 16] },
+    "rows": [["GK"], ["LB", "CB1", "CB2", "RB"], ["LM", "CM1", "CM2", "RM"], ["ST1", "ST2"]]
+  },
+  "3-5-2": {
+    "name": "3-5-2",
+    "def": 3, "mid": 5, "att": 2,
+    "slots": ["GK", "CB1", "CB2", "CB3", "LM", "CM1", "CM2", "CAM", "RM", "ST1", "ST2"],
+    "slotCategory": { "GK": "GK", "CB1": "DEF", "CB2": "DEF", "CB3": "DEF", "LM": "MID", "CM1": "MID", "CM2": "MID", "CAM": "MID", "RM": "MID", "ST1": "ATT", "ST2": "ATT" },
+    "coords": { "GK": [50, 88], "CB1": [32, 74], "CB2": [50, 74], "CB3": [68, 74], "LM": [17, 50], "CM1": [32, 53], "CM2": [68, 53], "CAM": [50, 43], "RM": [83, 50], "ST1": [37, 16], "ST2": [63, 16] },
+    "rows": [["GK"], ["CB1", "CB2", "CB3"], ["LM", "CM1", "CM2", "RM"], ["CAM"], ["ST1", "ST2"]]
+  },
+  "5-3-2": {
+    "name": "5-3-2",
+    "def": 5, "mid": 3, "att": 2,
+    "slots": ["GK", "LB", "CB1", "CB2", "CB3", "RB", "CM1", "CM2", "CAM", "ST1", "ST2"],
+    "slotCategory": { "GK": "GK", "LB": "DEF", "CB1": "DEF", "CB2": "DEF", "CB3": "DEF", "RB": "DEF", "CM1": "MID", "CM2": "MID", "CAM": "MID", "ST1": "ATT", "ST2": "ATT" },
+    "coords": { "GK": [50, 88], "LB": [13, 70], "CB1": [33, 74], "CB2": [50, 74], "CB3": [67, 74], "RB": [87, 70], "CM1": [32, 53], "CM2": [68, 53], "CAM": [50, 43], "ST1": [37, 16], "ST2": [63, 16] },
+    "rows": [["GK"], ["LB", "CB1", "CB2", "CB3", "RB"], ["CM1", "CM2"], ["CAM"], ["ST1", "ST2"]]
+  },
+  "3-4-3": {
+    "name": "3-4-3",
+    "def": 3, "mid": 4, "att": 3,
+    "slots": ["GK", "CB1", "CB2", "CB3", "CM1", "CM2", "RM", "LM", "LW", "ST", "RW"],
+    "slotCategory": { "GK": "GK", "CB1": "DEF", "CB2": "DEF", "CB3": "DEF", "CM1": "MID", "CM2": "MID", "RM": "MID", "LM": "MID", "LW": "ATT", "ST": "ATT", "RW": "ATT" },
+    "coords": { "GK": [50, 88], "CB1": [32, 74], "CB2": [50, 74], "CB3": [68, 74], "CM1": [32, 53], "CM2": [68, 53], "RM": [83, 50], "LM": [17, 50], "LW": [19, 25], "ST": [50, 18], "RW": [81, 25] },
+    "rows": [["GK"], ["CB1", "CB2", "CB3"], ["LM", "CM1", "CM2", "RM"], ["LW", "ST", "RW"]]
+  },
+  "4-2-3-1": {
+    "name": "4-2-3-1",
+    "def": 4, "mid": 3, "att": 3,
+    "slots": ["GK", "LB", "CB1", "CB2", "RB", "CDM1", "CDM2", "CAM", "LW", "ST", "RW"],
+    "slotCategory": { "GK": "GK", "LB": "DEF", "CB1": "DEF", "CB2": "DEF", "RB": "DEF", "CDM1": "MID", "CDM2": "MID", "CAM": "MID", "LW": "ATT", "ST": "ATT", "RW": "ATT" },
+    "coords": { "GK": [50, 88], "LB": [17, 70], "CB1": [38, 74], "CB2": [62, 74], "RB": [83, 70], "CDM1": [38, 58], "CDM2": [62, 58], "CAM": [50, 43], "LW": [19, 25], "ST": [50, 18], "RW": [81, 25] },
+    "rows": [["GK"], ["LB", "CB1", "CB2", "RB"], ["CDM1", "CDM2"], ["LW", "CAM", "RW"], ["ST"]]
+  }
+}

@@ -1,7 +1,7 @@
 const express = require("express");
 const { db } = require("./db");
 const { hashPassword, verifyPassword, publicUser, createSession, userByToken, deleteSession } = require("./auth");
-const { PACK_TYPES, openPack, confirmPackPick, questsFor, claimQuest, grantWelcomeGift, todayBucket, exchangeForGuaranteed, exchangeForPurple, PURPLE_REQUIREMENTS, PURPLE_REWARD_RANGE, eventQuestsFor, claimEventQuest, INVENTORY_LIMIT, INVENTORY_WARN_AT, loginRewardStatus, claimLoginReward, packPurchasesInWindow } = require("./economy");
+const { PACK_TYPES, openPack, confirmPackPick, questsFor, claimQuest, grantWelcomeGift, todayBucket, exchangeForGuaranteed, exchangeForPurple, PURPLE_REQUIREMENTS, PURPLE_REWARD_RANGE, eventQuestsFor, claimEventQuest, INVENTORY_LIMIT, INVENTORY_WARN_AT, loginRewardStatus, claimLoginReward, packPurchasesInWindow, TOKEN_RATES, TOKEN_REWARD_COST, TOKEN_REWARD_RANGE, exchangeForTokens, redeemTokenReward } = require("./economy");
 const { effectiveRating } = require("./ovr");
 
 const router = express.Router();
@@ -83,7 +83,7 @@ router.post("/login-reward/claim", requireAuth, (req, res) => {
 
 router.get("/cards", (req, res) => {
   const rows = db.prepare("SELECT * FROM cards ORDER BY category, base_rating DESC").all();
-  res.json({ cards: rows });
+  res.json({ cards: rows.map((c) => ({ ...c, version: c.variant === "laliga" ? "laliga" : c.version })) });
 });
 
 const LEADERBOARD_TYPES = ["wins", "goals", "saves"];
@@ -112,7 +112,7 @@ router.get("/leaderboard", (req, res) => {
 
 router.get("/inventory", requireAuth, (req, res) => {
   const rows = db.prepare(`
-    SELECT oc.*, c.name, c.season, c.club, c.nation, c.position, c.category, c.base_rating, c.tier, c.image
+    SELECT oc.*, c.name, c.season, c.club, c.nation, c.position, c.category, c.base_rating, c.tier, c.image, c.variant
     FROM owned_cards oc JOIN cards c ON c.id = oc.card_id
     WHERE oc.user_id = ?
     ORDER BY c.base_rating DESC, oc.id ASC
@@ -122,7 +122,7 @@ router.get("/inventory", requireAuth, (req, res) => {
 
 router.get("/team", requireAuth, (req, res) => {
   const rows = db.prepare(`
-    SELECT oc.*, c.name, c.season, c.club, c.nation, c.position, c.category, c.base_rating, c.tier, c.image
+    SELECT oc.*, c.name, c.season, c.club, c.nation, c.position, c.category, c.base_rating, c.tier, c.image, c.variant
     FROM owned_cards oc JOIN cards c ON c.id = oc.card_id
     WHERE oc.user_id = ? AND oc.is_in_xi = 1
   `).all(req.user.id);
@@ -137,7 +137,7 @@ router.get("/team/:userId", requireAuth, (req, res) => {
   const userId = Number(req.params.userId);
   if (!Number.isInteger(userId) || userId <= 0) return res.status(400).json({ error: "Invalid user id." });
   const rows = db.prepare(`
-    SELECT oc.*, c.name, c.season, c.club, c.nation, c.position, c.category, c.base_rating, c.tier, c.image
+    SELECT oc.*, c.name, c.season, c.club, c.nation, c.position, c.category, c.base_rating, c.tier, c.image, c.variant
     FROM owned_cards oc JOIN cards c ON c.id = oc.card_id
     WHERE oc.user_id = ? AND oc.is_in_xi = 1
   `).all(userId);
@@ -156,10 +156,14 @@ router.post("/team", requireAuth, (req, res) => {
   const ids = entries.map(([, id]) => Number(id));
   if (new Set(ids).size !== ids.length) return res.status(400).json({ error: "The same player cannot fill two slots." });
 
+  const seenNames = new Set();
   for (const [slot, id] of entries) {
     if (!SLOT_ORDER.includes(slot)) return res.status(400).json({ error: "Unknown slot." });
-    const owned = db.prepare("SELECT oc.*, c.category FROM owned_cards oc JOIN cards c ON c.id = oc.card_id WHERE oc.id = ? AND oc.user_id = ?").get(Number(id), req.user.id);
+    const owned = db.prepare("SELECT oc.*, c.category, c.name FROM owned_cards oc JOIN cards c ON c.id = oc.card_id WHERE oc.id = ? AND oc.user_id = ?").get(Number(id), req.user.id);
     if (!owned) return res.status(404).json({ error: "You don't own that player." });
+    const nameKey = String(owned.name || "").trim().toLowerCase();
+    if (nameKey && seenNames.has(nameKey)) return res.status(400).json({ error: "You can only have one copy of each player in your starting XI." });
+    seenNames.add(nameKey);
   }
 
   const clear = db.prepare("UPDATE owned_cards SET is_in_xi = 0, slot = NULL WHERE user_id = ?");
@@ -184,7 +188,7 @@ router.post("/team", requireAuth, (req, res) => {
 });
 
 router.get("/packs", requireAuth, (req, res) => {
-  const pool = db.prepare("SELECT * FROM cards").all();
+  const pool = db.prepare("SELECT * FROM cards WHERE variant = ''").all();
   const bronze = pool.filter((c) => c.base_rating < 70).length;
   const silver = pool.filter((c) => c.base_rating >= 70 && c.base_rating < 80).length;
   const total = bronze + silver || 1;
@@ -228,6 +232,16 @@ const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
 const EVENT_CATALOG = [
   {
+    id: "laliga-kickoff",
+    icon: "⚽",
+    title: "La Liga Kickoff",
+    desc: "50 of Spain's best from the 2025-26 season land as limited La Liga cards rated up to 85. Quests and packs drop soon.",
+    tag: "LALIGA 26/27",
+    reward: "limited La Liga cards up to 85",
+    startAt: Date.now() - 1 * HOUR,
+    endAt: Date.now() + 30 * DAY,
+  },
+  {
     id: "new-beginnings",
     icon: "🌅",
     title: "New Beginnings",
@@ -263,7 +277,7 @@ router.get("/events", requireAuth, (req, res) => {
       else { label = `Ends in ${Math.ceil((ev.endAt - now) / HOUR)}h`; tag = EVENT_TAGS.ending; }
       return { ...ev, status, tag, label };
     });
-  const previewPool = db.prepare("SELECT * FROM cards WHERE base_rating BETWEEN ? AND ?").all(PURPLE_REWARD_RANGE.min, PURPLE_REWARD_RANGE.max);
+  const previewPool = db.prepare("SELECT * FROM cards WHERE base_rating BETWEEN ? AND ? AND variant = ''").all(PURPLE_REWARD_RANGE.min, PURPLE_REWARD_RANGE.max);
   const previews = previewPool
     .map((c) => ({ ...c, version: "purple" }))
     .sort(() => Math.random() - 0.5);
@@ -292,6 +306,22 @@ router.post("/events/exchange", requireAuth, (req, res) => {
 
 router.post("/exchange", requireAuth, (req, res) => {
   const result = exchangeForGuaranteed(req.user.id, req.body?.ids);
+  if (result.error) return res.status(400).json({ error: result.error });
+  res.json(result);
+});
+
+router.get("/exchange/tokens", requireAuth, (req, res) => {
+  res.json({ rates: TOKEN_RATES, cost: TOKEN_REWARD_COST, reward: TOKEN_REWARD_RANGE, tokens: req.user.tokens || 0 });
+});
+
+router.post("/exchange/tokens", requireAuth, (req, res) => {
+  const result = exchangeForTokens(req.user.id, req.body?.ids);
+  if (result.error) return res.status(400).json({ error: result.error });
+  res.json(result);
+});
+
+router.post("/exchange/tokens/redeem", requireAuth, (req, res) => {
+  const result = redeemTokenReward(req.user.id);
   if (result.error) return res.status(400).json({ error: result.error });
   res.json(result);
 });

@@ -6,6 +6,7 @@ import SquadBoard from "./SquadBoard";
 import FcCard from "./FcCard";
 import { slotCategory, effectiveRating } from "../lib/position";
 import { countryFlagPath } from "../lib/countries";
+import { clubLogoPath, isLaligaCard, lastName } from "../lib/card";
 import LoadingOverlay from "./LoadingOverlay";
 
 const emptyPositions = () => ({ GK:null, LB:null, CB1:null, CB2:null, RB:null, CM1:null, CM2:null, CAM:null, LW:null, ST:null, RW:null });
@@ -84,7 +85,11 @@ export default function TeamScreen({ onBack }) {
     }
     setPositions((current) => {
       const next = { ...current };
-      Object.keys(next).forEach((key) => { if (next[key]?.id === pickedCard.id) next[key] = null; });
+      const nameKey = String(pickedCard.name || "").trim().toLowerCase();
+      Object.keys(next).forEach((key) => {
+        if (next[key]?.id === pickedCard.id) next[key] = null;
+        else if (nameKey && String(next[key]?.name || "").trim().toLowerCase() === nameKey) next[key] = null;
+      });
       next[slot] = pickedCard;
       return next;
     });
@@ -95,7 +100,11 @@ export default function TeamScreen({ onBack }) {
   const assign = (card) => {
     setPositions((current) => {
       const next = { ...current };
-      Object.keys(next).forEach((slot) => { if (next[slot]?.id === card.id) next[slot] = null; });
+      const nameKey = String(card.name || "").trim().toLowerCase();
+      Object.keys(next).forEach((slot) => {
+        if (next[slot]?.id === card.id) next[slot] = null;
+        else if (nameKey && String(next[slot]?.name || "").trim().toLowerCase() === nameKey) next[slot] = null;
+      });
       next[selectedSlot] = card;
       return next;
     });
@@ -133,7 +142,7 @@ export default function TeamScreen({ onBack }) {
 
   const autobuild = () => {
     if (inventory.length === 0) return;
-    const used = new Set();
+    const usedNames = new Set();
     const next = emptyPositions();
     const plan = [
       ["GK", ["GK"]],
@@ -143,23 +152,19 @@ export default function TeamScreen({ onBack }) {
     ];
     for (const [cat, slots] of plan) {
       const pool = inventory
-        .filter((c) => c.category === cat && !used.has(c.id))
+        .filter((c) => c.category === cat)
         .sort((a, b) => cardRating(b) - cardRating(a) || a.name.localeCompare(b.name));
-      slots.forEach((slot, i) => {
-        const card = pool[i];
-        if (card) { next[slot] = card; used.add(card.id); }
+      let cursor = 0;
+      slots.forEach((slot) => {
+        while (cursor < pool.length && usedNames.has(pool[cursor].name.trim().toLowerCase())) cursor++;
+        const card = pool[cursor];
+        if (card) { next[slot] = card; usedNames.add(card.name.trim().toLowerCase()); cursor++; }
       });
     }
     setSelectedSlot(null);
     setPositions(next);
     setDirty(true);
-    setNotice("Auto-built your best XI from your highest-rated players.");
-  };
-
-  const shortName = (name) => {
-    const parts = (name || "").trim().split(/\s+/).filter(Boolean);
-    if (parts.length <= 1) return name;
-    return `${parts[0][0]}. ${parts[parts.length - 1]}`;
+    setNotice("Auto-built your best XI from your highest-rated players — one copy of each player only.");
   };
 
   const cardRating = (card) => card.base_rating ?? card.rating;
@@ -204,14 +209,22 @@ export default function TeamScreen({ onBack }) {
 
   const tabs = <div className="category-tabs">{FILTERS.map((key) => <button key={key} className={filter === key ? "active" : ""} onClick={() => setFilter(key)}>{key}</button>)}</div>;
 
-  const cardBody = (card, badge) => (
-    <>
-      <div className={`owned-card-art ${isPurple(card) ? "owned-card-art-purple" : ""}`}>{card.image ? <img src={card.image} alt="" /> : <span>{shortName(card.name)}</span>}</div>
-      <div className="owned-card-info"><small>{countryFlagPath(card.nation) ? <img className="owned-card-nation" src={countryFlagPath(card.nation)} alt={card.nation} /> : null}{card.category}</small><b>{shortName(card.name)}</b></div>
-      <strong>{cardRating(card)}</strong>
-      {badge}
-    </>
-  );
+  const cardBody = (card, badge) => {
+    const laliga = isLaligaCard(card);
+    const club = laliga ? clubLogoPath(card.club) : null;
+    return (
+      <>
+        <div className={`owned-card-art ${isPurple(card) ? "owned-card-art-purple" : ""} ${laliga ? "owned-card-art-laliga" : ""}`}>
+          {club && <img className="owned-card-club-bg" src={club} alt="" aria-hidden="true" />}
+          {card.image ? <img src={card.image} alt="" /> : <span>{lastName(card.name)}</span>}
+          {laliga && <em className="laliga-mini-badge">LALIGA</em>}
+        </div>
+        <div className="owned-card-info"><small>{countryFlagPath(card.nation) ? <img className="owned-card-nation" src={countryFlagPath(card.nation)} alt={card.nation} /> : null}{card.category}</small><b>{lastName(card.name)}</b></div>
+        <strong>{cardRating(card)}</strong>
+        {badge}
+      </>
+    );
+  };
 
   const exchangePanel = (
     <>
@@ -233,7 +246,7 @@ export default function TeamScreen({ onBack }) {
           const eligible = isExchangable(card) && !inXI;
           const selected = exchangeIds.includes(card.id);
           return (
-            <button key={card.id} className={`owned-card exchg ${isPurple(card) ? "owned-card-purple" : ""} ${selected ? "exchg-selected" : ""} ${!eligible ? "exchg-disabled" : ""}`} disabled={!eligible} onClick={() => toggleExchange(card)}>
+            <button key={card.id} className={`owned-card exchg ${isPurple(card) ? "owned-card-purple" : ""} ${isLaligaCard(card) ? "owned-card-laliga" : ""} ${selected ? "exchg-selected" : ""} ${!eligible ? "exchg-disabled" : ""}`} disabled={!eligible} onClick={() => toggleExchange(card)}>
               {cardBody(card, inXI ? <em className="xi-badge exchg-xi">XI</em> : null)}
             </button>
           );
@@ -262,7 +275,7 @@ export default function TeamScreen({ onBack }) {
           const slot = Object.keys(positions).find((key) => positions[key]?.id === card.id);
           const inXI = Boolean(slot);
           return (
-            <button key={card.id} className={`owned-card pickable ${isPurple(card) ? "owned-card-purple" : ""} ${inXI ? "in-xi" : ""} ${pickedCard?.id === card.id ? "selected" : ""}`} onClick={() => pickCard(card)}>
+            <button key={card.id} className={`owned-card pickable ${isPurple(card) ? "owned-card-purple" : ""} ${isLaligaCard(card) ? "owned-card-laliga" : ""} ${inXI ? "in-xi" : ""} ${pickedCard?.id === card.id ? "selected" : ""}`} onClick={() => pickCard(card)}>
               {cardBody(card, inXI ? <em className="xi-badge">{slot}</em> : null)}
             </button>
           );

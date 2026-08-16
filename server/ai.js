@@ -20,7 +20,7 @@ function aiCard(row) {
 // team, medium matches it, hard sits above, and extreme takes the single best
 // player available in every position.
 function buildAiTeam(difficulty, userOvr) {
-  const cards = db.prepare("SELECT * FROM cards").all();
+  const cards = db.prepare("SELECT * FROM cards WHERE variant = ''").all();
   if (!cards.length) return null;
   const byCategory = (category) => cards.filter((card) => card.category === category).sort((a, b) => b.base_rating - a.base_rating);
   const offset = AI_OVR_OFFSET[difficulty] || 0;

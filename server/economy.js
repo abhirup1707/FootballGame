@@ -24,8 +24,8 @@ function loadClubCatalog() {
   return cards;
 }
 
-const INVENTORY_LIMIT = 50;
-const INVENTORY_WARN_AT = 35;
+const INVENTORY_LIMIT = 80;
+const INVENTORY_WARN_AT = 60;
 const EXCHANGE_REQUIRE_COUNT = 10;
 const EXCHANGE_MIN_RATING = 60;
 const EXCHANGE_MAX_RATING = 69;
@@ -58,7 +58,7 @@ function exchangeForGuaranteed(userId, ids) {
   const bad = owned.find((row) => row.base_rating < EXCHANGE_MIN_RATING || row.base_rating > EXCHANGE_MAX_RATING);
   if (bad) return { error: `Only players rated ${EXCHANGE_MIN_RATING}-${EXCHANGE_MAX_RATING} can be exchanged (${bad.name} is ${bad.base_rating}).` };
 
-  const pool = db.prepare("SELECT * FROM cards WHERE base_rating >= ?").all(EXCHANGE_REWARD_MIN_RATING);
+  const pool = db.prepare("SELECT * FROM cards WHERE base_rating >= ? AND variant = ''").all(EXCHANGE_REWARD_MIN_RATING);
   if (!pool.length) return { error: "No exchangeable rewards right now." };
   const reward = pool[Math.floor(Math.random() * pool.length)];
 
@@ -109,7 +109,7 @@ function exchangeForPurple(userId, ids) {
     }
   }
 
-  const pool = db.prepare("SELECT * FROM cards WHERE base_rating BETWEEN ? AND ?").all(PURPLE_REWARD_RANGE.min, PURPLE_REWARD_RANGE.max);
+  const pool = db.prepare("SELECT * FROM cards WHERE base_rating BETWEEN ? AND ? AND variant = ''").all(PURPLE_REWARD_RANGE.min, PURPLE_REWARD_RANGE.max);
   if (!pool.length) return { error: "No purple rewards available right now." };
   const reward = pool[Math.floor(Math.random() * pool.length)];
 
@@ -125,6 +125,80 @@ function exchangeForPurple(userId, ids) {
   return { card: { ...reward, version: "purple" }, count: ownedCount(userId) };
 }
 
+// Footyverse token economy: owned players can be traded in for tokens based on
+// their rating band, then tokens can be spent in the token shop.
+const TOKEN_RATES = [
+  { min: 70, max: 75, tokens: 2 },
+  { min: 76, max: 80, tokens: 3 },
+  { min: 81, max: 85, tokens: 5 },
+];
+const TOKEN_REWARD_COST = 60;
+const TOKEN_REWARD_RANGE = { min: 83, max: 85 };
+
+function tokenRateFor(rating) {
+  const band = TOKEN_RATES.find((b) => rating >= b.min && rating <= b.max);
+  return band ? band.tokens : 0;
+}
+
+// Trade owned players in for Footyverse tokens. Every selected player must be
+// owned, out of the starting XI, and rated within a token band (70-85).
+function exchangeForTokens(userId, ids) {
+  if (!Array.isArray(ids) || ids.length === 0) return { error: "Select at least one player to exchange." };
+  const numericIds = [...new Set(ids.map(Number))];
+  if (numericIds.length !== ids.length) return { error: "Duplicate players selected." };
+  if (numericIds.some((id) => !Number.isInteger(id) || id <= 0)) return { error: "Invalid player selection." };
+
+  const placeholders = numericIds.map(() => "?").join(",");
+  const owned = db.prepare(`
+    SELECT oc.*, c.base_rating, c.name
+    FROM owned_cards oc JOIN cards c ON c.id = oc.card_id
+    WHERE oc.user_id = ? AND oc.id IN (${placeholders})
+  `).all(userId, ...numericIds);
+  if (owned.length !== numericIds.length) return { error: "You don't own all the selected players." };
+  const inXI = owned.find((row) => row.is_in_xi === 1);
+  if (inXI) return { error: `Remove ${inXI.name} from your starting XI before exchanging.` };
+  const invalid = owned.find((row) => tokenRateFor(row.base_rating) === 0);
+  if (invalid) return { error: `Only players rated 70-85 earn tokens (${invalid.name} is ${invalid.base_rating}).` };
+
+  let awarded = 0;
+  for (const row of owned) awarded += tokenRateFor(row.base_rating);
+
+  db.exec("BEGIN");
+  try {
+    db.prepare(`DELETE FROM owned_cards WHERE user_id = ? AND id IN (${placeholders})`).run(userId, ...numericIds);
+    db.prepare("UPDATE users SET tokens = tokens + ? WHERE id = ?").run(awarded, userId);
+    db.exec("COMMIT");
+  } catch (error) {
+    db.exec("ROLLBACK");
+    return { error: "Could not complete the exchange." };
+  }
+  const user = db.prepare("SELECT tokens FROM users WHERE id = ?").get(userId);
+  return { tokens: Number(user.tokens), awarded, count: ownedCount(userId) };
+}
+
+// Spend Footyverse tokens on one guaranteed 83-85 rated card from the token shop.
+function redeemTokenReward(userId) {
+  const user = db.prepare("SELECT tokens FROM users WHERE id = ?").get(userId);
+  const balance = Number(user?.tokens || 0);
+  if (balance < TOKEN_REWARD_COST) return { error: `You need ${TOKEN_REWARD_COST} tokens — you have ${balance}.` };
+
+  const pool = db.prepare("SELECT * FROM cards WHERE base_rating BETWEEN ? AND ?").all(TOKEN_REWARD_RANGE.min, TOKEN_REWARD_RANGE.max);
+  if (!pool.length) return { error: "No token shop rewards available right now." };
+  const reward = pool[Math.floor(Math.random() * pool.length)];
+
+  db.exec("BEGIN");
+  try {
+    db.prepare("UPDATE users SET tokens = tokens - ? WHERE id = ?").run(TOKEN_REWARD_COST, userId);
+    db.prepare("INSERT INTO owned_cards (user_id, card_id, rating, xp, is_in_xi, slot, acquired_from) VALUES (?, ?, ?, 0, 0, NULL, 'token_shop')").run(userId, reward.id, reward.base_rating);
+    db.exec("COMMIT");
+  } catch (error) {
+    db.exec("ROLLBACK");
+    return { error: "Could not complete the redemption." };
+  }
+  const after = db.prepare("SELECT tokens FROM users WHERE id = ?").get(userId);
+  return { card: reward, tokens: Number(after.tokens), count: ownedCount(userId) };
+}
+
 const PACK_TYPES = [
   { key: "daily", name: "Daily Free Pack", cost: { type: "free" }, cardCount: 3, image: "🎁", description: "Free every day. Streak bonus inside.", odds: { bronze: 0.8, silver: 0.2 } },
   { key: "basic", name: "100 Coins Pack", cost: { type: "coins", amount: 100 }, cardCount: 3, image: "📦", description: "Three players rated 60-69.", odds: { bronze: 1 } },
@@ -132,6 +206,8 @@ const PACK_TYPES = [
   { key: "gem100", name: "100 Gems Pick", cost: { type: "gems", amount: 100 }, image: "💎", description: "Choose 1 of 3 star players rated 73-75.", pick: { rounds: 1, optionsPerPick: 3, minRating: 73, maxRating: 75 } },
   { key: "gem1000", name: "1000 Coins Pick", cost: { type: "coins", amount: 1000 }, image: "👑", description: "Three picks — choose 1 of 3 players rated 70-75 each.", pick: { rounds: 3, optionsPerPick: 3, minRating: 70, maxRating: 75 } },
   { key: "star5000", name: "5000 Coins Star Pack", cost: { type: "coins", amount: 5000 }, cardCount: 1, image: "🌟", description: "One 77-80 rated star. Limited to 2 buys every 7 days.", ratings: { 77: 0.4, 78: 0.3, 79: 0.2, 80: 0.1 }, limit: { max: 2, days: 7 }, reveal: "walkout" },
+  { key: "laliga50", name: "50 Gems La Liga Pack", cost: { type: "gems", amount: 50 }, cardCount: 1, image: "⚽", description: "One La Liga event player rated 75-85. Lower rated players are far more common — 83+ is a rare hit.", variant: "laliga", ratings: { 76: 0.21, 77: 0.18, 78: 0.16, 79: 0.14, 80: 0.12, 81: 0.1, 82: 0.05, 83: 0.02, 84: 0.01, 85: 0.01 } },
+  { key: "laliga5000", name: "5000 Gems La Liga Pack", cost: { type: "gems", amount: 5000 }, cardCount: 1, image: "👑", description: "One guaranteed La Liga event player rated 83-85. Limited to 2 buys for the whole event.", variant: "laliga", ratings: { 83: 0.5, 84: 0.3, 85: 0.2 }, limit: { max: 2, days: 40 }, reveal: "walkout" },
 ];
 
 const QUEST_SEEDS = [
@@ -218,7 +294,7 @@ function addXp(userId, amount) {
 }
 
 function drawCards(pack, cardCount) {
-  const pool = db.prepare("SELECT * FROM cards").all();
+  const pool = db.prepare("SELECT * FROM cards WHERE variant = ?").all(pack.variant || "");
   const odds = pack.odds;
   const ratings = pack.ratings;
   const selected = [];
@@ -299,7 +375,7 @@ function grantWelcomeGift(userId) {
   take(gk, Math.min(gkCount, gk.length));
   take(field, WELCOME_CARDS - chosen.length);
 
-  const findCard = db.prepare("SELECT id FROM cards WHERE name = ? AND category = ?");
+  const findCard = db.prepare("SELECT id FROM cards WHERE name = ? AND category = ? AND variant = ''");
   const insertCard = db.prepare(`
     INSERT INTO cards (name, season, club, nation, position, category, pace, shooting, passing, dribbling, defending, physicality, base_rating, tier, image)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -436,7 +512,7 @@ function openPack(userId, packKey, options = {}) {
   let cards = [];
   let pick = null;
   if (pack.pick) {
-    const pool = db.prepare("SELECT * FROM cards").all();
+    const pool = db.prepare("SELECT * FROM cards WHERE variant = ''").all();
     const rounds = buildPickRounds(pool, pack.pick);
     const pickId = randomUUID();
     pendingPicks.set(pickId, { userId, packKey, rounds });
@@ -466,7 +542,7 @@ function confirmPackPick(userId, pickId, selections) {
   if (!Array.isArray(selections) || selections.length !== entry.rounds.length) {
     return { error: `Pick exactly ${entry.rounds.length} player${entry.rounds.length > 1 ? "s" : ""}.` };
   }
-  const pool = db.prepare("SELECT * FROM cards").all();
+  const pool = db.prepare("SELECT * FROM cards WHERE variant = ''").all();
   const byId = new Map(pool.map((c) => [c.id, c]));
   const picked = [];
   for (let i = 0; i < entry.rounds.length; i++) {
@@ -635,4 +711,4 @@ function resolveMatchRewards(room) {
   return rewards;
 }
 
-module.exports = { PACK_TYPES, openPack, confirmPackPick, questsFor, claimQuest, bumpQuest, resolveMatchRewards, grantWelcomeGift, todayBucket, ownedCount, exchangeForGuaranteed, exchangeForPurple, PURPLE_REQUIREMENTS, PURPLE_REWARD_RANGE, eventQuestsFor, claimEventQuest, INVENTORY_LIMIT, INVENTORY_WARN_AT, loginRewardStatus, claimLoginReward, LOGIN_REWARD_DAYS, LOGIN_REWARD_COINS, LOGIN_REWARD_GEMS, packPurchasesInWindow };
+module.exports = { PACK_TYPES, openPack, confirmPackPick, questsFor, claimQuest, bumpQuest, resolveMatchRewards, grantWelcomeGift, todayBucket, ownedCount, exchangeForGuaranteed, exchangeForPurple, PURPLE_REQUIREMENTS, PURPLE_REWARD_RANGE, eventQuestsFor, claimEventQuest, INVENTORY_LIMIT, INVENTORY_WARN_AT, loginRewardStatus, claimLoginReward, LOGIN_REWARD_DAYS, LOGIN_REWARD_COINS, LOGIN_REWARD_GEMS, packPurchasesInWindow, TOKEN_RATES, TOKEN_REWARD_COST, TOKEN_REWARD_RANGE, exchangeForTokens, redeemTokenReward };

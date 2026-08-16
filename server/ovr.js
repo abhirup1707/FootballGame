@@ -1,9 +1,10 @@
 // Season reset scale: cards run 60-75. Tiers add a small premium so the
 // boosted stats (still capped at 75) never push a displayed OVR past 75.
-// Ultimate Icons event cards break the catalog cap and ship authored stats
-// up to 80, so the displayed rating clamp is lifted to 80 for those rows.
+// Event cards (Ultimate Icons, La Liga Kickoff) break the catalog cap and
+// ship authored stats, so the displayed rating clamp is lifted to 85 for
+// those rows.
 const STAT_CAP = 75;
-const CATALOG_RATING_CAP = 80;
+const CATALOG_RATING_CAP = 85;
 const TIER_MULTIPLIERS = { base: 1, inform: 1.01, prime: 1.03, icon: 1.05 };
 
 function tierForRating(rating) {

@@ -7,12 +7,16 @@ const DB_PATH = process.env.DATABASE_PATH || path.join(__dirname, "footyverse.db
 const DATABASE_URL = process.env.DATABASE_URL;
 const usingPostgres = Boolean(DATABASE_URL);
 
+// Tables whose primary key is not a column named `id` (meta, user_stats)
+// cannot accept `RETURNING id`, so never append it for them.
+const NO_ID_TABLES = /^\s*INSERT\s+INTO\s+(meta|user_stats)\b/i;
+
 function pgSql(sql, params, returning) {
   let index = 0;
   let converted = sql.replace(/\?/g, () => `$${++index}`)
     .replace(/datetime\('now'\)/g, "CURRENT_TIMESTAMP")
-    .replace(/;\s*DELETE FROM sqlite_sequence[^;]*;?/gi, ";");
-  if (returning && /^\s*INSERT\s+INTO\s+(?!meta\b)/i.test(converted) && !/\bRETURNING\b/i.test(converted)) converted += " RETURNING id";
+    .replace(/;\s*DELETE FROM sqlite_sequence[^;]*?;?/gi, ";");
+  if (returning && /^\s*INSERT\s+INTO\s+/i.test(converted) && !NO_ID_TABLES.test(converted) && !/\bRETURNING\b/i.test(converted)) converted += " RETURNING id";
   return converted;
 }
 
@@ -81,13 +85,13 @@ function postgresDb() {
 }
 
 const db = usingPostgres ? postgresDb() : new DatabaseSync(DB_PATH);
-const SCHEMA_VERSION = 7;
+const SCHEMA_VERSION = 9;
 
 function migratePostgres() {
   db.exec(`
-    CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, username TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL, coins INTEGER NOT NULL DEFAULT 0, gems INTEGER NOT NULL DEFAULT 0, xp INTEGER NOT NULL DEFAULT 0, level INTEGER NOT NULL DEFAULT 1, last_claimed_daily TEXT, streak INTEGER NOT NULL DEFAULT 0, last_login_reward TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP);
+    CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, username TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL, coins INTEGER NOT NULL DEFAULT 0, gems INTEGER NOT NULL DEFAULT 0, xp INTEGER NOT NULL DEFAULT 0, level INTEGER NOT NULL DEFAULT 1, last_claimed_daily TEXT, streak INTEGER NOT NULL DEFAULT 0, last_login_reward TEXT, tokens INTEGER NOT NULL DEFAULT 0, created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP);
     CREATE TABLE IF NOT EXISTS sessions (id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, token_hash TEXT NOT NULL UNIQUE, created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, expires_at TEXT NOT NULL);
-    CREATE TABLE IF NOT EXISTS cards (id SERIAL PRIMARY KEY, name TEXT NOT NULL, season TEXT NOT NULL DEFAULT '', club TEXT NOT NULL DEFAULT '', nation TEXT NOT NULL DEFAULT '', position TEXT NOT NULL, category TEXT NOT NULL, pace INTEGER NOT NULL DEFAULT 70, shooting INTEGER NOT NULL DEFAULT 70, passing INTEGER NOT NULL DEFAULT 70, dribbling INTEGER NOT NULL DEFAULT 70, defending INTEGER NOT NULL DEFAULT 70, physicality INTEGER NOT NULL DEFAULT 70, base_rating INTEGER NOT NULL DEFAULT 70, tier TEXT NOT NULL DEFAULT 'base', image TEXT);
+    CREATE TABLE IF NOT EXISTS cards (id SERIAL PRIMARY KEY, name TEXT NOT NULL, season TEXT NOT NULL DEFAULT '', club TEXT NOT NULL DEFAULT '', nation TEXT NOT NULL DEFAULT '', position TEXT NOT NULL, category TEXT NOT NULL, pace INTEGER NOT NULL DEFAULT 70, shooting INTEGER NOT NULL DEFAULT 70, passing INTEGER NOT NULL DEFAULT 70, dribbling INTEGER NOT NULL DEFAULT 70, defending INTEGER NOT NULL DEFAULT 70, physicality INTEGER NOT NULL DEFAULT 70, base_rating INTEGER NOT NULL DEFAULT 70, tier TEXT NOT NULL DEFAULT 'base', image TEXT, variant TEXT NOT NULL DEFAULT '');
     CREATE TABLE IF NOT EXISTS owned_cards (id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, card_id INTEGER NOT NULL REFERENCES cards(id) ON DELETE CASCADE, rating INTEGER NOT NULL, xp INTEGER NOT NULL DEFAULT 0, is_in_xi INTEGER NOT NULL DEFAULT 0, slot TEXT, acquired_from TEXT, version TEXT NOT NULL DEFAULT 'base', acquired_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP);
     CREATE TABLE IF NOT EXISTS pack_logs (id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, pack_key TEXT NOT NULL, card_ids TEXT NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP);
     CREATE TABLE IF NOT EXISTS quests (id SERIAL PRIMARY KEY, key TEXT NOT NULL UNIQUE, title TEXT NOT NULL, description TEXT NOT NULL, type TEXT NOT NULL, requirement INTEGER NOT NULL, reward_coins INTEGER NOT NULL DEFAULT 0, reward_gems INTEGER NOT NULL DEFAULT 0, reward_pack TEXT, reset_daily INTEGER NOT NULL DEFAULT 0);
@@ -103,11 +107,13 @@ function migratePostgres() {
   `);
   db.prepare("ALTER TABLE owned_cards ADD COLUMN IF NOT EXISTS version TEXT NOT NULL DEFAULT 'base'").run();
   db.prepare("ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login_reward TEXT").run();
+  db.prepare("ALTER TABLE users ADD COLUMN IF NOT EXISTS tokens INTEGER NOT NULL DEFAULT 0").run();
+  db.prepare("ALTER TABLE cards ADD COLUMN IF NOT EXISTS variant TEXT NOT NULL DEFAULT ''").run();
   db.prepare("INSERT INTO meta (key, value) VALUES ('schema_version', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").run(SCHEMA_VERSION);
 }
 
 function migrateSqlite() {
-  db.exec(`CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL, coins INTEGER NOT NULL DEFAULT 0, gems INTEGER NOT NULL DEFAULT 0, xp INTEGER NOT NULL DEFAULT 0, level INTEGER NOT NULL DEFAULT 1, last_claimed_daily TEXT, streak INTEGER NOT NULL DEFAULT 0, last_login_reward TEXT, created_at TEXT NOT NULL DEFAULT (datetime('now'))); CREATE TABLE IF NOT EXISTS sessions (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, token_hash TEXT NOT NULL UNIQUE, created_at TEXT NOT NULL DEFAULT (datetime('now')), expires_at TEXT NOT NULL); CREATE TABLE IF NOT EXISTS cards (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, season TEXT NOT NULL DEFAULT '', club TEXT NOT NULL DEFAULT '', nation TEXT NOT NULL DEFAULT '', position TEXT NOT NULL, category TEXT NOT NULL, pace INTEGER NOT NULL DEFAULT 70, shooting INTEGER NOT NULL DEFAULT 70, passing INTEGER NOT NULL DEFAULT 70, dribbling INTEGER NOT NULL DEFAULT 70, defending INTEGER NOT NULL DEFAULT 70, physicality INTEGER NOT NULL DEFAULT 70, base_rating INTEGER NOT NULL DEFAULT 70, tier TEXT NOT NULL DEFAULT 'base', image TEXT); CREATE TABLE IF NOT EXISTS owned_cards (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, card_id INTEGER NOT NULL REFERENCES cards(id) ON DELETE CASCADE, rating INTEGER NOT NULL, xp INTEGER NOT NULL DEFAULT 0, is_in_xi INTEGER NOT NULL DEFAULT 0, slot TEXT, acquired_from TEXT, version TEXT NOT NULL DEFAULT 'base', acquired_at TEXT NOT NULL DEFAULT (datetime('now'))); CREATE TABLE IF NOT EXISTS pack_logs (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, pack_key TEXT NOT NULL, card_ids TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now'))); CREATE TABLE IF NOT EXISTS user_stats (user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE, wins INTEGER NOT NULL DEFAULT 0, goals INTEGER NOT NULL DEFAULT 0, saves INTEGER NOT NULL DEFAULT 0); CREATE TABLE IF NOT EXISTS quests (id INTEGER PRIMARY KEY AUTOINCREMENT, key TEXT NOT NULL UNIQUE, title TEXT NOT NULL, description TEXT NOT NULL, type TEXT NOT NULL, requirement INTEGER NOT NULL, reward_coins INTEGER NOT NULL DEFAULT 0, reward_gems INTEGER NOT NULL DEFAULT 0, reward_pack TEXT, reset_daily INTEGER NOT NULL DEFAULT 0); CREATE TABLE IF NOT EXISTS quest_progress (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, quest_id INTEGER NOT NULL, progress INTEGER NOT NULL DEFAULT 0, claimed_at TEXT, bucket TEXT, UNIQUE(user_id, quest_id)); CREATE TABLE IF NOT EXISTS event_quests (id INTEGER PRIMARY KEY AUTOINCREMENT, key TEXT NOT NULL UNIQUE, title TEXT NOT NULL, description TEXT NOT NULL, type TEXT NOT NULL, requirement INTEGER NOT NULL, reward_coins INTEGER NOT NULL DEFAULT 0, reward_gems INTEGER NOT NULL DEFAULT 0, difficulty TEXT NOT NULL DEFAULT 'easy'); CREATE TABLE IF NOT EXISTS event_quest_progress (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, quest_id INTEGER NOT NULL, progress INTEGER NOT NULL DEFAULT 0, claimed_at TEXT, bucket TEXT, UNIQUE(user_id, quest_id)); CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL); CREATE TABLE IF NOT EXISTS pack_purchases (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, pack_key TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')));`);
+  db.exec(`CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL, coins INTEGER NOT NULL DEFAULT 0, gems INTEGER NOT NULL DEFAULT 0, xp INTEGER NOT NULL DEFAULT 0, level INTEGER NOT NULL DEFAULT 1, last_claimed_daily TEXT, streak INTEGER NOT NULL DEFAULT 0, last_login_reward TEXT, tokens INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL DEFAULT (datetime('now'))); CREATE TABLE IF NOT EXISTS sessions (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, token_hash TEXT NOT NULL UNIQUE, created_at TEXT NOT NULL DEFAULT (datetime('now')), expires_at TEXT NOT NULL); CREATE TABLE IF NOT EXISTS cards (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, season TEXT NOT NULL DEFAULT '', club TEXT NOT NULL DEFAULT '', nation TEXT NOT NULL DEFAULT '', position TEXT NOT NULL, category TEXT NOT NULL, pace INTEGER NOT NULL DEFAULT 70, shooting INTEGER NOT NULL DEFAULT 70, passing INTEGER NOT NULL DEFAULT 70, dribbling INTEGER NOT NULL DEFAULT 70, defending INTEGER NOT NULL DEFAULT 70, physicality INTEGER NOT NULL DEFAULT 70, base_rating INTEGER NOT NULL DEFAULT 70, tier TEXT NOT NULL DEFAULT 'base', image TEXT, variant TEXT NOT NULL DEFAULT ''); CREATE TABLE IF NOT EXISTS owned_cards (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, card_id INTEGER NOT NULL REFERENCES cards(id) ON DELETE CASCADE, rating INTEGER NOT NULL, xp INTEGER NOT NULL DEFAULT 0, is_in_xi INTEGER NOT NULL DEFAULT 0, slot TEXT, acquired_from TEXT, version TEXT NOT NULL DEFAULT 'base', acquired_at TEXT NOT NULL DEFAULT (datetime('now'))); CREATE TABLE IF NOT EXISTS pack_logs (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, pack_key TEXT NOT NULL, card_ids TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now'))); CREATE TABLE IF NOT EXISTS user_stats (user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE, wins INTEGER NOT NULL DEFAULT 0, goals INTEGER NOT NULL DEFAULT 0, saves INTEGER NOT NULL DEFAULT 0); CREATE TABLE IF NOT EXISTS quests (id INTEGER PRIMARY KEY AUTOINCREMENT, key TEXT NOT NULL UNIQUE, title TEXT NOT NULL, description TEXT NOT NULL, type TEXT NOT NULL, requirement INTEGER NOT NULL, reward_coins INTEGER NOT NULL DEFAULT 0, reward_gems INTEGER NOT NULL DEFAULT 0, reward_pack TEXT, reset_daily INTEGER NOT NULL DEFAULT 0); CREATE TABLE IF NOT EXISTS quest_progress (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, quest_id INTEGER NOT NULL, progress INTEGER NOT NULL DEFAULT 0, claimed_at TEXT, bucket TEXT, UNIQUE(user_id, quest_id)); CREATE TABLE IF NOT EXISTS event_quests (id INTEGER PRIMARY KEY AUTOINCREMENT, key TEXT NOT NULL UNIQUE, title TEXT NOT NULL, description TEXT NOT NULL, type TEXT NOT NULL, requirement INTEGER NOT NULL, reward_coins INTEGER NOT NULL DEFAULT 0, reward_gems INTEGER NOT NULL DEFAULT 0, difficulty TEXT NOT NULL DEFAULT 'easy'); CREATE TABLE IF NOT EXISTS event_quest_progress (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, quest_id INTEGER NOT NULL, progress INTEGER NOT NULL DEFAULT 0, claimed_at TEXT, bucket TEXT, UNIQUE(user_id, quest_id)); CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL); CREATE TABLE IF NOT EXISTS pack_purchases (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, pack_key TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')));`);
 }
 
 function migrate() { if (usingPostgres) return migratePostgres(); migrateSqlite(); }
@@ -132,6 +138,14 @@ function upgrade() {
   if (version < 7) {
     const cols = db.prepare("PRAGMA table_info(users)").all().map((c) => c.name);
     if (!cols.includes("last_login_reward")) db.exec("ALTER TABLE users ADD COLUMN last_login_reward TEXT");
+  }
+  if (version < 8) {
+    const cols = db.prepare("PRAGMA table_info(cards)").all().map((c) => c.name);
+    if (!cols.includes("variant")) db.exec("ALTER TABLE cards ADD COLUMN variant TEXT NOT NULL DEFAULT ''");
+  }
+  if (version < 9) {
+    const cols = db.prepare("PRAGMA table_info(users)").all().map((c) => c.name);
+    if (!cols.includes("tokens")) db.exec("ALTER TABLE users ADD COLUMN tokens INTEGER NOT NULL DEFAULT 0");
   }
   db.prepare("INSERT INTO meta (key, value) VALUES ('schema_version', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").run(SCHEMA_VERSION);
 }

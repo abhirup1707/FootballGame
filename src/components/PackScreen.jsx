@@ -200,7 +200,19 @@ export default function PackScreen({ onBack }) {
     </AnimatePresence>
 
     <AnimatePresence>
-      {result && result.pack.reveal !== "walkout" && <motion.div className="pack-overlay" initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}>
+      {result && result.pack.reveal === "walkout" && result.cards?.[0] && (
+        <WalkoutReveal card={result.cards[0]} packName={result.pack.name} onDone={() => setResult(null)} />
+      )}
+    </AnimatePresence>
+
+    <AnimatePresence>
+      {result && result.pack.reveal !== "walkout" && (result.cards?.[0]?.base_rating ?? result.cards?.[0]?.rating) >= 83 && (
+        <WalkoutReveal card={result.cards[0]} packName={result.pack.name} onDone={() => setResult(null)} />
+      )}
+    </AnimatePresence>
+
+    <AnimatePresence>
+      {result && result.pack.reveal !== "walkout" && (result.cards?.[0] ? (result.cards[0].base_rating ?? result.cards[0].rating) < 83 : true) && <motion.div className="pack-overlay" initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}>
         <div className="pack-reveal">
           <div className="pack-reveal-head"><small>YOU OPENED</small><h2>{result.pack.name}</h2>{result.bonus && <p className="pack-streak-bonus">🔥 {result.bonus.streak}-day streak! +{result.bonus.coins} coins</p>}</div>
           <div className="pack-reveal-grid">

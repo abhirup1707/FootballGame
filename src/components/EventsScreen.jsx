@@ -4,6 +4,7 @@ import api from "../api";
 import { useAuth } from "../auth";
 import FcCard from "./FcCard";
 import LoadingOverlay from "./LoadingOverlay";
+import { lastName } from "../lib/card";
 
 const DIFF_ORDER = { easy: 0, medium: 1, hard: 2, epic: 3 };
 const DIFF_LABEL = { easy: "Easy", medium: "Medium", hard: "Hard", epic: "Epic" };
@@ -215,7 +216,7 @@ export default function EventsScreen({ onBack }) {
           return (
             <button key={card.id} className={`owned-card exchg ${isPurple(card) ? "owned-card-purple" : ""} ${isSelected ? "exchg-selected" : ""} ${!eligible ? "exchg-disabled" : ""}`} disabled={!eligible} onClick={() => toggle(card)}>
               <div className={`owned-card-art ${isPurple(card) ? "owned-card-art-purple" : ""}`}>{card.image ? <img src={card.image} alt="" /> : <span>{card.name.split(/\s+/).slice(0, 2).map((p) => p[0]).join("").slice(0, 3) || card.name.slice(0, 3)}</span>}</div>
-              <div className="owned-card-info"><small>{card.category}</small><b>{card.name}</b></div>
+              <div className="owned-card-info"><small>{card.category}</small><b>{lastName(card.name)}</b></div>
               <strong>{rating}</strong>
               {card.version === "purple" && <em className="xi-badge">P</em>}
             </button>
@@ -323,7 +324,7 @@ export default function EventsScreen({ onBack }) {
                 <div key={card.id} className="purple-all-row">
                   <FcCard player={{ ...card, version: "purple" }} size="sm" />
                   <div className="purple-all-info">
-                    <b>{card.name}</b>
+                    <b>{lastName(card.name)}</b>
                     <small>{card.category} · {card.club || "Free agent"} · {card.nation}</small>
                   </div>
                   <strong>{card.base_rating ?? card.rating}</strong>

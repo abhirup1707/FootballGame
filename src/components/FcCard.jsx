@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { countryFlagPath } from "../lib/countries";
+import { clubLogoPath, isLaligaCard, lastName } from "../lib/card";
 
 const STAT_ITEMS = [
   ["PAC", "pace"],
@@ -8,19 +10,6 @@ const STAT_ITEMS = [
   ["DEF", "defending"],
   ["PHY", "physicality"],
 ];
-
-function StadiumSilhouette() {
-  return (
-    <svg className="fcc-stadium" viewBox="0 0 220 140" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-      <path d="M0 140 V118 H220 V140 Z" />
-      <path d="M14 118 V100 q10-8 22 0 V118 Z M48 118 V96 q12-9 26 0 V118 Z M86 118 V92 q14-10 28 0 V118 Z M126 118 V92 q12-10 24 0 V118 Z M162 118 V96 q12-8 26 0 V118 Z M198 118 V100 q8-7 22 0 V118 Z" />
-      <path d="M6 100 q0-40 20-58 M214 100 q0-40-20-58" fill="none" strokeWidth="5" strokeLinecap="round" />
-      <circle cx="6" cy="38" r="4" />
-      <circle cx="214" cy="38" r="4" />
-      <path d="M96 52 h28 M96 60 h28 M100 52 v10 M120 52 v10" strokeWidth="3" />
-    </svg>
-  );
-}
 
 function PlayerShadow() {
   return (
@@ -37,10 +26,64 @@ function PlayerShadow() {
   );
 }
 
-export default function FcCard({ player, size = "md", className = "", onClick }) {
+function LaligaHexCard({ player, size = "md", className = "", onClick }) {
   const rating = player.rating ?? player.base_rating ?? 0;
   const position = player.position || player.category || "?";
-  const tier = player.version === "purple" || (rating >= 77 && rating <= 80) ? "purple" : rating >= 70 ? "silver" : "bronze";
+  const clickable = Boolean(onClick);
+  const logo = clubLogoPath(player.club);
+  const flag = countryFlagPath(player.nation);
+  return (
+    <div className={`laliga-card laliga-card-${size} ${clickable ? "laliga-card-clickable" : ""} ${className}`} onClick={onClick}>
+      <div className="laliga-card-frame">
+        <div className="laliga-card-bg">
+          {logo && <img className="laliga-card-logo" src={logo} alt="" aria-hidden="true" draggable="false" />}
+          <div className="laliga-card-shine" />
+          <span className="laliga-card-brand">LALIGA</span>
+          <div className="laliga-card-ovr">{rating}</div>
+          <div className="laliga-card-details">
+            {flag && <img className="laliga-card-flag" src={flag} alt={player.nation} />}
+            <span className="laliga-card-pos">{position}</span>
+            {logo && <img className="laliga-card-club" src={logo} alt={player.club} />}
+          </div>
+          <div className="laliga-card-portrait">
+            {player.image
+              ? <img src={player.image} alt={player.name} className="laliga-card-img" draggable="false" />
+              : <PlayerShadow />}
+          </div>
+          <div className="laliga-card-name">{lastName(player.name)}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StadiumSilhouette() {
+  return (
+    <svg className="fcc-stadium" viewBox="0 0 220 140" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <path d="M0 140 V118 H220 V140 Z" />
+      <path d="M14 118 V100 q10-8 22 0 V118 Z M48 118 V96 q12-9 26 0 V118 Z M86 118 V92 q14-10 28 0 V118 Z M126 118 V92 q12-10 24 0 V118 Z M162 118 V96 q12-8 26 0 V118 Z M198 118 V100 q8-7 22 0 V118 Z" />
+      <path d="M6 100 q0-40 20-58 M214 100 q0-40-20-58" fill="none" strokeWidth="5" strokeLinecap="round" />
+      <circle cx="6" cy="38" r="4" />
+      <circle cx="214" cy="38" r="4" />
+      <path d="M96 52 h28 M96 60 h28 M100 52 v10 M120 52 v10" strokeWidth="3" />
+    </svg>
+  );
+}
+
+export default function FcCard({ player, size = "md", className = "", onClick }) {
+  if (isLaligaCard(player)) {
+    return <LaligaHexCard player={player} size={size} className={className} onClick={onClick} />;
+  }
+
+  const rating = player.rating ?? player.base_rating ?? 0;
+  const position = player.position || player.category || "?";
+  const tier = player.version === "purple" || (rating >= 77 && rating <= 80)
+    ? "purple"
+    : rating >= 80
+      ? "gold"
+      : rating >= 70
+        ? "silver"
+        : "bronze";
   const clickable = Boolean(onClick);
   return (
     <div className={`fcc fcc-${tier} fcc-${size} ${clickable ? "fcc-clickable" : ""} ${className}`} onClick={onClick}>
@@ -50,7 +93,7 @@ export default function FcCard({ player, size = "md", className = "", onClick })
         <span className="fcc-pos">{position}</span>
         {countryFlagPath(player.nation) && <img className="fcc-nation" src={countryFlagPath(player.nation)} alt={player.nation} />}
       </div>
-      <div className="fcc-name">{player.name}</div>
+      <div className="fcc-name">{lastName(player.name)}</div>
       <div className="fcc-photo-wrap">
         <div className="fcc-photo">
           {player.image

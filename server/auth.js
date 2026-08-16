@@ -35,6 +35,7 @@ function publicUser(row) {
     xp: row.xp,
     level: row.level,
     streak: row.streak,
+    tokens: row.tokens || 0,
     last_claimed_daily: row.last_claimed_daily || null,
     created_at: row.created_at,
   };

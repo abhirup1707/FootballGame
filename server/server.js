@@ -35,11 +35,25 @@ app.get("/health", (_req, res) => res.status(200).json({ status: "ok" }));
 const server = http.createServer(app);
 const io = new Server(server, { cors: corsOptions });
 const rooms = {};
-// 22 rounds: each manager drafts an 11-man starting XI.
-const DRAFT_ROUNDS = [...Array(6).fill("ATT"), ...Array(6).fill("MID"), ...Array(8).fill("DEF"), ...Array(2).fill("GK")];
+// Each manager drafts an 11-man starting XI matching the formation they chose
+// at the start of the draft (22 total picks, one per player per turn).
+const FORMATIONS = require(path.join(__dirname, "..", "src", "data", "formations.json"));
+const DEFAULT_FORMATION = "4-3-3";
+const DRAFT_ORDER = ["ATT", "MID", "DEF", "GK"];
+const DRAFT_TOTAL = 22;
 const STARTER_COUNT = 11;
-const PITCH_COORDINATES = { GK:[50,88], LB:[17,70], CB1:[38,74], CB2:[62,74], RB:[83,70], CM1:[32,53], CM2:[68,53], CAM:[50,43], LW:[19,25], ST:[50,18], RW:[81,25] };
+const PITCH_COORDINATES = Object.fromEntries(Object.values(FORMATIONS).flatMap((formation) => Object.entries(formation.coords)));
 const FORMATION_CATEGORY = { GK:"GK", LB:"DEF", CB1:"DEF", CB2:"DEF", RB:"DEF", CM1:"MID", CM2:"MID", CAM:"MID", LW:"ATT", ST:"ATT", RW:"ATT" };
+function formationOf(room, playerId) { return FORMATIONS[room.draft?.formations?.[playerId]] || FORMATIONS[DEFAULT_FORMATION]; }
+// The category the given manager still needs to draft for their formation, in a
+// fixed order (attackers first, keeper last) so the pack always matches their XI.
+function nextNeeded(formation, picks) {
+  const counts = { ATT: formation.att, MID: formation.mid, DEF: formation.def, GK: 1 };
+  for (const category of DRAFT_ORDER) {
+    if ((picks || []).filter((player) => player.position === category).length < counts[category]) return category;
+  }
+  return null;
+}
 const randomItem = (items) => items[Math.floor(Math.random() * items.length)];
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const MOVE_TIMEOUT = 7000;
@@ -60,9 +74,10 @@ function ownedPlayer(row) {
 function validLineup(room, playerId, positions) {
   const drafted = room.draft.picks[playerId] || [];
   if (!positions || drafted.length < STARTER_COUNT) return false;
+  const slotCategory = formationOf(room, playerId).slotCategory;
   const draftedById = new Map(drafted.map((player) => [player.id, player]));
   const usedIds = new Set();
-  return Object.entries(FORMATION_CATEGORY).every(([slot, category]) => {
+  return Object.entries(slotCategory).every(([slot, category]) => {
     const player = positions[slot], draftedPlayer = player && draftedById.get(player.id);
     if (!draftedPlayer || draftedPlayer.position !== category || usedIds.has(player.id)) return false;
     usedIds.add(player.id);
@@ -95,7 +110,10 @@ function movePlayerState(room, previousId, nextId) {
   }
 }
 
-function draftPayload(room) { return { turnId:room.draft.turnId, round:room.draft.round, category:DRAFT_ROUNDS[room.draft.round] || null, picks:room.draft.picks, complete:room.draft.round >= DRAFT_ROUNDS.length }; }
+function draftPayload(room) {
+  const turnId = room.draft.turnId;
+  return { turnId, round:room.draft.round, category:room.draft.round < DRAFT_TOTAL ? nextNeeded(formationOf(room, turnId), room.draft.picks[turnId]) : null, picks:room.draft.picks, complete:room.draft.round >= DRAFT_TOTAL, formations:room.draft.formations || {} };
+}
 function sendDraftState(room) { io.to(room.roomCode).emit("draftState", draftPayload(room)); }
 function teamName(room, teamId) { return `${room.players.find((player) => player.id === teamId)?.name || "Unknown"}'s team`; }
 function playerPosition(team, playerId) { return Object.keys(team.positions).find((key) => team.positions[key]?.id === playerId); }
@@ -543,7 +561,7 @@ io.on("connection", (socket) => {
   });
   socket.on("createRoom", ({ playerName, goalLimit, matchMode, timeLimit, resumeToken, mode }) => {
     const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-    rooms[roomCode] = { roomCode, mode: mode === "club" ? "club" : "draft", goalLimit:[1,3,5].includes(Number(goalLimit)) ? Number(goalLimit) : 3, matchMode:matchMode === "time" ? "time" : "goals", timeLimit:[90,120,150,180].includes(Number(timeLimit)) ? Number(timeLimit) : 90, players:[{ id:socket.id, name:playerName, resumeToken, userId:socket.data.userId }], readyPlayers:0, teams:{}, scoreA:0, scoreB:0, possession:null, commentary:[], stats:{}, draft:{ round:0, turnId:socket.id, picks:{}, takenIds:[] }, match:null, timer:null, finished:false, shootout:null, reconnectTimers:{}, rematchVotes:[] };
+    rooms[roomCode] = { roomCode, mode: mode === "club" ? "club" : "draft", goalLimit:[1,3,5].includes(Number(goalLimit)) ? Number(goalLimit) : 3, matchMode:matchMode === "time" ? "time" : "goals", timeLimit:[90,120,150,180].includes(Number(timeLimit)) ? Number(timeLimit) : 90, players:[{ id:socket.id, name:playerName, resumeToken, userId:socket.data.userId }], readyPlayers:0, teams:{}, scoreA:0, scoreB:0, possession:null, commentary:[], stats:{}, draft:{ round:0, turnId:socket.id, picks:{}, takenIds:[], formations:{} }, match:null, timer:null, finished:false, shootout:null, reconnectTimers:{}, rematchVotes:[] };
     socket.join(roomCode); socket.emit("roomCreated", roomCode);
   });
   socket.on("createAiMatch", ({ playerName, difficulty, matchMode, goalLimit, timeLimit }) => {
@@ -601,9 +619,16 @@ io.on("connection", (socket) => {
     sendDraftState(room);
     if (room.match) socket.emit("enterMatch", matchPayload(room));
   });
+  socket.on("chooseFormation", ({ roomCode, formation }) => {
+    const room = rooms[roomCode];
+    if (!room || room.mode !== "draft" || !FORMATIONS[formation]) return;
+    room.draft.formations = room.draft.formations || {};
+    room.draft.formations[socket.id] = formation;
+    sendDraftState(room);
+  });
   socket.on("requestDraftPack", ({ roomCode }) => {
     const room = rooms[roomCode]; if (!room || room.draft.turnId !== socket.id) return;
-    const category = DRAFT_ROUNDS[room.draft.round];
+    const category = nextNeeded(formationOf(room, socket.id), room.draft.picks[socket.id]);
     if (!category) return;
     const taken = room.draft.takenIds || [];
     const candidates = DRAFT_POOL.filter((card) => card.category === category && !taken.includes(card.id));
@@ -616,8 +641,10 @@ io.on("connection", (socket) => {
     socket.emit("draftPack", { pack: pack.map(cardPayload), category });
   });
   socket.on("draftPick", ({ roomCode, player }) => {
-    const room = rooms[roomCode], category = room && DRAFT_ROUNDS[room.draft.round];
+    const room = rooms[roomCode];
     if (!room || room.draft.turnId !== socket.id || !player) return;
+    const category = nextNeeded(formationOf(room, socket.id), room.draft.picks[socket.id]);
+    if (!category) return;
     const card = DRAFT_POOL.find((c) => c.id === player.id && c.category === category);
     if (!card || room.draft.takenIds.includes(card.id)) return;
     room.draft.takenIds.push(card.id); room.draft.picks[socket.id] = [...(room.draft.picks[socket.id] || []), cardPayload(card)]; room.draft.round += 1;
@@ -635,7 +662,7 @@ io.on("connection", (socket) => {
       team = own.team;
     } else {
       if (!validLineup(room, socket.id, positions)) return socket.emit("errorMessage", "Your lineup must keep each player in their own category.");
-      const verifiedOverall = Number((Object.keys(FORMATION_CATEGORY).reduce((sum, slot) => sum + positions[slot].rating, 0) / STARTER_COUNT).toFixed(1));
+      const verifiedOverall = Number((Object.keys(formationOf(room, socket.id).slotCategory).reduce((sum, slot) => sum + positions[slot].rating, 0) / STARTER_COUNT).toFixed(1));
       team = { positions: buildTeam(positions), overall: verifiedOverall };
     }
     room.teams[socket.id] = team; room.readyPlayers += 1; io.to(roomCode).emit("readyCount", room.readyPlayers);
@@ -685,7 +712,7 @@ io.on("connection", (socket) => {
     const reset = {
       roomCode:room.roomCode, mode:room.mode, goalLimit:room.goalLimit, matchMode:room.matchMode, timeLimit:room.timeLimit, players:room.players,
       readyPlayers:0, teams:{}, scoreA:0, scoreB:0, possession:null, commentary:[], stats:{},
-      draft:{ round:0, turnId:room.players[0].id, picks:{}, takenIds:[] },
+      draft:{ round:0, turnId:room.players[0].id, picks:{}, takenIds:[], formations:{} },
       match:null, timer:null, finished:false, shootout:null, reconnectTimers:room.reconnectTimers, rematchVotes:[]
     };
     rooms[roomCode] = reset;

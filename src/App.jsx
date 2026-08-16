@@ -9,6 +9,8 @@ import PackScreen from "./components/PackScreen";
 import QuestScreen from "./components/QuestScreen";
 import Leaderboard from "./components/Leaderboard";
 import EventsScreen from "./components/EventsScreen";
+import PlayersScreen from "./components/PlayersScreen";
+import ExchangeScreen from "./components/ExchangeScreen";
 import Lobby from "./components/Lobby";
 import Draft from "./components/Draft";
 import WelcomePopup from "./components/WelcomePopup";
@@ -77,6 +79,8 @@ function Shell() {
   if (screen === "quests") return <QuestScreen onBack={() => setScreen("hub")} />;
   if (screen === "leaderboard") return <Leaderboard onBack={() => setScreen("hub")} />;
   if (screen === "events") return <EventsScreen onBack={() => setScreen("hub")} />;
+  if (screen === "players") return <PlayersScreen onBack={() => setScreen("hub")} />;
+  if (screen === "exchange") return <ExchangeScreen onBack={() => setScreen("hub")} />;
   if (screen === "play") return <Lobby setRoom={setRoom} onBack={() => setScreen("hub")} />;
   return (
     <>
