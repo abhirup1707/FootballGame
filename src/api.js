@@ -39,6 +39,10 @@ const api = {
   tokenConfig: (token) => request("/api/exchange/tokens", { token }),
   loginReward: (token) => request("/api/login-reward", { token }),
   claimLoginReward: (token) => request("/api/login-reward/claim", { method: "POST", token }),
+  friends: (token) => request("/api/friends", { token }),
+  friendRequest: (token, username) => request("/api/friends/request", { method: "POST", token, body: { username } }),
+  friendRespond: (token, requestId, accept) => request("/api/friends/respond", { method: "POST", token, body: { requestId, accept } }),
+  friendRemove: (token, friendId) => request(`/api/friends/${friendId}`, { method: "DELETE", token }),
 };
 
 export default api;

@@ -3,6 +3,7 @@ const { db } = require("./db");
 const { hashPassword, verifyPassword, publicUser, createSession, userByToken, deleteSession } = require("./auth");
 const { PACK_TYPES, openPack, confirmPackPick, questsFor, claimQuest, grantWelcomeGift, todayBucket, exchangeForGuaranteed, exchangeForPurple, PURPLE_REQUIREMENTS, PURPLE_REWARD_RANGE, eventQuestsFor, claimEventQuest, INVENTORY_LIMIT, INVENTORY_WARN_AT, loginRewardStatus, claimLoginReward, packPurchasesInWindow, TOKEN_RATES, TOKEN_REWARD_COST, TOKEN_REWARD_RANGE, exchangeForTokens, redeemTokenReward } = require("./economy");
 const { effectiveRating } = require("./ovr");
+const { isOnline } = require("./presence");
 
 const router = express.Router();
 const VALID_USERNAME = /^[a-zA-Z0-9_]{3,20}$/;
@@ -324,6 +325,98 @@ router.post("/exchange/tokens/redeem", requireAuth, (req, res) => {
   const result = redeemTokenReward(req.user.id);
   if (result.error) return res.status(400).json({ error: result.error });
   res.json(result);
+});
+
+// ----- Friends -----
+// One row per friendship, stored in both directions once accepted (each side
+// gets their own row, so a row can never reference itself and removal only
+// needs to look at the two ids involved). Requests are a single row owned by
+// the requester; accepting flips it to 'accepted' and writes the mirror row.
+function friendUserId(row, me) { return row.user_id === me ? row.friend_id : row.user_id; }
+function friendsList(userId) {
+  const activeRows = db.prepare(`
+    SELECT f.*, u.username, s.wins
+    FROM friends f
+    JOIN users u ON u.id = CASE WHEN f.user_id = ? THEN f.friend_id ELSE f.user_id END
+    LEFT JOIN user_stats s ON s.user_id = u.id
+    WHERE f.status = 'accepted' AND (f.user_id = ? OR f.friend_id = ?)
+  `).all(userId, userId, userId);
+  const seen = new Set();
+  const active = activeRows
+    .filter((row) => { const id = friendUserId(row, userId); if (seen.has(id)) return false; seen.add(id); return true; })
+    .sort((a, b) => a.username.localeCompare(b.username))
+    .map((row) => {
+      const id = friendUserId(row, userId);
+      return { id, username: row.username, wins: Number(row.wins) || 0, online: isOnline(id), since: row.created_at };
+    });
+  const incoming = db.prepare(`
+    SELECT f.*, u.username
+    FROM friends f JOIN users u ON u.id = f.user_id
+    WHERE f.status = 'pending' AND f.friend_id = ?
+    ORDER BY f.id DESC
+  `).all(userId);
+  const outgoing = db.prepare(`
+    SELECT f.*, u.username
+    FROM friends f JOIN users u ON u.id = f.friend_id
+    WHERE f.status = 'pending' AND f.user_id = ?
+    ORDER BY f.id DESC
+  `).all(userId);
+  return {
+    friends: active,
+    incoming: incoming.map((row) => ({ id: row.id, userId: row.user_id, username: row.username, online: isOnline(row.user_id) })),
+    outgoing: outgoing.map((row) => ({ id: row.id, userId: row.friend_id, username: row.username })),
+  };
+}
+
+router.get("/friends", requireAuth, (req, res) => res.json(friendsList(req.user.id)));
+
+router.post("/friends/request", requireAuth, (req, res) => {
+  const username = String(req.body?.username || "").trim();
+  if (!username) return res.status(400).json({ error: "Enter a manager's username." });
+  const target = db.prepare("SELECT id, username FROM users WHERE LOWER(username) = LOWER(?)").get(username);
+  if (!target) return res.status(404).json({ error: "No manager with that username." });
+  if (target.id === req.user.id) return res.status(400).json({ error: "You can't add yourself." });
+  const existing = db.prepare(`
+    SELECT status FROM friends
+    WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)
+    LIMIT 1
+  `).get(req.user.id, target.id, target.id, req.user.id);
+  if (existing?.status === "accepted") return res.status(400).json({ error: "You're already friends." });
+  if (existing?.status === "pending") return res.status(400).json({ error: "A request is already pending between you two." });
+  db.prepare("INSERT INTO friends (user_id, friend_id, status) VALUES (?, ?, 'pending')").run(req.user.id, target.id);
+  res.json({ ok: true, list: friendsList(req.user.id) });
+});
+
+router.post("/friends/respond", requireAuth, (req, res) => {
+  const requestId = Number(req.body?.requestId);
+  const accept = req.body?.accept === true;
+  const request = db.prepare("SELECT * FROM friends WHERE id = ? AND friend_id = ? AND status = 'pending'").get(requestId, req.user.id);
+  if (!request) return res.status(400).json({ error: "That request no longer exists." });
+  if (accept) {
+    db.exec("BEGIN");
+    try {
+      db.prepare("UPDATE friends SET status = 'accepted' WHERE id = ?").run(request.id);
+      db.prepare("DELETE FROM friends WHERE user_id = ? AND friend_id = ?").run(req.user.id, request.user_id);
+      db.prepare("INSERT INTO friends (user_id, friend_id, status) VALUES (?, ?, 'accepted')").run(req.user.id, request.user_id);
+      db.exec("COMMIT");
+    } catch (error) {
+      db.exec("ROLLBACK");
+      return res.status(500).json({ error: "Could not accept the request." });
+    }
+  } else {
+    db.prepare("DELETE FROM friends WHERE id = ?").run(request.id);
+  }
+  res.json({ ok: true, list: friendsList(req.user.id) });
+});
+
+router.delete("/friends/:friendId", requireAuth, (req, res) => {
+  const friendId = Number(req.params.friendId);
+  if (!Number.isInteger(friendId) || friendId <= 0) return res.status(400).json({ error: "Invalid friend id." });
+  db.prepare(`
+    DELETE FROM friends
+    WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)
+  `).run(req.user.id, friendId, friendId, req.user.id);
+  res.json({ ok: true, list: friendsList(req.user.id) });
 });
 
 module.exports = router;

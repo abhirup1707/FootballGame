@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import socket from "../socket";
 import { useAuth } from "../auth";
+import api from "../api";
 import LoadingOverlay from "./LoadingOverlay";
 
 const sessionKey = (code) => `footyverse-room-${code}`;
@@ -49,7 +50,7 @@ const DIFFICULTIES = [
   },
 ];
 
-export default function Lobby({ setRoom, onBack }) {
+export default function Lobby({ setRoom, onBack, inviteRoom }) {
   const initialCode =
     new URLSearchParams(window.location.search).get("room")?.toUpperCase() ||
     "";
@@ -57,11 +58,11 @@ export default function Lobby({ setRoom, onBack }) {
     ? JSON.parse(localStorage.getItem(sessionKey(initialCode)) || "null")
     : null;
   const sessionRef = useRef(savedSession);
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [playerName] = useState(
     savedSession?.playerName || user?.username || "",
   );
-  const [roomCode, setRoomCode] = useState(initialCode);
+  const [roomCode, setRoomCode] = useState(initialCode || inviteRoom || "");
   const [status, setStatus] = useState("");
   const [creating, setCreating] = useState(false);
   const [players, setPlayers] = useState([]);
@@ -74,6 +75,9 @@ export default function Lobby({ setRoom, onBack }) {
   const [isRoomOwner, setIsRoomOwner] = useState(
     Boolean(savedSession && initialCode),
   );
+  const [friends, setFriends] = useState([]);
+  const [invitedIds, setInvitedIds] = useState([]);
+  const [inviteNotice, setInviteNotice] = useState("");
   const ownerWaiting = isRoomOwner && Boolean(roomCode);
   const joiningFromInvite = Boolean(initialCode) && !ownerWaiting;
   const inviteLink = roomCode
@@ -150,6 +154,12 @@ export default function Lobby({ setRoom, onBack }) {
       /* Share sheet dismissed. */
     }
   };
+  const leaveWaitingRoom = () => {
+    // Leaving a waiting room without telling the server would leave a ghost
+    // room behind, which makes friends look "in a match" forever.
+    if (ownerWaiting && roomCode) socket.emit("leaveRoom", { roomCode });
+    onBack();
+  };
 
   useEffect(() => {
     const created = (code) => {
@@ -174,15 +184,61 @@ export default function Lobby({ setRoom, onBack }) {
       setCreating(false);
       alert(message);
     };
+    const onInviteSent = ({ targetUserId }) => {
+      setInvitedIds((current) => (current.includes(targetUserId) ? current : [...current, targetUserId]));
+      setInviteNotice("Invite sent — waiting for them to accept.");
+    };
+    const onInviteDeclined = ({ name }) => {
+      setInviteNotice(`${name} declined the invite.`);
+    };
     socket.on("roomCreated", created);
     socket.on("roomReady", ready);
     socket.on("errorMessage", onError);
+    socket.on("inviteSent", onInviteSent);
+    socket.on("inviteDeclined", onInviteDeclined);
     return () => {
       socket.off("roomCreated", created);
       socket.off("roomReady", ready);
       socket.off("errorMessage", onError);
+      socket.off("inviteSent", onInviteSent);
+      socket.off("inviteDeclined", onInviteDeclined);
     };
   }, [playerName, setRoom]);
+
+  // Accepting a friend's in-app invite lands here with a room code — auto-join
+  // instead of asking for the code again.
+  useEffect(() => {
+    if (!inviteRoom || ownerWaiting) return;
+    setCreating(true);
+    setStatus("Joining your friend's room…");
+    sessionRef.current = {
+      playerName: (user?.username || playerName).trim(),
+      resumeToken: newToken(),
+    };
+    socket.emit("joinRoom", {
+      roomCode: inviteRoom,
+      playerName: sessionRef.current.playerName,
+      resumeToken: sessionRef.current.resumeToken,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inviteRoom]);
+
+  // The waiting host pulls their online friends so they can ping an invite
+  // straight into the room instead of only sharing the link.
+  useEffect(() => {
+    if (!ownerWaiting || !token) return;
+    let alive = true;
+    api.friends(token)
+      .then((data) => { if (alive) setFriends(data.friends.filter((friend) => friend.online)); })
+      .catch(() => { if (alive) setFriends([]); });
+    return () => { alive = false; };
+  }, [ownerWaiting, token, players.length]);
+
+  const inviteFriend = (friend) => {
+    if (!roomCode) return;
+    setInviteNotice("");
+    socket.emit("inviteToRoom", { roomCode, targetUserId: friend.id });
+  };
 
   const formatBlock = () => (
     <>
@@ -259,7 +315,7 @@ export default function Lobby({ setRoom, onBack }) {
           <div className="lobby-topbar">
             <button
               className="icon-btn"
-              onClick={onBack}
+              onClick={leaveWaitingRoom}
               aria-label="Back to hub"
             >
               ←
@@ -358,6 +414,37 @@ export default function Lobby({ setRoom, onBack }) {
                 <button className="g-share" onClick={shareRoom}>
                   Share invite <span>↗</span>
                 </button>
+              </div>
+              <div className="g-friends-invite">
+                <small>INVITE ONLINE FRIENDS</small>
+                {inviteNotice && <em className="f-notice">{inviteNotice}</em>}
+                {friends.length === 0 && !inviteNotice && (
+                  <p className="g-hint">
+                    No online friends — share the link above or add friends from
+                    the Hub.
+                  </p>
+                )}
+                {friends.length > 0 && (
+                  <div className="f-invite-list">
+                    {friends.map((friend) => {
+                      const sent = invitedIds.includes(friend.id);
+                      return (
+                        <div key={friend.id} className="f-invite-row">
+                          <i className="f-dot f-online" />
+                          <span className="f-avatar">{friend.username.slice(0, 2).toUpperCase()}</span>
+                          <span className="f-name">{friend.username}</span>
+                          <button
+                            className={sent ? "f-invited" : "f-accept"}
+                            disabled={sent}
+                            onClick={() => inviteFriend(friend)}
+                          >
+                            {sent ? "✓ Invited" : "Invite"}
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
               <div className="g-wait">
                 <i />

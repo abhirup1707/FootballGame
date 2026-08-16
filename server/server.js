@@ -11,6 +11,7 @@ const { userByToken } = require("./auth");
 const { computeOVR, effectiveStats, positionPenalty } = require("./ovr");
 const { DRAFT_POOL } = require("./draftPool");
 const { buildAiTeam, AI_DIFFICULTIES, AI_NAMES, AI_READ_RATE, AI_ATTACK_SMART } = require("./ai");
+const { markOnline, markOffline, socketIdsFor } = require("./presence");
 
 // How many pass options each side sees in Vs AI matches: [user, cpu].
 // Vs Friends always uses 3 for both.
@@ -318,17 +319,10 @@ function resolvePass(room) {
   if (!receiver) return;
   const carrier = room.match.carrier;
   const interceptor = closestDefender(room, defendId, receiver);
-  // Reading the pass correctly still dominates — the defender picked the exact
-  // teammate the carrier targeted. But stats now tilt the margins: a slippery
-  // receiver (dribbling/pace) can beat even a well-read press, and a weak pass
-  // (low passing) invites a giveaway when it ISN'T marked.
+  // Reading the pass correctly means the defender has the ball. No stat roll —
+  // a correct read is always an interception.
   if (markedId === receiver.id && interceptor) {
-    const interceptChance = clamp(0.78 + (statAbility(interceptor, "defending", "pace") - statAbility(receiver, "dribbling", "pace")) * 0.005, 0.55, 0.95);
-    if (Math.random() * 100 < interceptChance * 100) {
-      beginInterception(room, defendId, receiver, interceptor, `INTERCEPTED! ${interceptor.name} reads ${carrier.name}'s pass to ${receiver.name} and wins the ball.`);
-      return;
-    }
-    completePass(room, attackId, defendId, carrier, receiver, `💨 ${receiver.name} is read but beats the press with quick feet.`);
+    beginInterception(room, defendId, receiver, interceptor, `INTERCEPTED! ${interceptor.name} reads ${carrier.name}'s pass to ${receiver.name} and wins the ball.`);
     return;
   }
   // Unmarked pass: completes most of the time, but a press can force a loose
@@ -391,17 +385,21 @@ function resolveShot(room) {
   const shooter = room.match.carrier;
   const keeper = room.teams[defendId].positions.GK;
   const matched = shot === save;
-  // The keeper's guess shapes the odds: a correct read is usually a save and a
-  // wrong one is usually a goal — but finishing (shooting) vs reach
-  // (defending/physicality) decides the unlucky cases where the keeper has to
-  // react to the ball.
-  const shooterSHO = effectiveStat(shooter, "shooting");
-  const keeperAbility = statAbility(keeper, "defending", "physicality");
-  const goal = matched
-    ? Math.random() * 100 >= clamp(0.8 + (keeperAbility - shooterSHO) * 0.006, 0.6, 0.95) * 100
-    : Math.random() * 100 < clamp(0.85 - (keeperAbility - shooterSHO) * 0.006, 0.62, 0.97) * 100;
   const keeperName = keeper?.name || "the keeper";
   room.match.choices = {};
+  // A correct read by the keeper is always a save; a wrong read is almost
+  // always a goal — stats only tilt the miss/finish odds when the read is off.
+  if (matched) {
+    room.stats[defendId].saves += 1;
+    addStory(room, `🧱 SAVE! ${keeperName} reads ${shooter.name}'s ${shot.toLowerCase()} finish.`);
+    startPossession(room, defendId, `🔄 ${room.players.find((p) => p.id === defendId).name} build again from defence.`);
+    io.to(room.roomCode).emit("saveMade", { keeper:keeperName, shooter:shooter.name, shot });
+    return false;
+  }
+  // Keeper guessed wrong — the shot has a good chance of going in.
+  const shooterSHO = effectiveStat(shooter, "shooting");
+  const keeperAbility = statAbility(keeper, "defending", "physicality");
+  const goal = Math.random() * 100 < clamp(0.88 - (keeperAbility - shooterSHO) * 0.006, 0.7, 0.98) * 100;
   if (goal) {
     if (attackId === room.players[0].id) room.scoreA += 1; else room.scoreB += 1;
     room.stats[attackId].goals.push(shooter.name);
@@ -417,10 +415,10 @@ function resolveShot(room) {
     io.to(room.roomCode).emit("goalScored", { scorer:shooter.name, shot, scoreA:room.scoreA, scoreB:room.scoreB, stats:room.stats });
     setTimeout(() => { if (room.finished) return; startPossession(room, defendId, `🔄 ${room.players.find((p) => p.id === defendId).name} restart after the goal.`); sendMatch(room); }, 2800);
     return true;
-  } else {
-    room.stats[defendId].saves += 1;
-    addStory(room, `🧱 SAVE! ${keeperName} reads ${shooter.name}'s ${shot.toLowerCase()} finish.`);
   }
+  // Keeper wrong but the shot misses.
+  room.stats[defendId].saves += 1;
+  addStory(room, `📐 ${shooter.name}'s effort goes wide despite ${keeperName} committing the wrong way.`);
   startPossession(room, defendId, `🔄 ${room.players.find((p) => p.id === defendId).name} build again from defence.`);
   io.to(room.roomCode).emit("saveMade", { keeper:keeperName, shooter:shooter.name, shot });
   return false;
@@ -558,6 +556,7 @@ io.on("connection", (socket) => {
   socket.on("authSocket", ({ token }) => {
     const user = userByToken(token);
     socket.data.userId = user ? user.id : undefined;
+    if (user) markOnline(user.id, socket.id);
   });
   socket.on("createRoom", ({ playerName, goalLimit, matchMode, timeLimit, resumeToken, mode }) => {
     const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -594,6 +593,50 @@ io.on("connection", (socket) => {
     if (room.players.length >= 2) return socket.emit("errorMessage", "Room full");
     room.players.push({ id:socket.id, name:playerName, resumeToken, userId:socket.data.userId }); socket.join(roomCode);
     io.to(roomCode).emit("roomReady", room); sendDraftState(room);
+  });
+  // A room owner can ping an online friend straight into their open room. The
+  // friend must be on the friend list and not already sitting in a match.
+  socket.on("inviteToRoom", ({ roomCode, targetUserId }) => {
+    const inviterId = socket.data.userId;
+    if (!inviterId) return socket.emit("errorMessage", "Log in to invite friends.");
+    const room = rooms[roomCode];
+    if (!room) return socket.emit("errorMessage", "Room not found");
+    const inviter = room.players.find((player) => player.id === socket.id);
+    if (!inviter) return socket.emit("errorMessage", "You're not in that room.");
+    if (room.players.length >= 2) return socket.emit("errorMessage", "That room is already full.");
+    const target = Number(targetUserId);
+    if (!Number.isInteger(target) || target <= 0) return socket.emit("errorMessage", "Invalid friend.");
+    const friendship = db.prepare(`
+      SELECT 1 FROM friends
+      WHERE status = 'accepted'
+        AND ((user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?))
+      LIMIT 1
+    `).get(inviterId, target, target, inviterId);
+    if (!friendship) return socket.emit("errorMessage", "You can only invite managers on your friend list.");
+    if (!socketIdsFor(target).length) return socket.emit("errorMessage", "That friend isn't online right now.");
+    // Only an *active* room counts as busy: a finished match leaves its room
+    // object in memory until the players disconnect, so checking every room
+    // would wrongly flag a friend who just finished playing. The target must
+    // also be present on one of their current sockets.
+    const targetSockets = new Set(socketIdsFor(target));
+    const busy = Object.values(rooms).some((other) =>
+      other !== room &&
+      !other.finished &&
+      other.players.some((player) => player.userId === target && !player.isBot && targetSockets.has(player.id)),
+    );
+    if (busy) return socket.emit("errorMessage", "That friend is already in a match.");
+    io.to(socketIdsFor(target)).emit("roomInvite", {
+      roomCode, fromUserId: inviterId, fromName: inviter.name,
+      matchMode: room.matchMode, goalLimit: room.goalLimit,
+    });
+    socket.emit("inviteSent", { targetUserId: target, roomCode });
+  });
+  socket.on("declineRoomInvite", ({ roomCode, fromUserId }) => {
+    const sender = Number(fromUserId);
+    const target = socket.data.userId;
+    if (!sender || !target) return;
+    const user = db.prepare("SELECT username FROM users WHERE id = ?").get(target);
+    io.to(socketIdsFor(sender)).emit("inviteDeclined", { roomCode, name: user?.username || target });
   });
   socket.on("getDraftState", ({ roomCode }) => { const room = rooms[roomCode]; if (!room) return; socket.emit("draftState", draftPayload(room)); if (room.match) socket.emit("enterMatch", matchPayload(room)); });
   // A dropped socket silently reconnects with a brand-new id. Without this, the
@@ -733,7 +776,7 @@ io.on("connection", (socket) => {
     if (room.ai || !room.players.length) { delete rooms[roomCode]; return; }
     io.to(roomCode).emit("opponentLeft", { name:room.players.find((player) => player.id !== socket.id)?.name });
   });
-  socket.on("disconnect", () => { Object.keys(rooms).forEach((code) => { const room = rooms[code]; const player = room.players.find((participant) => participant.id === socket.id); if (!player) return; room.rematchVotes = room.rematchVotes.filter((id) => id !== socket.id); room.reconnectTimers ||= {}; room.reconnectTimers[socket.id] = setTimeout(() => { const currentRoom = rooms[code]; if (!currentRoom) return; currentRoom.players = currentRoom.players.filter((participant) => participant.id !== socket.id); delete currentRoom.reconnectTimers[socket.id]; if (currentRoom.ai || !currentRoom.players.length) { if (currentRoom.timer) clearInterval(currentRoom.timer); delete rooms[code]; } else { io.to(code).emit("opponentLeft", { name: player.name }); } }, 60000); }); });
+  socket.on("disconnect", () => { markOffline(socket.id); Object.keys(rooms).forEach((code) => { const room = rooms[code]; const player = room.players.find((participant) => participant.id === socket.id); if (!player) return; room.rematchVotes = room.rematchVotes.filter((id) => id !== socket.id); room.reconnectTimers ||= {}; room.reconnectTimers[socket.id] = setTimeout(() => { const currentRoom = rooms[code]; if (!currentRoom) return; currentRoom.players = currentRoom.players.filter((participant) => participant.id !== socket.id); delete currentRoom.reconnectTimers[socket.id]; if (currentRoom.ai || !currentRoom.players.length) { if (currentRoom.timer) clearInterval(currentRoom.timer); delete rooms[code]; } else { io.to(code).emit("opponentLeft", { name: player.name }); } }, 60000); }); });
 });
 const port = Number(process.env.PORT) || 5000;
 server.listen(port, () => {

@@ -68,6 +68,14 @@ const NAV = [
     color: "#ffd24a",
     tag: "TRADES",
   },
+  {
+    key: "friends",
+    icon: "🤝",
+    title: "Friends",
+    desc: "Add managers, see who's online, and invite them into your rooms.",
+    color: "#4fe3a0",
+    tag: "SOCIAL",
+  },
 ];
 
 export default function Hub({ onNavigate }) {
