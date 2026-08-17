@@ -84,6 +84,14 @@ const NAV = [
     color: "#ffd24a",
     tag: "FREE",
   },
+  {
+    key: "live-scores",
+    icon: "⚽",
+    title: "Live Scores",
+    desc: "Follow real-time scores from top leagues worldwide.",
+    color: "#ff6b6b",
+    tag: "LIVE",
+  },
 ];
 
 export default function Hub({ onNavigate }) {

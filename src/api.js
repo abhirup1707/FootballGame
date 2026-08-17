@@ -46,6 +46,8 @@ const api = {
   freeResources: (token) => request("/api/free-resources", { token }),
   watchAd: (token, rewardKey) => request("/api/free-resources/watch", { method: "POST", token, body: { rewardKey } }),
   claimFreeReward: (token, rewardKey) => request("/api/free-resources/claim", { method: "POST", token, body: { rewardKey } }),
+  liveScores: (token) => request("/api/live-scores", { token }),
+  liveScoresCompetition: (token, comp) => request(`/api/live-scores/${comp}`, { token }),
 };
 
 export default api;

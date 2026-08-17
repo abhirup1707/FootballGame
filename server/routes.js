@@ -472,4 +472,59 @@ router.post("/free-resources/claim", requireAuth, (req, res) => {
   res.json({ ok: true, reward: def.reward, user });
 });
 
+const FD_API_KEY = process.env.FOOTBALL_DATA_API_KEY || "";
+const FD_BASE = "https://api.football-data.org/v4";
+const FD_COMPETITIONS = ["PL", "PD", "SA", "BL1", "FL1", "CL", "ELC", "PPL", "DED", "BSA"];
+const fdCache = { ts: 0, data: {} };
+const FD_CACHE_MS = 60 * 1000;
+
+router.get("/live-scores/:competition", requireAuth, async (req, res) => {
+  if (!FD_API_KEY) return res.status(503).json({ error: "Football API key not configured." });
+  const comp = req.params.competition;
+  if (!FD_COMPETITIONS.includes(comp)) return res.status(400).json({ error: "Invalid competition." });
+  const cacheKey = comp;
+  if (fdCache.data[cacheKey] && Date.now() - fdCache.ts < FD_CACHE_MS) {
+    return res.json(fdCache.data[cacheKey]);
+  }
+  try {
+    const fetchFn = globalThis.fetch;
+    const resp = await fetchFn(`${FD_BASE}/competitions/${comp}/matches?status=SCHEDULED,IN_PLAY,PAUSED,FINISHED`, {
+      headers: { "X-Auth-Token": FD_API_KEY },
+    });
+    if (!resp.ok) {
+      const body = await resp.text();
+      return res.status(502).json({ error: "Football API error", detail: body });
+    }
+    const data = await resp.json();
+    const result = {
+      ok: true,
+      competition: data.competition?.name || comp,
+      matches: (data.matches || []).map((m) => ({
+        id: m.id,
+        homeTeam: m.homeTeam?.shortName || m.homeTeam?.name || "Home",
+        awayTeam: m.awayTeam?.shortName || m.awayTeam?.name || "Away",
+        homeCrest: m.homeTeam?.crest || "",
+        awayCrest: m.awayTeam?.crest || "",
+        homeScore: m.score?.fullTime?.home,
+        awayScore: m.score?.fullTime?.away,
+        status: m.status,
+        matchday: m.matchday,
+        utcDate: m.utcDate,
+        minute: m.minute,
+      })),
+    };
+    fdCache.data[cacheKey] = result;
+    fdCache.ts = Date.now();
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ error: "Failed to fetch scores: " + e.message });
+  }
+});
+
+router.get("/live-scores", requireAuth, (req, res) => {
+  if (!FD_API_KEY) return res.status(503).json({ error: "Football API key not configured." });
+  const LABELS = { PL:"Premier League", PD:"La Liga", SA:"Serie A", BL1:"Bundesliga", FL1:"Ligue 1", CL:"Champions League", ELC:"Championship", PPL:"Primeira Liga", DED:"Eredivisie", BSA:"Brasileirão" };
+  res.json({ ok: true, competitions: FD_COMPETITIONS.map((c) => ({ id: c, name: LABELS[c] || c })) });
+});
+
 module.exports = router;

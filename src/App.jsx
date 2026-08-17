@@ -13,6 +13,7 @@ import PlayersScreen from "./components/PlayersScreen";
 import ExchangeScreen from "./components/ExchangeScreen";
 import FriendsScreen from "./components/FriendsScreen";
 import FreeResourcesScreen from "./components/FreeResourcesScreen";
+import LiveScoresScreen from "./components/LiveScoresScreen";
 import Lobby from "./components/Lobby";
 import Draft from "./components/Draft";
 import WelcomePopup from "./components/WelcomePopup";
@@ -108,6 +109,7 @@ function Shell() {
   else if (screen === "exchange") content = <ExchangeScreen onBack={() => setScreen("hub")} />;
   else if (screen === "friends") content = <FriendsScreen onBack={() => setScreen("hub")} />;
   else if (screen === "free-resources") content = <FreeResourcesScreen onBack={() => setScreen("hub")} />;
+  else if (screen === "live-scores") content = <LiveScoresScreen onBack={() => setScreen("hub")} />;
   else if (screen === "play") content = <Lobby setRoom={setRoom} onBack={() => setScreen("hub")} inviteRoom={inviteJoin} />;
   else content = (
     <>

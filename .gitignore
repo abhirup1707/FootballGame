@@ -25,3 +25,7 @@ dist-ssr
 
 # Local database
 server/footyverse.db*
+
+# Environment variables
+.env
+.env.*
