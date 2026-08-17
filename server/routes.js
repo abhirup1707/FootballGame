@@ -419,32 +419,57 @@ router.delete("/friends/:friendId", requireAuth, (req, res) => {
   res.json({ ok: true, list: friendsList(req.user.id) });
 });
 
-const AD_REWARD_COINS = 250;
-const AD_REWARD_COOLDOWN_MS = 60 * 60 * 1000;
+const AD_REWARD_DEFS = {
+  gems: { required: 5, reward: { gems: 200 }, label: "200 Gems" },
+  coins: { required: 10, reward: { coins: 50 }, label: "50 Coins per ad (500 total)" },
+};
 
-router.get("/reward/ad", requireAuth, (req, res) => {
-  const row = db.prepare("SELECT claimed_at FROM ad_rewards WHERE user_id = ? ORDER BY id DESC LIMIT 1").get(req.user.id);
-  if (row) {
-    const elapsed = Date.now() - new Date(row.claimed_at).getTime();
-    if (elapsed < AD_REWARD_COOLDOWN_MS) {
-      return res.json({ ok: true, cooldownMs: AD_REWARD_COOLDOWN_MS - elapsed, coins: AD_REWARD_COINS });
-    }
-  }
-  res.json({ ok: true, cooldownMs: 0, coins: AD_REWARD_COINS });
+router.get("/free-resources", requireAuth, (req, res) => {
+  const bucket = todayBucket();
+  const rows = db.prepare("SELECT reward_key, COUNT(*) as cnt FROM ad_watches WHERE user_id = ? AND DATE(created_at) = ? GROUP BY reward_key").all(req.user.id, bucket);
+  const counts = {};
+  for (const r of rows) counts[r.reward_key] = r.cnt;
+  const claimed = db.prepare("SELECT reward_key FROM ad_rewards WHERE user_id = ? AND DATE(claimed_at) = ?").all(req.user.id, bucket);
+  const claimedKeys = new Set(claimed.map((r) => r.reward_key));
+  const rewards = Object.entries(AD_REWARD_DEFS).map(([key, def]) => ({
+    key,
+    label: def.label,
+    required: def.required,
+    watched: counts[key] || 0,
+    claimed: claimedKeys.has(key),
+    ready: (counts[key] || 0) >= def.required && !claimedKeys.has(key),
+  }));
+  res.json({ ok: true, rewards });
 });
 
-router.post("/reward/ad/claim", requireAuth, (req, res) => {
-  const row = db.prepare("SELECT claimed_at FROM ad_rewards WHERE user_id = ? ORDER BY id DESC LIMIT 1").get(req.user.id);
-  if (row) {
-    const elapsed = Date.now() - new Date(row.claimed_at).getTime();
-    if (elapsed < AD_REWARD_COOLDOWN_MS) {
-      return res.status(400).json({ error: "Reward not ready yet. Try again later.", cooldownMs: AD_REWARD_COOLDOWN_MS - elapsed });
-    }
-  }
-  db.prepare("INSERT INTO ad_rewards (user_id) VALUES (?)").run(req.user.id);
-  db.prepare("UPDATE users SET coins = coins + ? WHERE id = ?").run(AD_REWARD_COINS, req.user.id);
+router.post("/free-resources/watch", requireAuth, (req, res) => {
+  const { rewardKey } = req.body || {};
+  const def = AD_REWARD_DEFS[rewardKey];
+  if (!def) return res.status(400).json({ error: "Invalid reward type." });
+  const bucket = todayBucket();
+  const claimed = db.prepare("SELECT 1 FROM ad_rewards WHERE user_id = ? AND reward_key = ? AND DATE(claimed_at) = ?").get(req.user.id, rewardKey, bucket);
+  if (claimed) return res.status(400).json({ error: "Already claimed this reward today." });
+  db.prepare("INSERT INTO ad_watches (user_id, reward_key) VALUES (?, ?)").run(req.user.id, rewardKey);
+  const row = db.prepare("SELECT COUNT(*) as cnt FROM ad_watches WHERE user_id = ? AND reward_key = ? AND DATE(created_at) = ?").get(req.user.id, rewardKey, bucket);
+  const watched = row.cnt;
+  if (watched > def.required) return res.status(400).json({ error: "Already watched enough ads for this reward." });
+  res.json({ ok: true, watched, required: def.required, ready: watched >= def.required });
+});
+
+router.post("/free-resources/claim", requireAuth, (req, res) => {
+  const { rewardKey } = req.body || {};
+  const def = AD_REWARD_DEFS[rewardKey];
+  if (!def) return res.status(400).json({ error: "Invalid reward type." });
+  const bucket = todayBucket();
+  const claimed = db.prepare("SELECT 1 FROM ad_rewards WHERE user_id = ? AND reward_key = ? AND DATE(claimed_at) = ?").get(req.user.id, rewardKey, bucket);
+  if (claimed) return res.status(400).json({ error: "Already claimed today." });
+  const row = db.prepare("SELECT COUNT(*) as cnt FROM ad_watches WHERE user_id = ? AND reward_key = ? AND DATE(created_at) = ?").get(req.user.id, rewardKey, bucket);
+  if (row.cnt < def.required) return res.status(400).json({ error: `Need ${def.required - row.cnt} more ads.` });
+  db.prepare("INSERT INTO ad_rewards (user_id, reward_key) VALUES (?, ?)").run(req.user.id, rewardKey);
+  if (def.reward.coins) db.prepare("UPDATE users SET coins = coins + ? WHERE id = ?").run(def.reward.coins, req.user.id);
+  if (def.reward.gems) db.prepare("UPDATE users SET gems = gems + ? WHERE id = ?").run(def.reward.gems, req.user.id);
   const user = publicUser(db.prepare("SELECT * FROM users WHERE id = ?").get(req.user.id));
-  res.json({ ok: true, coins: AD_REWARD_COINS, user });
+  res.json({ ok: true, reward: def.reward, user });
 });
 
 module.exports = router;

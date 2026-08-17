@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "../auth";
 import api from "../api";
-import RewardedAd from "./RewardedAd";
 
 const NAV = [
   {
@@ -76,6 +75,14 @@ const NAV = [
     desc: "Add managers, see who's online, and invite them into your rooms.",
     color: "#4fe3a0",
     tag: "SOCIAL",
+  },
+  {
+    key: "free-resources",
+    icon: "📺",
+    title: "Free Resources",
+    desc: "Watch ads to earn free gems and coins every day.",
+    color: "#ffd24a",
+    tag: "FREE",
   },
 ];
 
@@ -210,8 +217,6 @@ export default function Hub({ onNavigate }) {
             </motion.button>
           ))}
         </div>
-
-        <RewardedAd onReward={() => {}} />
 
         <button className="g-signout" onClick={logout}>
           Sign out

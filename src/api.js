@@ -43,8 +43,9 @@ const api = {
   friendRequest: (token, username) => request("/api/friends/request", { method: "POST", token, body: { username } }),
   friendRespond: (token, requestId, accept) => request("/api/friends/respond", { method: "POST", token, body: { requestId, accept } }),
   friendRemove: (token, friendId) => request(`/api/friends/${friendId}`, { method: "DELETE", token }),
-  adRewardStatus: (token) => request("/api/reward/ad", { token }),
-  claimAdReward: (token) => request("/api/reward/ad/claim", { method: "POST", token }),
+  freeResources: (token) => request("/api/free-resources", { token }),
+  watchAd: (token, rewardKey) => request("/api/free-resources/watch", { method: "POST", token, body: { rewardKey } }),
+  claimFreeReward: (token, rewardKey) => request("/api/free-resources/claim", { method: "POST", token, body: { rewardKey } }),
 };
 
 export default api;

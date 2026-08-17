@@ -1759,3 +1759,23 @@ button:disabled.f-accept,button:disabled.f-decline{opacity:.5;cursor:not-allowed
 .ad-earned-icon{font-size:48px}
 .ad-earned b{color:#ffd24a;font-size:24px}
 .ad-earned p{color:#8b7a50;font-size:14px}
+
+/* ----- Free Resources ----- */
+.free-resources-list{display:grid;gap:16px;margin-top:18px}
+.free-resource-card{padding:20px;border:1px solid #ffffff0a;border-radius:18px}
+.free-resource-top{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.free-resource-icon{width:48px;height:48px;display:grid;place-items:center;border-radius:14px;font-size:24px;flex-shrink:0}
+.free-resource-info{min-width:0;flex:1}
+.free-resource-info b{display:block;font-size:16px;margin-bottom:2px}
+.free-resource-info span{display:block;color:#8b7a50;font-size:12px}
+.free-resource-progress{margin-bottom:14px}
+.free-resource-bar{height:6px;border-radius:3px;background:#ffffff10;overflow:hidden;margin-bottom:6px}
+.free-resource-fill{height:100%;border-radius:3px;transition:width .4s ease}
+.free-resource-progress small{display:block;font-size:11px;font-weight:800}
+.free-resource-actions{display:flex;gap:10px}
+.free-resource-watch-btn{flex:1;padding:12px;border:1px solid #ffffff15;border-radius:12px;background:#0a0e14cc;color:#ccd5e0;font-size:13px;font-weight:800;cursor:pointer;transition:all .18s}
+.free-resource-watch-btn:hover{border-color:#ffffff30;background:#121a28cc;transform:translateY(-1px)}
+.free-resource-claim-btn{flex:1;padding:12px;border:none;border-radius:12px;font-size:14px;font-weight:900;cursor:pointer;transition:all .18s}
+.free-resource-claim-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 20px #0006}
+.free-resource-claim-btn:disabled{opacity:.5;cursor:not-allowed}
+.free-resource-claimed{flex:1;display:grid;place-items:center;padding:12px;border:1px solid #ffffff10;border-radius:12px;color:#556;font-size:13px;font-weight:800}
