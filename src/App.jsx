@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { AuthProvider, useAuth } from "./auth";
 import socket from "./socket";
 import { MusicProvider, useMusic } from "./music";
@@ -121,9 +122,22 @@ function Shell() {
       )}
     </>
   );
+  const contentKey = checking ? "boot" : !user ? "auth" : room ? "match" : screen;
+
   return (
     <>
-      {content}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={contentKey}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.18, ease: "easeOut" }}
+          style={{ minHeight: "100vh" }}
+        >
+          {content}
+        </motion.div>
+      </AnimatePresence>
       {invite && user && !room && <InviteToast invite={invite} onAccept={acceptInvite} onDecline={declineInvite} />}
     </>
   );

@@ -117,7 +117,7 @@ export default function FriendsScreen({ onBack }) {
               {dot(friend.online)}
               <span className="f-avatar">{friend.username.slice(0, 2).toUpperCase()}</span>
               <span className="f-name">{friend.username}</span>
-              <span className="f-meta">{friend.wins} 🏆{friend.online ? " · online" : ""}</span>
+              <span className={`f-meta f-h2h ${friend.myWins > friend.theirWins ? "f-h2h-leading" : friend.myWins < friend.theirWins ? "f-h2h-trailing" : ""}`}>{friend.myWins > 0 || friend.theirWins > 0 ? <><span className="f-h2h-score">{friend.myWins}–{friend.theirWins}</span> H2H</> : <>{friend.wins} 🏆</>}{friend.online ? " · online" : ""}</span>
               <div className="f-actions">
                 <button className="f-decline" onClick={() => remove(friend.id)} disabled={busy} aria-label="Remove friend">✕</button>
               </div>

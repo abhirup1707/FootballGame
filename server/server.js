@@ -155,6 +155,19 @@ function finishMatch(room) {
   let rewards = {};
   try { rewards = resolveMatchRewards(room); } catch (error) { console.error(`[match] reward grant failed for room ${room.roomCode}:`, error.message); }
   io.to(room.roomCode).emit("matchFinished", { scoreA:room.scoreA, scoreB:room.scoreB, stats:room.stats, shootout:room.shootout || null, rewards });
+  const [pA, pB] = room.players;
+  if (pA?.userId && pB?.userId) {
+    let winnerId = null;
+    if (room.scoreA > room.scoreB) winnerId = pA.userId;
+    else if (room.scoreB > room.scoreA) winnerId = pB.userId;
+    else if (room.shootout) {
+      const sA = (room.shootout.kicks[pA.id] || []).filter(Boolean).length;
+      const sB = (room.shootout.kicks[pB.id] || []).filter(Boolean).length;
+      if (sA > sB) winnerId = pA.userId;
+      else if (sB > sA) winnerId = pB.userId;
+    }
+    try { db.prepare("INSERT INTO match_history (player_a_id, player_b_id, score_a, score_b, winner_id) VALUES (?, ?, ?, ?, ?)").run(pA.userId, pB.userId, room.scoreA, room.scoreB, winnerId); } catch (e) { console.error("[match] failed to record history:", e.message); }
+  }
 }
 function shootoutScore(room, id) { return room.shootout.kicks[id].filter(Boolean).length; }
 function startShootout(room) {

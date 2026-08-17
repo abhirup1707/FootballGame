@@ -349,6 +349,26 @@ function friendsList(userId) {
       const id = friendUserId(row, userId);
       return { id, username: row.username, wins: Number(row.wins) || 0, online: isOnline(id), since: row.created_at };
     });
+  const friendIds = active.map((f) => f.id);
+  let h2hRows = [];
+  if (friendIds.length) {
+    try { h2hRows = db.prepare(`
+      SELECT
+        CASE WHEN player_a_id = ? THEN player_b_id ELSE player_a_id END AS friend_id,
+        SUM(CASE WHEN winner_id = ? THEN 1 ELSE 0 END) AS my_wins,
+        SUM(CASE WHEN winner_id IS NOT NULL AND winner_id != ? THEN 1 ELSE 0 END) AS their_wins
+      FROM match_history
+      WHERE player_a_id = ? OR player_b_id = ?
+      GROUP BY friend_id
+    `).all(userId, userId, userId, userId, userId); } catch {}
+  }
+  const h2hMap = {};
+  for (const row of h2hRows) h2hMap[row.friend_id] = { myWins: Number(row.my_wins) || 0, theirWins: Number(row.their_wins) || 0 };
+  for (const friend of active) {
+    const h = h2hMap[friend.id] || { myWins: 0, theirWins: 0 };
+    friend.myWins = h.myWins;
+    friend.theirWins = h.theirWins;
+  }
   const incoming = db.prepare(`
     SELECT f.*, u.username
     FROM friends f JOIN users u ON u.id = f.user_id

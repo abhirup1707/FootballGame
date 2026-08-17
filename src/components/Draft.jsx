@@ -9,6 +9,7 @@ import { useAuth } from "../auth";
 import LoadingOverlay from "./LoadingOverlay";
 import { slotCategory, effectiveRating } from "../lib/position";
 import FORMATIONS from "../data/formations.json";
+import { fireWinConfetti } from "../confetti";
 
 const DEFAULT_FORMATION = "4-3-3";
 const formationForKey = (key) => FORMATIONS[key] || FORMATIONS[DEFAULT_FORMATION];
@@ -114,7 +115,7 @@ export default function Draft({ room, onLeaveRoom }) {
     const onPack = ({ pack }) => { setOpening(true); setTimeout(() => setPack(pack), 450); };
     const onReady = setReadyCount;
     const onMatch = (data) => setMatchData(data);
-    const onFinished = (data) => { setCelebration(data); setTimeout(() => { setFinished(data); setCelebration(null); }, 2600); };
+    const onFinished = (data) => { setCelebration(data); fireWinConfetti(); setTimeout(() => { setFinished(data); setCelebration(null); }, 2600); };
     const onRematchRequested = ({ count }) => setRematchCount(count);
     const onRematchConfirmed = () => {
       setDraft({ turnId:null, round:0, category:null, picks:{}, complete:false });
@@ -176,7 +177,10 @@ export default function Draft({ room, onLeaveRoom }) {
     const shootout = celebration.shootout;
     const score = (id) => shootout?.kicks?.[id]?.filter(Boolean).length || 0;
     const winner = shootout ? room.players[score(room.players[0].id) > score(room.players[1].id) ? 0 : 1]?.name : room.players[celebration.scoreA > celebration.scoreB ? 0 : 1]?.name;
-    return <main className="winner-celebration"><div className="fireworks">{Array.from({ length:18 }, (_, index) => <i key={index} style={{ "--spark":index }} />)}</div><motion.div initial={{ scale:.4, opacity:0 }} animate={{ scale:1, opacity:1 }} className="winner-announcement"><span>🏆</span><small>FULL TIME</small><h1>{winner} wins!</h1><p>{shootout ? "Penalty shootout secured" : "The final whistle blows"}</p></motion.div></main>;
+    const loser = shootout ? room.players[score(room.players[0].id) > score(room.players[1].id) ? 1 : 0]?.name : room.players[celebration.scoreA > celebration.scoreB ? 1 : 0]?.name;
+    const winnerScore = celebration.scoreA > celebration.scoreB ? celebration.scoreA : celebration.scoreB;
+    const loserScore = celebration.scoreA > celebration.scoreB ? celebration.scoreB : celebration.scoreA;
+    return <main className="winner-celebration"><div className="fireworks">{Array.from({ length:18 }, (_, index) => <i key={index} style={{ "--spark":index }} />)}</div><motion.div initial={{ scale:.4, opacity:0 }} animate={{ scale:1, opacity:1 }} className="winner-announcement"><span>🏆</span><small>FULL TIME</small><h1>{winner} wins!</h1><p>{shootout ? "Penalty shootout secured" : "The final whistle blows"}</p><div className="victory-podium"><motion.div className="victory-podium-spot podium-2nd" initial={{ opacity:0, y:30 }} animate={{ opacity:1, y:0 }} transition={{ delay:.4 }}><div className="podium-avatar">{loser?.[0]}</div><span className="podium-name">{loser}</span><div className="podium-bar">{loserScore}</div></motion.div><motion.div className="victory-podium-spot podium-1st" initial={{ opacity:0, y:30 }} animate={{ opacity:1, y:0 }} transition={{ delay:.2 }}><div className="podium-avatar">{winner?.[0]}</div><span className="podium-name">{winner}</span><div className="podium-bar">{winnerScore}</div></motion.div></div></motion.div></main>;
   }
   if (opponentLeft) {
     return <div className="fulltime"><motion.div initial={{ scale:.5, opacity:0 }} animate={{ scale:1, opacity:1 }} className="fulltime-card final-scoreboard"><div className="trophy">👋</div><p>OPPONENT LEFT</p><h1>Your opponent left the match</h1><h2>Return to the lobby to create or join a new room.</h2><button className="primary-btn" onClick={() => { localStorage.removeItem(`footyverse-room-${room.roomCode}`); window.history.replaceState({}, "", window.location.pathname); onLeaveRoom(); }}>Back to lobby</button></motion.div></div>;

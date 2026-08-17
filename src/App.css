@@ -1704,6 +1704,12 @@ box-shadow:
 .f-avatar{display:grid;place-items:center;width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#c77dff,#6d3dff);color:#150422;font-size:11px;font-weight:1000}
 .f-name{font-size:14px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .f-meta{color:#9fbad0;font-size:12px;font-weight:700}
+.f-h2h{display:inline-flex;align-items:center;gap:5px;border-radius:8px;padding:3px 9px;background:#0c1a2a;font-size:11px;font-weight:900;letter-spacing:.3px}
+.f-h2h-score{font-size:13px;font-weight:1000}
+.f-h2h-leading .f-h2h-score{color:#3ddc6a}
+.f-h2h-leading{color:#3ddc6a99}
+.f-h2h-trailing .f-h2h-score{color:#ff4d5e}
+.f-h2h-trailing{color:#ff4d5e99}
 .f-actions{display:flex;align-items:center;gap:6px}
 .f-actions .f-pending{color:#8fb6cd;font-size:11px;font-weight:800}
 .f-accept{padding:8px 13px;border:1px solid #3ddc6a;border-radius:10px;background:#0c2b1c;color:#7dffa5;font-size:12px;font-weight:1000;cursor:pointer}
@@ -1808,3 +1814,51 @@ button:disabled.f-accept,button:disabled.f-decline{opacity:.5;cursor:not-allowed
 .ls-score b{color:#e0e8f0}
 .ls-vs{color:#334455;font-size:13px;font-weight:800}
 .ls-kickoff{margin-top:8px;text-align:center;color:#556677;font-size:11px}
+
+/* ----- Loading Animation ----- */
+.loading-content{position:relative;display:flex;flex-direction:column;align-items:center;gap:14px}
+.loading-ball{font-size:48px;filter:drop-shadow(0 4px 12px rgba(249,200,70,.4))}
+.loading-rings{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+.loading-ring{position:absolute;border:2px solid transparent;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);animation:loadingRing 1.4s ease-in-out infinite}
+.loading-ring-1{width:70px;height:70px;border-top-color:#f9c846;animation-delay:0s}
+.loading-ring-2{width:90px;height:90px;border-right-color:#3ad8ff;animation-delay:.2s}
+.loading-ring-3{width:110px;height:110px;border-bottom-color:#ff7ee0;animation-delay:.4s}
+@keyframes loadingRing{0%{transform:translate(-50%,-50%) rotate(0)}100%{transform:translate(-50%,-50%) rotate(360deg)}}
+.loading-text{color:#8899aa;font-size:13px;font-weight:800;letter-spacing:1px}
+
+/* ----- 3D Card Tilt ----- */
+.fcc,.laliga-card{transition:box-shadow .25s ease;will-change:transform;transform-style:preserve-3d}
+.fcc:hover{z-index:10}
+.fcc-clickable:hover{box-shadow:0 12px 40px rgba(249,200,70,.25),0 0 0 2px rgba(249,200,70,.3)}
+.laliga-card-clickable:hover{box-shadow:0 12px 40px rgba(249,200,70,.25),0 0 0 2px rgba(249,200,70,.3)}
+
+/* ----- Ball Trail ----- */
+.ball-trail{position:absolute;width:12px;height:12px;border-radius:50%;background:radial-gradient(circle,#ffd24a,#f9a80080,transparent);pointer-events:none;z-index:1;filter:blur(2px);transition:opacity .3s,transform .3s}
+
+/* ----- Goal Replay Card ----- */
+.goal-replay-card{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:90;padding:18px 32px;border:2px solid #ffd24a55;border-radius:18px;background:linear-gradient(135deg,#1a1508,#0e0c05);box-shadow:0 8px 40px #ffd24a22,0 0 80px #ffd24a11;overflow:hidden;text-align:center;perspective:600px}
+.goal-replay-badge{color:#ffd24a;font-size:11px;font-weight:1000;letter-spacing:2px;margin-bottom:6px}
+.goal-replay-scorer{font-size:26px;font-weight:900;color:#fff;margin-bottom:4px}
+.goal-replay-detail{color:#8b7a50;font-size:13px}
+.goal-replay-shine{position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,#ffd24a15,transparent);animation:goalReplayShine .8s ease-out .2s}
+@keyframes goalReplayShine{0%{left:-100%}100%{left:200%}}
+
+/* ----- Card Tier Glow ----- */
+@keyframes tierGlow{0%,100%{filter:drop-shadow(0 0 6px var(--glow-color))}50%{filter:drop-shadow(0 0 16px var(--glow-color))}}
+.fcc-gold,.laliga-card{--glow-color:#ffd24a}
+.fcc-purple{--glow-color:#c77dff}
+.fcc-gold:hover,.laliga-card:hover{animation:tierGlow 2s ease-in-out infinite}
+.fcc-purple:hover{animation:tierGlow 2s ease-in-out infinite}
+
+/* ----- Victory Podium ----- */
+.victory-podium{display:flex;align-items:flex-end;justify-content:center;gap:12px;margin:24px auto;max-width:340px}
+.victory-podium-spot{display:flex;flex-direction:column;align-items:center;gap:6px}
+.victory-podium-spot .podium-avatar{width:56px;height:56px;border-radius:50%;background:#1a2535;display:grid;place-items:center;font-size:22px;border:2px solid #334455;overflow:hidden}
+.victory-podium-spot .podium-name{font-size:12px;font-weight:800;color:#ccd5e0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px}
+.victory-podium-spot .podium-bar{width:80px;border-radius:10px 10px 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:10px;font-size:20px;font-weight:900}
+.podium-1st .podium-bar{height:90px;background:linear-gradient(180deg,#ffd24a,#b8930e);color:#1a1008}
+.podium-2nd .podium-bar{height:65px;background:linear-gradient(180deg,#c0c8d4,#8899aa);color:#1a2535}
+.podium-3rd .podium-bar{height:50px;background:linear-gradient(180deg,#cd7f32,#8b5a1e);color:#1a1008}
+.podium-1st .podium-avatar{border-color:#ffd24a;box-shadow:0 0 16px #ffd24a44}
+.podium-2nd .podium-avatar{border-color:#c0c8d4}
+.podium-3rd .podium-avatar{border-color:#cd7f32}

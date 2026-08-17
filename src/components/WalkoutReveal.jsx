@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { countryFlagPath } from "../lib/countries";
 import { clubLogoPath, isLaligaCard, lastName } from "../lib/card";
+import { fireWalkoutConfetti } from "../confetti";
 
 const STAT_ITEMS = [
   ["PAC", "pace"],
@@ -41,6 +42,7 @@ export default function WalkoutReveal({ card, packName, onDone }) {
       elapsed += step;
       timers.current.push(setTimeout(() => setStage((s) => s + 1), elapsed));
     }
+    timers.current.push(setTimeout(() => fireWalkoutConfetti(), elapsed - 400));
     return () => timers.current.forEach(clearTimeout);
   }, []);
 

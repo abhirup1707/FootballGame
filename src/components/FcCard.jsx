@@ -1,6 +1,31 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { countryFlagPath } from "../lib/countries";
 import { clubLogoPath, isLaligaCard, lastName } from "../lib/card";
+
+function useTilt(ref) {
+  const frame = useRef(null);
+  const handleMove = useCallback((e) => {
+    if (!ref.current) return;
+    if (frame.current) cancelAnimationFrame(frame.current);
+    frame.current = requestAnimationFrame(() => {
+      const el = ref.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      el.style.transform = `perspective(600px) rotateY(${x * 18}deg) rotateX(${-y * 18}deg) scale(1.06)`;
+      el.style.zIndex = "10";
+    });
+  }, [ref]);
+  const handleLeave = useCallback(() => {
+    if (frame.current) cancelAnimationFrame(frame.current);
+    if (ref.current) {
+      ref.current.style.transform = "";
+      ref.current.style.zIndex = "";
+    }
+  }, [ref]);
+  return { onMouseMove: handleMove, onMouseLeave: handleLeave };
+}
 
 const STAT_ITEMS = [
   ["PAC", "pace"],
@@ -32,8 +57,10 @@ function LaligaHexCard({ player, size = "md", className = "", onClick }) {
   const clickable = Boolean(onClick);
   const logo = clubLogoPath(player.club);
   const flag = countryFlagPath(player.nation);
+  const tiltRef = useRef(null);
+  const tilt = useTilt(tiltRef);
   return (
-    <div className={`laliga-card laliga-card-${size} ${clickable ? "laliga-card-clickable" : ""} ${className}`} onClick={onClick}>
+    <div ref={tiltRef} className={`laliga-card laliga-card-${size} ${clickable ? "laliga-card-clickable" : ""} ${className}`} onClick={onClick} {...tilt}>
       <div className="laliga-card-frame">
         <div className="laliga-card-bg">
           {logo && <img className="laliga-card-logo" src={logo} alt="" aria-hidden="true" draggable="false" />}
@@ -85,8 +112,10 @@ export default function FcCard({ player, size = "md", className = "", onClick })
         ? "silver"
         : "bronze";
   const clickable = Boolean(onClick);
+  const tiltRef = useRef(null);
+  const tilt = useTilt(tiltRef);
   return (
-    <div className={`fcc fcc-${tier} fcc-${size} ${clickable ? "fcc-clickable" : ""} ${className}`} onClick={onClick}>
+    <div ref={tiltRef} className={`fcc fcc-${tier} fcc-${size} ${clickable ? "fcc-clickable" : ""} ${className}`} onClick={onClick} {...tilt}>
       <StadiumSilhouette />
       <div className="fcc-head">
         <span className="fcc-ovr">{rating}</span>
