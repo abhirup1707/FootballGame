@@ -114,6 +114,9 @@ function migratePostgres() {
   db.prepare("ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login_reward TEXT").run();
   db.prepare("ALTER TABLE users ADD COLUMN IF NOT EXISTS tokens INTEGER NOT NULL DEFAULT 0").run();
   db.prepare("ALTER TABLE cards ADD COLUMN IF NOT EXISTS variant TEXT NOT NULL DEFAULT ''").run();
+  try { db.prepare("ALTER TABLE ad_rewards ADD COLUMN IF NOT EXISTS reward_key TEXT NOT NULL DEFAULT 'coins'").run(); } catch {}
+  try { db.prepare("CREATE TABLE IF NOT EXISTS ad_watches (id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE, reward_key TEXT NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP)").run(); } catch {}
+  try { db.prepare("CREATE INDEX IF NOT EXISTS idx_ad_watches_user ON ad_watches(user_id)").run(); } catch {}
   db.prepare("INSERT INTO meta (key, value) VALUES ('schema_version', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").run(SCHEMA_VERSION);
 }
 
